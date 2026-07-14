@@ -1,191 +1,194 @@
-/* Global styles and CSS variables in Android 16 / Material Design 3 style */
+/**
+ * Seiten-Layout: Startseite, Einstellungsseite und die gemeinsame
+ * "Game-Shell" (Setup-/Spielansicht-Grundgerüst), die jedes Spiel nutzt.
+ * Spiel-spezifisches Aussehen (z.B. der Bomben-Ring) lebt bewusst in der
+ * jeweiligen public/games/<id>/<id>.css, NICHT hier.
+ */
 
-:root {
-  /* System Fonts - GDPR-compliant, no external servers */
-  --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-
-  /* Animation Timings */
-  --transition-default: 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-  --transition-slow: 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
-  --transition-bounce: 0.35s cubic-bezier(0.1, 0.9, 0.2, 1);
-
-  /* Corner Radii */
-  --radius-full: 100vmax;
-  --radius-large: 28px;
-  --radius-medium: 16px;
-  --radius-small: 12px;
-}
-
-/* Light Theme Variables */
-[data-theme="light"] {
-  --color-background: #F7F9FF;
-  --color-on-background: #1A1C22;
-  
-  --color-primary: #3F51B5;
-  --color-on-primary: #FFFFFF;
-  --color-primary-container: #E0E0FF;
-  --color-on-primary-container: #000B63;
-
-  --color-secondary: #5C5E78;
-  --color-on-secondary: #FFFFFF;
-  --color-secondary-container: #E1E2EC;
-  --color-on-secondary-container: #191B2C;
-
-  --color-tertiary: #B8006D;
-  --color-on-tertiary: #FFFFFF;
-  --color-tertiary-container: #FFD8EC;
-  --color-on-tertiary-container: #3E0021;
-
-  --color-surface: #FFFFFF;
-  --color-on-surface: #1A1C22;
-  --color-surface-variant: #F0F0FA;
-  --color-on-surface-variant: #44474F;
-
-  --color-outline: #74777F;
-  --color-error: #BA1A1A;
-  
-  --shadow-elevation-1: 0px 1px 3px 1px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
-  --shadow-elevation-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
-  --shadow-elevation-3: 0px 4px 8px 3px rgba(0, 0, 0, 0.15), 0px 1px 3px 0px rgba(0, 0, 0, 0.3);
-}
-
-/* Dark Theme Variables (Default) */
-[data-theme="dark"] {
-  --color-background: #111318;
-  --color-on-background: #E2E2E9;
-  
-  --color-primary: #B8C4FF;
-  --color-on-primary: #001A68;
-  --color-primary-container: #23399F;
-  --color-on-primary-container: #E0E0FF;
-
-  --color-secondary: #C5C6D0;
-  --color-on-secondary: #2C2E43;
-  --color-secondary-container: #43465B;
-  --color-on-secondary-container: #E1E2EC;
-
-  --color-tertiary: #FFB0D8;
-  --color-on-tertiary: #5E0035;
-  --color-tertiary-container: #8C0054;
-  --color-on-tertiary-container: #FFD8EC;
-
-  --color-surface: #1A1C22;
-  --color-on-surface: #E2E2E9;
-  --color-surface-variant: #282A33;
-  --color-on-surface-variant: #C4C6D0;
-
-  --color-outline: #8E9099;
-  --color-error: #FFB4AB;
-  
-  --shadow-elevation-1: 0px 1px 3px 1px rgba(0, 0, 0, 0.2), 0px 1px 2px 0px rgba(0, 0, 0, 0.4);
-  --shadow-elevation-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.2), 0px 1px 2px 0px rgba(0, 0, 0, 0.4);
-  --shadow-elevation-3: 0px 4px 8px 3px rgba(0, 0, 0, 0.2), 0px 1px 3px 0px rgba(0, 0, 0, 0.4);
-}
-
-/* Dynamic color theme adjustments based on seed color (stored in localStorage) */
-[data-accent="blue"] {
-  --color-primary: #AEC6FF;
-  --color-primary-container: #1C40A3;
-}
-[data-accent="purple"] {
-  --color-primary: #D0BCFF;
-  --color-primary-container: #4F378B;
-}
-[data-accent="green"] {
-  --color-primary: #A3F4B5;
-  --color-primary-container: #00522B;
-}
-[data-accent="orange"] {
-  --color-primary: #FFB77C;
-  --color-primary-container: #7E3700;
-}
-[data-accent="pink"] {
-  --color-primary: #FFB2D9;
-  --color-primary-container: #8C0054;
-}
-
-/* CSS Reset & General Base */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  -webkit-tap-highlight-color: transparent; /* Remove blue highlight on mobile tap */
-}
-
-html, body {
-  width: 100%;
-  height: 100%;
-  font-family: var(--font-family);
-  background-color: var(--color-background);
-  color: var(--color-on-background);
-  overflow-x: hidden;
-  user-select: none; /* Make game interactions feel like a native app */
-  transition: background-color var(--transition-default), color var(--transition-default);
-}
-
-body {
+.app-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
   display: flex;
-  flex-direction: column;
-  position: relative;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: var(--m3-background);
 }
 
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: var(--color-background);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--color-secondary-container);
-  border-radius: var(--radius-full);
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-outline);
+.app-topbar .m3-search {
+  flex: 1;
 }
 
-/* Screen layout container */
-#app-container {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  max-width: 600px; /* Standardize mobile width on desktop */
-  height: 100%;
+.app-content {
+  max-width: 720px;
   margin: 0 auto;
-  position: relative;
-  box-shadow: 0 0 40px rgba(0,0,0,0.1);
-  background-color: var(--color-background);
+  padding: 8px 20px 48px;
 }
 
-/* Utility classes */
-.hidden {
-  display: none !important;
+/* ---------- Startseite: Widget-Grid ---------- */
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
 }
 
-.ripple-effect {
-  position: relative;
-  overflow: hidden;
+.game-widget {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  aspect-ratio: 1 / 1;
+  justify-content: space-between;
 }
 
-/* Haptic feedback simulation */
-@keyframes press-scale {
-  0% { transform: scale(1); }
-  50% { transform: scale(0.95); }
-  100% { transform: scale(1); }
-}
-.haptic-press:active {
-  animation: press-scale 0.15s ease-out;
+.game-widget__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--m3-shape-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  background: var(--accent-container, var(--m3-primary-container));
 }
 
-/* Desktop Responsiveness */
-@media (min-width: 768px) {
-  #app-container {
-    max-width: 1000px;
-    height: 90vh;
-    margin: 5vh auto;
-    border-radius: var(--radius-large);
-    border: 1px solid var(--color-surface-variant);
-    box-shadow: var(--shadow-elevation-3);
-    overflow: hidden;
-  }
+.game-widget[data-color="red"] {
+  --accent-container: var(--game-red-container);
+}
+
+.game-widget[data-color="purple"] {
+  --accent-container: var(--game-purple-container);
+}
+
+.game-widget[data-color="green"] {
+  --accent-container: var(--game-green-container);
+}
+
+.game-widget__title {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.game-widget__description {
+  font-size: 0.8rem;
+  color: var(--m3-on-surface-variant);
+  line-height: 1.3;
+}
+
+/* ---------- Einstellungsseite ---------- */
+.settings-section {
+  margin-top: 24px;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 4px;
+  border-bottom: 1px solid var(--m3-outline-variant);
+}
+
+.settings-row:last-child {
+  border-bottom: none;
+}
+
+.settings-row__label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.settings-row__title {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.settings-row__hint {
+  font-size: 0.8rem;
+  color: var(--m3-on-surface-variant);
+}
+
+/* ---------- Gemeinsame Game-Shell ---------- */
+.game-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.game-topbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 12px 12px 4px;
+}
+
+.game-topbar__title {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.game-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 20px 24px;
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.game-view[hidden] {
+  display: none;
+}
+
+.game-section-title {
+  margin: 20px 0 12px;
+}
+
+.player-input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.player-input-row input {
+  flex: 1;
+  height: 48px;
+  padding: 0 16px;
+  border-radius: var(--m3-shape-sm);
+  border: 1px solid var(--m3-outline);
+  background: var(--m3-surface-container-low);
+  color: var(--m3-on-surface);
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+.player-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  min-height: 36px;
+}
+
+.game-bottom-bar {
+  position: sticky;
+  bottom: 0;
+  padding: 16px 0 24px;
+  background: linear-gradient(to top, var(--m3-background) 60%, transparent);
+}
+
+.game-bottom-bar .m3-button {
+  width: 100%;
+}
+
+.game-play {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  text-align: center;
 }

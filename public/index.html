@@ -1,214 +1,47 @@
-<!DOCTYPE html>
-<html lang="de" data-theme="dark" data-accent="blue">
+<!doctype html>
+<html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Anna</title>
-  
-  <!-- PWA & Mobile Meta Tags -->
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#111318">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Anna">
-  <link rel="apple-touch-icon" href="assets/icon-192.png">
-  
-  <!-- SEO Meta Tags -->
-  <meta name="description" content="Spiele lustige Party-Spiele wie 'Tickende Bombe' offline mit deinen Freunden. 100% DSGVO-konform, werbefrei, ohne Datenübertragung.">
-  <meta name="keywords" content="Party Spiele, PWA, Offline Spiele, Bombe Spiel, Wahrheit oder Pflicht, Stadt Land Fluss, DSGVO konform, Android 16">
-
-  <!-- Core & Component Styling -->
-  <link rel="stylesheet" href="css/main.css">
-  <link rel="stylesheet" href="css/components.css">
-  <link rel="stylesheet" href="css/games.css">
+  <meta charset="utf-8" />
+  <script>
+    (function () {
+      try {
+        var s = JSON.parse(localStorage.getItem("anna:settings") || "{}");
+        if (s.theme === "light" || s.theme === "dark") document.documentElement.dataset.theme = s.theme;
+      } catch (e) {}
+    })();
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#6750a4" />
+  <title>Anna – Partyspiele</title>
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" href="/assets/icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="stylesheet" href="/css/material.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+  <link rel="stylesheet" href="/css/main.css" />
 </head>
 <body>
-
-  <div id="app-container">
-    
-    <!-- MAIN HOME PAGE -->
-    <main id="home-page" class="view-panel">
-      
-      <!-- Top Search & Settings bar -->
-      <header class="top-bar">
-        <div class="search-bar-container">
-          <!-- Search Icon SVG -->
-          <svg class="search-icon" viewBox="0 0 24 24" width="24" height="24">
-            <path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-          </svg>
-          <input type="text" id="game-search-input" class="search-input" placeholder="Spiele durchsuchen..." autocomplete="off">
-        </div>
-        <button id="global-settings-btn" class="settings-btn ripple-effect haptic-press" aria-label="Einstellungen öffnen">
-          <!-- Settings Icon SVG -->
-          <svg viewBox="0 0 24 24">
-            <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
-          </svg>
-        </button>
-      </header>
-
-      <!-- Widgets List -->
-      <section id="widgets-list" class="widgets-container">
-        
-        <!-- Bomb Passing Game Widget -->
-        <div class="widget-card ripple-effect haptic-press" id="widget-bombe" data-game-id="bombe">
-          <span class="widget-badge">Party</span>
-          <div class="widget-header">
-            <div class="widget-icon">
-              <!-- Bomb icon SVG -->
-              <svg viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" style="display:none;"/>
-                <!-- Custom Bomb silhouette path -->
-                <path d="M19 10.5C19 6.91 16.09 4 12.5 4S6 6.91 6 10.5 8.91 17 12.5 17 19 14.09 19 10.5z M12 2.5h1V4h-1zM20 5.5l-1-1 1-1 1 1z"/>
-              </svg>
-            </div>
-            <h2 class="widget-title">Tickende Bombe</h2>
-          </div>
-          <p class="widget-desc">Finde schnell eine Antwort zur Kategorie und gib das Handy weiter, bevor die Bombe in deiner Hand explodiert!</p>
-        </div>
-
-        <!-- Truth or Dare Widget -->
-        <div class="widget-card ripple-effect haptic-press" id="widget-truth-dare" data-game-id="truth_dare">
-          <span class="widget-badge">Klassiker</span>
-          <div class="widget-header">
-            <div class="widget-icon">
-              <!-- Flaschen-Icon (Bottle shape) SVG -->
-              <svg viewBox="0 0 24 24">
-                <path d="M12 2c-.55 0-1 .45-1 1v3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h2c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2V3c0-.55-.45-1-1-1zm1 18h-2v-2h2v2zm0-4h-2V8h2v8z"/>
-              </svg>
-            </div>
-            <h2 class="widget-title">Wahrheit oder Pflicht</h2>
-          </div>
-          <p class="widget-desc">Drehe die Flasche, wähle deine Herausforderung und lerne deine Freunde von einer ganz neuen Seite kennen.</p>
-        </div>
-
-        <!-- Categories Widget -->
-        <div class="widget-card ripple-effect haptic-press" id="widget-categories" data-game-id="categories">
-          <span class="widget-badge">Kreativ</span>
-          <div class="widget-header">
-            <div class="widget-icon">
-              <!-- Grid/List/Letter shape SVG -->
-              <svg viewBox="0 0 24 24">
-                <path d="M4 10.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm0 5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM4 5.5c-.83 0-1.5-.67-1.5-1.5S3.17 2.5 4 2.5s1.5.67 1.5 1.5S4.83 5.5 4 5.5zM8 9h12c.55 0 1 .45 1 1s-.45 1-1 1H8c-.55 0-1-.45-1-1s.45-1 1-1zm0 5h12c.55 0 1 .45 1 1s-.45 1-1 1H8c-.55 0-1-.45-1-1s.45-1 1-1zM8 4h12c.55 0 1 .45 1 1s-.45 1-1 1H8c-.55 0-1-.45-1-1s.45-1 1-1z"/>
-              </svg>
-            </div>
-            <h2 class="widget-title">Stadt Land Fluss</h2>
-          </div>
-          <p class="widget-desc">Generiere zufällige Buchstaben und Kategorien. Schnelligkeit zählt, bevor die Zeit abgelaufen ist!</p>
-        </div>
-
-        <!-- Privacy & Legal link in footer -->
-        <footer class="footer-text">
-          <span id="footer-gdpr-link" style="text-decoration: underline; cursor: pointer;">Impressum & Datenschutzerklärung (DSGVO-konform)</span>
-        </footer>
-      </section>
-    </main>
-
-    <!-- BACKDROP FOR MODALS -->
-    <div id="modal-backdrop" class="backdrop"></div>
-
-    <!-- SETTINGS BOTTOM SHEET -->
-    <div id="settings-sheet" class="bottom-sheet">
-      <div class="sheet-handle"></div>
-      <header class="sheet-header">
-        <h3 class="sheet-title" id="settings-title">Einstellungen</h3>
-        <button id="settings-close-btn" class="sheet-close-btn ripple-effect haptic-press" aria-label="Schließen">
-          <svg viewBox="0 0 24 24">
-            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-          </svg>
-        </button>
-      </header>
-
-      <div class="sheet-content">
-        <!-- Appearance Settings -->
-        <div class="settings-section">
-          <h4 class="settings-section-title">Erscheinungsbild</h4>
-          
-          <div class="setting-row">
-            <div class="setting-label-group">
-              <span class="setting-label">Dunkles Design</span>
-              <span class="setting-desc">Schont die Augen bei nächtlichen Spielen.</span>
-            </div>
-            <label class="switch">
-              <input type="checkbox" id="settings-darkmode-toggle" checked>
-              <span class="slider"></span>
-            </label>
-          </div>
-
-          <div class="setting-row" style="flex-direction: column; align-items: flex-start; gap: 8px;">
-            <div class="setting-label-group">
-              <span class="setting-label">Farbschema</span>
-              <span class="setting-desc">Wähle dein bevorzugtes Farbschema (Android 16 style).</span>
-            </div>
-            <div class="accent-picker" id="settings-accent-picker">
-              <div class="accent-bubble active" data-accent="blue" title="Blue"></div>
-              <div class="accent-bubble" data-accent="purple" title="Purple"></div>
-              <div class="accent-bubble" data-accent="green" title="Green"></div>
-              <div class="accent-bubble" data-accent="orange" title="Orange"></div>
-              <div class="accent-bubble" data-accent="pink" title="Pink"></div>
-            </div>
-          </div>
-
-          <div class="setting-row">
-            <div class="setting-label-group">
-              <span class="setting-label">Töne abspielen</span>
-              <span class="setting-desc">Aktiviert Tick-Geräusche und Buzzer-Alarme.</span>
-            </div>
-            <label class="switch">
-              <input type="checkbox" id="settings-sound-toggle" checked>
-              <span class="slider"></span>
-            </label>
-          </div>
-        </div>
-
-        <!-- Global Player Management -->
-        <div class="settings-section">
-          <h4 class="settings-section-title">Mitspieler verwalten</h4>
-          <span class="setting-desc" style="display: block; margin-bottom: 8px;">Trage die Namen der Personen ein, die standardmäßig mitspielen.</span>
-          
-          <div class="player-list" id="global-player-list">
-            <!-- Populated via JS -->
-          </div>
-          
-          <form class="add-player-form" id="global-add-player-form" onsubmit="return false;">
-            <input type="text" id="global-new-player-input" class="input-field" placeholder="Name eingeben..." autocomplete="off">
-            <button id="global-add-player-btn" class="btn-primary ripple-effect haptic-press" type="button">Hinzufügen</button>
-          </form>
-        </div>
-
-        <!-- GDPR & Privacy Accordion -->
-        <div class="settings-section">
-          <h4 class="settings-section-title">Rechtliches & DSGVO</h4>
-          <div class="accordion" id="gdpr-accordion">
-            <div class="accordion-header" id="accordion-trigger">
-              <span>Datenschutz & Impressum</span>
-              <svg viewBox="0 0 24 24">
-                <path d="M7 10l5 5 5-5z"/>
-              </svg>
-            </div>
-            <div class="accordion-content" id="accordion-content">
-              <h4>1. DSGVO-Konformität</h4>
-              <p>Diese Anwendung ist komplett offline-fähig und speichert keinerlei personenbezogene Daten auf einem Server. Es gibt kein Backend. Alle Spielstände, Namen und Einstellungen werden lokal auf Ihrem Gerät in der Browser-Sandbox (LocalStorage) gespeichert.</p>
-              
-              <h4>2. Keine Drittanbieter / CDNs</h4>
-              <p>Es werden keine externen APIs, Webfonts (z. B. Google Fonts) oder Analysetools (z. B. Google Analytics) aufgerufen. Alle Schriftarten sind System-Schriftarten. Es werden keine externen Netzwerkanfragen getätigt.</p>
-              
-              <h4>3. Impressum</h4>
-              <p><strong>Verantwortlich für den Inhalt:</strong><br>
-              Anna App Development<br>
-              E-Mail: offline-games@localhost.internal<br>
-              Hosted locally via Python HTTP Server / Docker.</p>
-            </div>
-          </div>
-        </div>
-      </div>
+  <header class="app-topbar">
+    <div class="m3-search">
+      <span class="m3-search__icon">🔍</span>
+      <input id="search-input" type="search" placeholder="Spiele suchen…" aria-label="Spiele suchen" />
     </div>
-    </div>
+    <button class="m3-icon-button" id="settings-button" aria-label="Einstellungen" title="Einstellungen">⚙️</button>
+  </header>
 
-  </div>
+  <main class="app-content">
+    <h1 class="m3-headline">Anna</h1>
+    <p class="m3-body">Wähle ein Spiel für deine Runde – alles läuft direkt auf euren Handys, auch offline.</p>
 
-  <!-- Main Orchestrator -->
-  <script src="js/audio.js"></script>
-  <script src="js/pwa-helper.js"></script>
-  <script src="js/app.js"></script>
+    <div class="game-grid" id="game-grid"></div>
+    <p class="m3-empty" id="empty-state" hidden>Kein Spiel gefunden.</p>
+  </main>
+
+  <script src="/js/storage.js"></script>
+  <script src="/js/game-registry.js"></script>
+  <script src="/js/app.js"></script>
+  <script src="/js/pwa-helper.js"></script>
 </body>
 </html>

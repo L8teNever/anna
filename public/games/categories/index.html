@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <script>
+    (function () {
+      try {
+        var s = JSON.parse(localStorage.getItem("anna:settings") || "{}");
+        if (s.theme === "light" || s.theme === "dark") document.documentElement.dataset.theme = s.theme;
+      } catch (e) {}
+    })();
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#386a20" />
+  <title>Kategorien – Anna</title>
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" href="/assets/icons/icon-192.png" />
+  <link rel="stylesheet" href="/css/material.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/games/categories/categories.css" />
+</head>
+<body>
+  <div class="game-shell">
+    <header class="game-topbar">
+      <button class="m3-icon-button" id="back-button" aria-label="Zurück" title="Zurück">←</button>
+      <h1 class="game-topbar__title">🗂️ Kategorien</h1>
+    </header>
+
+    <!-- ---------- Setup-Ansicht ---------- -->
+    <section class="game-view" id="setup-view">
+      <h2 class="m3-title game-section-title">Mitspieler (optional)</h2>
+      <div class="player-input-row">
+        <input type="text" id="player-name-input" placeholder="Name hinzufügen…" maxlength="20" />
+        <button type="button" class="m3-button m3-button--tonal" id="add-player-button">+</button>
+      </div>
+      <div class="player-chips" id="player-chips"></div>
+
+      <h2 class="m3-title game-section-title">Zeit pro Kategorie</h2>
+      <div class="player-input-row">
+        <input type="number" id="seconds-input" min="10" max="120" step="5" aria-label="Sekunden pro Kategorie" />
+        <span class="m3-body" style="align-self: center">Sekunden</span>
+      </div>
+
+      <div class="game-bottom-bar">
+        <button type="button" class="m3-button m3-button--filled" id="start-button">Spiel starten</button>
+      </div>
+    </section>
+
+    <!-- ---------- Spiel-Ansicht ---------- -->
+    <section class="game-view" id="play-view" hidden>
+      <div class="game-play">
+        <div class="cat-card">
+          <p class="m3-label">KATEGORIE</p>
+          <p class="m3-headline" id="cat-name">–</p>
+          <p class="m3-label" style="margin-top: 16px">BUCHSTABE</p>
+          <p class="cat-letter" id="cat-letter">–</p>
+        </div>
+        <p class="cat-timer" id="cat-timer">30</p>
+      </div>
+      <div class="game-bottom-bar" id="next-round-bar" hidden>
+        <button type="button" class="m3-button m3-button--filled" id="next-round-button">Nächste Kategorie</button>
+        <button type="button" class="m3-button m3-button--text" id="exit-button" style="margin-top: 8px">
+          Zur Startseite
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <script src="/js/storage.js"></script>
+  <script src="/js/wake-lock.js"></script>
+  <script src="/js/audio.js"></script>
+  <script src="/games/categories/categories.js"></script>
+  <script src="/js/pwa-helper.js"></script>
+</body>
+</html>

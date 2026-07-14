@@ -1,0 +1,30 @@
+/**
+ * Visuals, die ausschließlich zum Kategorien-Spiel gehören.
+ */
+
+.cat-card {
+  width: 100%;
+  border-radius: var(--m3-shape-xl);
+  background: var(--game-green-container);
+  color: var(--m3-on-surface);
+  padding: 32px 24px;
+  text-align: center;
+  box-shadow: var(--m3-elevation-1);
+}
+
+.cat-letter {
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--game-green);
+}
+
+.cat-timer {
+  font-size: 3.5rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  margin: 0;
+}
+
+.cat-timer[data-urgent="true"] {
+  color: var(--m3-error);
+}

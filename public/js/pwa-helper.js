@@ -1,69 +1,71 @@
-// Shared PWA Service Worker & Update helper
-(function() {
-  document.addEventListener('DOMContentLoaded', () => {
-    // 1. Create and inject PWA Update Banner dynamically if not present
-    if (!document.getElementById('pwa-update-banner')) {
-      const banner = document.createElement('div');
-      banner.id = 'pwa-update-banner';
-      banner.className = 'update-banner';
-      banner.innerHTML = `
-        <span class="update-banner-text">Eine neue App-Version ist verfügbar!</span>
-        <button id="pwa-update-btn" class="update-btn ripple-effect haptic-press">Aktualisieren</button>
-      `;
-      document.body.appendChild(banner);
-    }
+/**
+ * Globales PWA-Helper-Script, das auf JEDER Seite eingebunden wird.
+ * Registriert den Service Worker und zeigt bei einer neuen Version ein
+ * Material-Update-Banner oben an. Das Update wird NUR nach Klick auf
+ * "Aktualisieren" angewendet (nicht automatisch) – erst dann übernimmt der
+ * neue Service Worker und die Seite lädt neu.
+ */
+(function () {
+  if (!("serviceWorker" in navigator)) return;
 
-    // 2. Register Service Worker (always absolute root path)
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js')
-        .then((reg) => {
-          console.log('Service Worker Registered globally');
+  function showUpdateBanner(onConfirm) {
+    if (document.querySelector(".update-banner")) return;
 
-          // Check if there is already a waiting worker on load
-          if (reg.waiting) {
-            showUpdateBanner(reg.waiting);
-          }
+    const banner = document.createElement("div");
+    banner.className = "update-banner";
+    banner.setAttribute("role", "status");
+    banner.innerHTML = `
+      <span class="update-banner__text">Neue Version verfügbar</span>
+      <div class="update-banner__actions">
+        <button type="button" class="update-banner__dismiss" aria-label="Schließen">Später</button>
+        <button type="button" class="update-banner__confirm">Aktualisieren</button>
+      </div>
+    `;
+    document.body.prepend(banner);
+    requestAnimationFrame(() => banner.classList.add("update-banner--visible"));
 
-          // Listen for updates found during this session
-          reg.addEventListener('updatefound', () => {
-            const newWorker = reg.installing;
-            if (!newWorker) return;
-            newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                showUpdateBanner(newWorker);
-              }
-            });
-          });
+    banner.querySelector(".update-banner__dismiss").addEventListener("click", () => {
+      banner.classList.remove("update-banner--visible");
+      setTimeout(() => banner.remove(), 200);
+    });
 
-          // Actively poll for new versions in the background
-          setInterval(() => reg.update().catch(() => {}), 60 * 1000);
-          document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible') reg.update().catch(() => {});
-          });
-        })
-        .catch((err) => {
-          console.error('Service Worker registration failed:', err);
-        });
-
-      // Reload once the new worker confirms it has taken control
-      navigator.serviceWorker.addEventListener('message', (event) => {
-        if (event.data && event.data.type === 'SW_UPDATED') {
-          window.location.reload();
-        }
-      });
-    }
-  });
-
-  function showUpdateBanner(worker) {
-    const banner = document.getElementById('pwa-update-banner');
-    const btn = document.getElementById('pwa-update-btn');
-    if (banner && btn) {
-      banner.classList.add('show');
-      btn.onclick = () => {
-        worker.postMessage({ type: 'SKIP_WAITING' });
-        // Fallback in case the SW_UPDATED confirmation is delayed
-        setTimeout(() => window.location.reload(), 400);
-      };
-    }
+    banner.querySelector(".update-banner__confirm").addEventListener("click", () => {
+      banner.querySelector(".update-banner__confirm").textContent = "Wird aktualisiert…";
+      onConfirm();
+    });
   }
+
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js").then((registration) => {
+      // Fall 1: Es gibt bereits einen wartenden Worker (Update wurde auf
+      // einer anderen Seite/Tab entdeckt, Nutzer hat aber noch nicht bestätigt).
+      if (registration.waiting && navigator.serviceWorker.controller) {
+        showUpdateBanner(() => {
+          registration.waiting.postMessage({ type: "SKIP_WAITING" });
+        });
+      }
+
+      // Fall 2: Ein neuer Worker wird gerade installiert.
+      registration.addEventListener("updatefound", () => {
+        const installingWorker = registration.installing;
+        if (!installingWorker) return;
+        installingWorker.addEventListener("statechange", () => {
+          if (installingWorker.state === "installed" && navigator.serviceWorker.controller) {
+            showUpdateBanner(() => {
+              installingWorker.postMessage({ type: "SKIP_WAITING" });
+            });
+          }
+        });
+      });
+    }).catch((err) => {
+      console.warn("[anna] Service-Worker-Registrierung fehlgeschlagen:", err);
+    });
+
+    let hasReloaded = false;
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (hasReloaded) return;
+      hasReloaded = true;
+      window.location.reload();
+    });
+  });
 })();

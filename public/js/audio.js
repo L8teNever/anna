@@ -1,158 +1,95 @@
-// Web Audio API Synthesizer - 100% offline, zero dependencies, no loaded assets.
-
-let audioCtx = null;
-let soundEnabled = true;
-
 /**
- * Initializes the AudioContext on first user interaction.
+ * Gemeinsames Sound-Utility. Erzeugt Töne per Web Audio API statt fester
+ * MP3-Dateien – dadurch gibt es keine zusätzlichen Binär-Assets, die
+ * gecacht/ausgeliefert werden müssen, und jedes Spiel kann eigene Sounds
+ * durch simple Frequenz/Dauer-Kombinationen zusammensetzen.
+ * Respektiert die Sound-Einstellung aus storage.js.
  */
-function initAudio() {
-  if (!audioCtx) {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  }
-  // Resume context if suspended (common browser security behavior)
-  if (audioCtx.state === 'suspended') {
-    audioCtx.resume();
-  }
-}
+(function (root) {
+  let ctx = null;
 
-/**
- * Procedural woodblock/ticking metronome beep
- */
-function playTick(pitch = 1000) {
-  if (!soundEnabled) return;
-  initAudio();
-  if (!audioCtx) return;
-
-  const osc = audioCtx.createOscillator();
-  const gainNode = audioCtx.createGain();
-
-  osc.connect(gainNode);
-  gainNode.connect(audioCtx.destination);
-
-  // Pitch envelope (fast pitch sweep creates a click/woodblock sound)
-  osc.type = 'triangle';
-  osc.frequency.setValueAtTime(pitch, audioCtx.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.04);
-
-  // Volume envelope
-  gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
-  gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
-
-  osc.start(audioCtx.currentTime);
-  osc.stop(audioCtx.currentTime + 0.06);
-}
-
-/**
- * Synthesizes a massive explosion using white noise, low-pass sweep, and decay
- */
-function playExplosion() {
-  if (!soundEnabled) return;
-  initAudio();
-  if (!audioCtx) return;
-
-  // Create a 1.5s white noise buffer
-  const bufferSize = audioCtx.sampleRate * 1.5;
-  const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-  const data = buffer.getChannelData(0);
-  for (let i = 0; i < bufferSize; i++) {
-    data[i] = Math.random() * 2 - 1;
+  function ensureContext() {
+    if (!ctx) {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return null;
+      ctx = new Ctx();
+    }
+    if (ctx.state === "suspended") ctx.resume();
+    return ctx;
   }
 
-  const noiseSource = audioCtx.createBufferSource();
-  noiseSource.buffer = buffer;
+  function isEnabled() {
+    return root.Storage ? root.Storage.getSettings().soundEnabled : true;
+  }
 
-  const filter = audioCtx.createBiquadFilter();
-  filter.type = 'lowpass';
-  // Lowpass sweep from 1200Hz down to 50Hz for rumble effect
-  filter.frequency.setValueAtTime(1200, audioCtx.currentTime);
-  filter.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 1.2);
+  function tone({ freq = 440, duration = 0.12, type = "sine", volume = 0.2, delay = 0 }) {
+    if (!isEnabled()) return;
+    const audioCtx = ensureContext();
+    if (!audioCtx) return;
 
-  const gainNode = audioCtx.createGain();
-  gainNode.gain.setValueAtTime(1.0, audioCtx.currentTime);
-  gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.4);
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.value = freq;
 
-  noiseSource.connect(filter);
-  filter.connect(gainNode);
-  gainNode.connect(audioCtx.destination);
+    const startAt = audioCtx.currentTime + delay;
+    gain.gain.setValueAtTime(0, startAt);
+    gain.gain.linearRampToValueAtTime(volume, startAt + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, startAt + duration);
 
-  // Add a low-frequency synth thump underneath the explosion
-  const synthOsc = audioCtx.createOscillator();
-  const synthGain = audioCtx.createGain();
-  synthOsc.type = 'sine';
-  synthOsc.frequency.setValueAtTime(150, audioCtx.currentTime);
-  synthOsc.frequency.linearRampToValueAtTime(30, audioCtx.currentTime + 0.5);
-  
-  synthGain.gain.setValueAtTime(0.8, audioCtx.currentTime);
-  synthGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
+    osc.connect(gain).connect(audioCtx.destination);
+    osc.start(startAt);
+    osc.stop(startAt + duration + 0.02);
+  }
 
-  synthOsc.connect(synthGain);
-  synthGain.connect(audioCtx.destination);
+  function noiseBurst({ duration = 0.6, volume = 0.5, delay = 0 }) {
+    if (!isEnabled()) return;
+    const audioCtx = ensureContext();
+    if (!audioCtx) return;
 
-  noiseSource.start(audioCtx.currentTime);
-  noiseSource.stop(audioCtx.currentTime + 1.5);
-  
-  synthOsc.start(audioCtx.currentTime);
-  synthOsc.stop(audioCtx.currentTime + 0.6);
-}
+    const startAt = audioCtx.currentTime + delay;
+    const bufferSize = Math.floor(audioCtx.sampleRate * duration);
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+    }
 
-/**
- * Dissonant dual-oscillator buzzer alarm
- */
-function playBuzzer() {
-  if (!soundEnabled) return;
-  initAudio();
-  if (!audioCtx) return;
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = buffer;
 
-  const osc1 = audioCtx.createOscillator();
-  const osc2 = audioCtx.createOscillator();
-  const gainNode = audioCtx.createGain();
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = "lowpass";
+    filter.frequency.setValueAtTime(1200, startAt);
+    filter.frequency.exponentialRampToValueAtTime(80, startAt + duration);
 
-  osc1.type = 'sawtooth';
-  osc2.type = 'sawtooth';
-  
-  // Dissonant pairing to sound alarming (180Hz and 183Hz creates beating)
-  osc1.frequency.setValueAtTime(180, audioCtx.currentTime);
-  osc2.frequency.setValueAtTime(183, audioCtx.currentTime);
+    const gain = audioCtx.createGain();
+    gain.gain.setValueAtTime(volume, startAt);
+    gain.gain.exponentialRampToValueAtTime(0.0001, startAt + duration);
 
-  gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime);
-  gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime + 0.1);
-  // Pulsing volume effect
-  gainNode.gain.setValueAtTime(0.01, audioCtx.currentTime + 0.25);
-  gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime + 0.35);
-  gainNode.gain.setValueAtTime(0.6, audioCtx.currentTime + 0.45);
-  gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.85);
+    noise.connect(filter).connect(gain).connect(audioCtx.destination);
+    noise.start(startAt);
+    noise.stop(startAt + duration + 0.02);
+  }
 
-  osc1.connect(gainNode);
-  osc2.connect(gainNode);
-  gainNode.connect(audioCtx.destination);
-
-  osc1.start(audioCtx.currentTime);
-  osc2.start(audioCtx.currentTime);
-  
-  osc1.stop(audioCtx.currentTime + 0.9);
-  osc2.stop(audioCtx.currentTime + 0.9);
-}
-
-/**
- * Toggle sound setting
- */
-function toggleSound(enabled) {
-  soundEnabled = enabled;
-  localStorage.setItem('settings_sound_enabled', enabled);
-  return soundEnabled;
-}
-
-// Load initial setting
-if (localStorage.getItem('settings_sound_enabled') !== null) {
-  soundEnabled = localStorage.getItem('settings_sound_enabled') === 'true';
-}
-
-window.AudioSynth = {
-  init: initAudio,
-  playTick: playTick,
-  playExplosion: playExplosion,
-  playBuzzer: playBuzzer,
-  toggleSound: toggleSound,
-  isEnabled: () => soundEnabled
-};
+  root.Sound = {
+    unlock() {
+      ensureContext();
+    },
+    tick(pitch = 880) {
+      tone({ freq: pitch, duration: 0.08, type: "square", volume: 0.15 });
+    },
+    beep(freq = 660, duration = 0.15) {
+      tone({ freq, duration, type: "sine", volume: 0.2 });
+    },
+    success() {
+      tone({ freq: 523.25, duration: 0.12, volume: 0.2 });
+      tone({ freq: 659.25, duration: 0.12, volume: 0.2, delay: 0.1 });
+      tone({ freq: 783.99, duration: 0.18, volume: 0.2, delay: 0.2 });
+    },
+    boom() {
+      noiseBurst({ duration: 0.7, volume: 0.6 });
+      tone({ freq: 90, duration: 0.5, type: "sawtooth", volume: 0.3 });
+    },
+  };
+})(window);

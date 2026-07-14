@@ -1,0 +1,31 @@
+/**
+ * Visuals, die ausschließlich zu Wahrheit-oder-Pflicht gehören.
+ */
+
+.td-card {
+  width: 100%;
+  min-height: 160px;
+  border-radius: var(--m3-shape-xl);
+  background: var(--m3-surface-container-high);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  box-shadow: var(--m3-elevation-1);
+}
+
+.td-card__prompt {
+  font-size: 1.2rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.td-choice-row {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.td-choice-row .m3-button {
+  flex: 1;
+}
