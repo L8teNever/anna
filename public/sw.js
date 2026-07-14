@@ -46,7 +46,21 @@ const PRECACHE_URLS = [...CORE_ASSETS, ...GAME_ASSETS];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS))
+    caches.keys().then(async (existingCacheNames) => {
+      // Erkennt einen fremden/älteren Service Worker (z.B. von einer
+      // komplett anderen Vorgänger-Version dieser App unter derselben
+      // Origin), der sonst unbegrenzt weiter alte Dateien ausliefern
+      // würde, ohne dass eine Nutzer-Bestätigung möglich ist. Nur wenn
+      // NOCH KEIN "anna-cache-*" existiert, wird sofort übernommen
+      // (einmalige Migration). Ab dann greift wieder die normale
+      // Update-Bestätigung über das Banner (siehe Kommentar oben).
+      const isFirstAnnaInstall = !existingCacheNames.some((name) => name.startsWith("anna-cache-"));
+
+      const cache = await caches.open(CACHE_NAME);
+      await cache.addAll(PRECACHE_URLS);
+
+      if (isFirstAnnaInstall) self.skipWaiting();
+    })
   );
 });
 
