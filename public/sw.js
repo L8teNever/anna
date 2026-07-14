@@ -15,7 +15,7 @@
  *     komplett offline mit dem neuen Stand.
  */
 
-const APP_VERSION = "1.2.1";
+const APP_VERSION = "1.2.2";
 const CACHE_NAME = `anna-cache-${APP_VERSION}`;
 
 importScripts("/js/game-registry.js");
