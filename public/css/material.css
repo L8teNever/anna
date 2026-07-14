@@ -63,12 +63,23 @@
   --m3-duration-long: 420ms;
 
   /* ---- Elevation ---- */
-  --m3-elevation-1: 0 1px 2px rgba(0, 0, 0, 0.15), 0 1px 3px 1px rgba(0, 0, 0, 0.08);
-  --m3-elevation-2: 0 1px 2px rgba(0, 0, 0, 0.18), 0 2px 6px 2px rgba(0, 0, 0, 0.1);
-  --m3-elevation-3: 0 4px 8px 3px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.2);
+  --m3-elevation-1: 0 1px 2px rgba(0, 0, 0, 0.12), 0 1px 3px 1px rgba(0, 0, 0, 0.05);
+  --m3-elevation-2: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.05);
+  --m3-elevation-3: 0 12px 30px rgba(0, 0, 0, 0.12), 0 4px 10px rgba(0, 0, 0, 0.05);
 
   /* ---- Typografie ---- */
-  --m3-font: "Roboto", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --m3-font: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --m3-font-display: "Outfit", var(--m3-font);
+
+  /* ---- Glassmorphism (Light) ---- */
+  --glass-bg: rgba(255, 255, 255, 0.45);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --glass-shadow: 0 8px 32px 0 rgba(103, 80, 164, 0.08);
+  --glass-blur: 16px;
+
+  /* ---- Ambient BG Glows (Light) ---- */
+  --bg-glow-1: rgba(103, 80, 164, 0.08);
+  --bg-glow-2: rgba(56, 106, 32, 0.06);
 }
 
 :root[data-theme="dark"] {
@@ -94,9 +105,9 @@
   --m3-error-container: #8c1d18;
   --m3-on-error-container: #f9dedc;
 
-  --m3-background: #1c1b1f;
+  --m3-background: #0f0e13;
   --m3-on-background: #e6e1e5;
-  --m3-surface: #1c1b1f;
+  --m3-surface: #141218;
   --m3-on-surface: #e6e1e5;
   --m3-surface-variant: #49454f;
   --m3-on-surface-variant: #cac4d0;
@@ -104,11 +115,21 @@
   --m3-outline: #938f99;
   --m3-outline-variant: #49454f;
 
-  --m3-surface-container-lowest: #0f0d13;
+  --m3-surface-container-lowest: #0b090e;
   --m3-surface-container-low: #1d1b20;
   --m3-surface-container: #211f26;
   --m3-surface-container-high: #2b2930;
   --m3-surface-container-highest: #36343b;
+
+  /* ---- Glassmorphism (Dark) ---- */
+  --glass-bg: rgba(20, 18, 24, 0.45);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  --glass-blur: 20px;
+
+  /* ---- Ambient BG Glows (Dark) ---- */
+  --bg-glow-1: rgba(162, 126, 255, 0.12);
+  --bg-glow-2: rgba(94, 180, 50, 0.08);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -135,9 +156,9 @@
     --m3-error-container: #8c1d18;
     --m3-on-error-container: #f9dedc;
 
-    --m3-background: #1c1b1f;
+    --m3-background: #0f0e13;
     --m3-on-background: #e6e1e5;
-    --m3-surface: #1c1b1f;
+    --m3-surface: #141218;
     --m3-on-surface: #e6e1e5;
     --m3-surface-variant: #49454f;
     --m3-on-surface-variant: #cac4d0;
@@ -145,11 +166,21 @@
     --m3-outline: #938f99;
     --m3-outline-variant: #49454f;
 
-    --m3-surface-container-lowest: #0f0d13;
+    --m3-surface-container-lowest: #0b090e;
     --m3-surface-container-low: #1d1b20;
     --m3-surface-container: #211f26;
     --m3-surface-container-high: #2b2930;
     --m3-surface-container-highest: #36343b;
+
+    /* ---- Glassmorphism (Dark) ---- */
+    --glass-bg: rgba(20, 18, 24, 0.45);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    --glass-blur: 20px;
+
+    /* ---- Ambient BG Glows (Dark) ---- */
+    --bg-glow-1: rgba(162, 126, 255, 0.12);
+    --bg-glow-2: rgba(94, 180, 50, 0.08);
   }
 }
 
@@ -180,10 +211,14 @@ body {
 
 body {
   font-family: var(--m3-font);
-  background: var(--m3-background);
+  background: radial-gradient(circle at 10% 20%, var(--bg-glow-1) 0%, transparent 40%),
+              radial-gradient(circle at 90% 80%, var(--bg-glow-2) 0%, transparent 45%),
+              var(--m3-background);
+  background-attachment: fixed;
   color: var(--m3-on-background);
   -webkit-font-smoothing: antialiased;
-  transition: background-color var(--m3-duration-medium) var(--m3-easing-standard);
+  min-height: 100vh;
+  transition: background var(--m3-duration-medium) var(--m3-easing-standard);
 }
 
 h1,

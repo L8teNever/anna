@@ -15,6 +15,9 @@
   <title>Wahrheit oder Pflicht – Anna</title>
   <link rel="manifest" href="/manifest.json" />
   <link rel="icon" href="/assets/icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/css/material.css" />
   <link rel="stylesheet" href="/css/components.css" />
   <link rel="stylesheet" href="/css/main.css" />
@@ -35,14 +38,19 @@
 
     <!-- ---------- Setup-Ansicht ---------- -->
     <section class="game-view" id="setup-view">
-      <h2 class="m3-title game-section-title">Mitspieler</h2>
-      <p class="m3-body">Anhaken, wer mitspielt – neue Spieler bleiben auch für andere Spiele gespeichert.</p>
-      <div class="player-picker" id="player-picker"></div>
-
-      <h2 class="m3-title game-section-title">Modus</h2>
-      <div class="m3-segmented" id="mode-segmented" role="group" aria-label="Modus wählen">
-        <button type="button" class="m3-segmented__option" data-value="normal">Normal</button>
-        <button type="button" class="m3-segmented__option" data-value="party">Party</button>
+      <div class="setup-grid">
+        <div class="setup-grid__left">
+          <h2 class="m3-title game-section-title">Mitspieler</h2>
+          <p class="m3-body">Anhaken, wer mitspielt – neue Spieler bleiben auch für andere Spiele gespeichert.</p>
+          <div class="player-picker" id="player-picker"></div>
+        </div>
+        <div class="setup-grid__right">
+          <h2 class="m3-title game-section-title">Modus</h2>
+          <div class="m3-segmented" id="mode-segmented" role="group" aria-label="Modus wählen" style="margin-top: 12px">
+            <button type="button" class="m3-segmented__option" data-value="normal">Normal</button>
+            <button type="button" class="m3-segmented__option" data-value="party">Party</button>
+          </div>
+        </div>
       </div>
 
       <div class="game-bottom-bar">

@@ -63,6 +63,7 @@
   const startButton = document.getElementById("start-button");
 
   const turnName = document.getElementById("turn-name");
+  const tdCard = document.getElementById("td-card");
   const tdPlaceholder = document.getElementById("td-placeholder");
   const tdPrompt = document.getElementById("td-prompt");
   const choiceRow = document.getElementById("td-choice-row");
@@ -97,6 +98,9 @@
     tdPrompt.hidden = true;
     choiceRow.hidden = false;
     nextTurnBar.hidden = true;
+    if (tdCard) {
+      tdCard.classList.remove("card-deal");
+    }
   }
 
   function pickPrompt(type) {
@@ -119,6 +123,13 @@
     tdPrompt.textContent = pickPrompt(type);
     choiceRow.hidden = true;
     nextTurnBar.hidden = false;
+
+    // Trigger dealt card animation
+    if (tdCard) {
+      tdCard.classList.remove("card-deal");
+      void tdCard.offsetWidth; // Reflow
+      tdCard.classList.add("card-deal");
+    }
   }
 
   truthButton.addEventListener("click", () => reveal("truth"));

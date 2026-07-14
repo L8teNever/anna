@@ -11,9 +11,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle at 35% 30%, var(--m3-error-container), var(--m3-error) 75%);
-  box-shadow: var(--m3-elevation-3);
+  background: radial-gradient(circle at 35% 30%, #ff5252, #b3261e 70%, #500e0b 100%);
+  box-shadow: 0 0 40px rgba(179, 38, 30, 0.4), var(--m3-elevation-3);
+  border: 4px solid rgba(255, 255, 255, 0.15);
   transition: transform 120ms var(--m3-easing-emphasized);
+  position: relative;
 }
 
 .bomb-ring__icon {
@@ -21,11 +23,12 @@
   height: 96px;
   color: #ffffff;
   stroke-width: 1.5;
-  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.35));
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
 }
 
 .bomb-ring--pulse {
   animation: bomb-pulse 160ms var(--m3-easing-emphasized);
+  box-shadow: 0 0 60px rgba(179, 38, 30, 0.8), var(--m3-elevation-3);
 }
 
 @keyframes bomb-pulse {
@@ -33,7 +36,7 @@
     transform: scale(1);
   }
   40% {
-    transform: scale(1.12);
+    transform: scale(1.1);
   }
   100% {
     transform: scale(1);
@@ -41,8 +44,9 @@
 }
 
 .bomb-ring--exploded {
-  background: radial-gradient(circle at 50% 50%, #fff3c4, #ff8a3d 55%, #b3261e 100%);
-  animation: bomb-explode 420ms var(--m3-easing-emphasized);
+  background: radial-gradient(circle at 50% 50%, #ffffff, #fff3c4 20%, #ff8a3d 55%, #b3261e 100%);
+  box-shadow: 0 0 100px #ff8a3d, var(--m3-elevation-3);
+  animation: bomb-explode 420ms var(--m3-easing-emphasized) forwards;
 }
 
 @keyframes bomb-explode {
@@ -50,17 +54,46 @@
     transform: scale(1);
   }
   35% {
-    transform: scale(1.5);
+    transform: scale(1.6);
   }
   60% {
     transform: scale(1.2);
   }
   100% {
-    transform: scale(1.3);
+    transform: scale(1.35);
   }
 }
 
 #play-status[data-exploded="true"] {
   color: var(--m3-error);
-  font-weight: 700;
+  font-family: var(--m3-font-display);
+  font-weight: 800;
+  font-size: 1.5rem;
+}
+
+/* Page shake effect triggered when bomb goes boom */
+@keyframes screen-shake {
+  0%, 100% { transform: translate(0, 0); }
+  10%, 30%, 50%, 70%, 90% { transform: translate(-8px, -4px); }
+  20%, 40%, 60%, 80% { transform: translate(8px, 4px); }
+}
+
+.shake {
+  animation: screen-shake 0.5s ease-in-out;
+}
+
+/* Fullscreen explosion flash overlay */
+.explosion-flash {
+  position: fixed;
+  inset: 0;
+  background: #ffffff;
+  z-index: 9999;
+  pointer-events: none;
+  animation: flash-animation 0.6s var(--m3-easing-emphasized) forwards;
+}
+
+@keyframes flash-animation {
+  0% { opacity: 1; background: #ffffff; }
+  20% { background: #ffaa44; }
+  100% { opacity: 0; }
 }

@@ -113,6 +113,20 @@
     playStatus.dataset.exploded = "true";
     playActions.hidden = false;
 
+    // Trigger visual feedback: Screen Shake
+    document.body.classList.add("shake");
+    setTimeout(() => {
+      document.body.classList.remove("shake");
+    }, 500);
+
+    // Trigger visual feedback: Fullscreen Explosion Flash
+    const flash = document.createElement("div");
+    flash.className = "explosion-flash";
+    document.body.appendChild(flash);
+    setTimeout(() => {
+      flash.remove();
+    }, 600);
+
     Sound.boom();
     if (Storage.getSettings().vibrationEnabled && navigator.vibrate) {
       navigator.vibrate([300, 100, 300, 100, 500]);

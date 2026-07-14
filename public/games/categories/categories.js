@@ -29,6 +29,27 @@
   PlayerPicker.create(document.getElementById("player-picker"), "categories");
   let intervalId = null;
   let remainingSeconds = 30;
+  const circle = document.querySelector(".progress-ring__circle");
+  const circumference = 2 * Math.PI * 52;
+  let totalDuration = 30;
+
+  if (circle) {
+    circle.style.strokeDasharray = `${circumference} ${circumference}`;
+    circle.style.strokeDashoffset = 0;
+  }
+
+  function updateProgress(remaining, total) {
+    if (!circle) return;
+    const progress = Math.max(0, Math.min(1, remaining / total));
+    const offset = circumference - (progress * circumference);
+    circle.style.strokeDashoffset = offset;
+
+    if (remaining <= 5) {
+      circle.setAttribute("stroke", "var(--m3-error)");
+    } else {
+      circle.setAttribute("stroke", "var(--m3-primary)");
+    }
+  }
 
   function loadSeconds() {
     try {
@@ -55,6 +76,7 @@
     remainingSeconds -= 1;
     catTimer.textContent = String(remainingSeconds);
     catTimer.dataset.urgent = String(remainingSeconds <= 5 && remainingSeconds > 0);
+    updateProgress(remainingSeconds, totalDuration);
 
     if (remainingSeconds <= 0) {
       stopTimer();
@@ -70,12 +92,18 @@
     const totalSeconds = Math.max(10, parseInt(secondsInput.value, 10) || 30);
     saveSeconds(totalSeconds);
     remainingSeconds = totalSeconds;
+    totalDuration = totalSeconds;
 
     catName.textContent = CATEGORY_POOL[Math.floor(Math.random() * CATEGORY_POOL.length)];
     catLetter.textContent = LETTER_POOL[Math.floor(Math.random() * LETTER_POOL.length)];
     catTimer.textContent = String(remainingSeconds);
     catTimer.dataset.urgent = "false";
     nextRoundBar.hidden = true;
+
+    if (circle) {
+      circle.style.strokeDashoffset = 0;
+      circle.setAttribute("stroke", "var(--m3-primary)");
+    }
 
     stopTimer();
     intervalId = setInterval(tickDown, 1000);

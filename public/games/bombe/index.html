@@ -15,6 +15,9 @@
   <title>Tickende Bombe – Anna</title>
   <link rel="manifest" href="/manifest.json" />
   <link rel="icon" href="/assets/icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/css/material.css" />
   <link rel="stylesheet" href="/css/components.css" />
   <link rel="stylesheet" href="/css/main.css" />
@@ -35,15 +38,20 @@
 
     <!-- ---------- Setup-Ansicht ---------- -->
     <section class="game-view" id="setup-view">
-      <h2 class="m3-title game-section-title">Mitspieler</h2>
-      <p class="m3-body">Anhaken, wer mitspielt – neue Spieler bleiben auch für andere Spiele gespeichert.</p>
-      <div class="player-picker" id="player-picker"></div>
-
-      <h2 class="m3-title game-section-title">Zünddauer</h2>
-      <p class="m3-body">Zufällige Zeit zwischen den beiden Werten – keiner weiß, wann es knallt.</p>
-      <div class="player-input-row" style="margin-top: 12px">
-        <input type="number" id="min-seconds-input" min="5" max="600" step="5" aria-label="Minimum Sekunden" />
-        <input type="number" id="max-seconds-input" min="5" max="600" step="5" aria-label="Maximum Sekunden" />
+      <div class="setup-grid">
+        <div class="setup-grid__left">
+          <h2 class="m3-title game-section-title">Mitspieler</h2>
+          <p class="m3-body">Anhaken, wer mitspielt – neue Spieler bleiben auch für andere Spiele gespeichert.</p>
+          <div class="player-picker" id="player-picker"></div>
+        </div>
+        <div class="setup-grid__right">
+          <h2 class="m3-title game-section-title">Zünddauer</h2>
+          <p class="m3-body">Zufällige Zeit zwischen den beiden Werten – keiner weiß, wann es knallt.</p>
+          <div class="player-input-row" style="margin-top: 12px">
+            <input type="number" id="min-seconds-input" min="5" max="600" step="5" aria-label="Minimum Sekunden" />
+            <input type="number" id="max-seconds-input" min="5" max="600" step="5" aria-label="Maximum Sekunden" />
+          </div>
+        </div>
       </div>
 
       <div class="game-bottom-bar">

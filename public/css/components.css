@@ -98,16 +98,21 @@
 
 /* ---------- Cards / Widgets ---------- */
 .m3-card {
-  background: var(--m3-surface-container);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   border-radius: var(--m3-shape-lg);
   padding: 20px;
+  box-shadow: var(--glass-shadow);
   transition: box-shadow var(--m3-duration-medium) var(--m3-easing-standard),
-    transform var(--m3-duration-medium) var(--m3-easing-emphasized);
+    transform var(--m3-duration-medium) var(--m3-easing-emphasized),
+    border-color var(--m3-duration-short) var(--m3-easing-standard);
 }
 
 .m3-card--interactive {
   cursor: pointer;
-  border: none;
+  border: 1px solid var(--glass-border);
   text-align: left;
   width: 100%;
   color: inherit;
@@ -115,12 +120,13 @@
 }
 
 .m3-card--interactive:hover {
-  box-shadow: var(--m3-elevation-2);
-  transform: translateY(-2px);
+  box-shadow: 0 12px 40px 0 rgba(103, 80, 164, 0.15);
+  transform: translateY(-4px);
+  border-color: rgba(103, 80, 164, 0.3);
 }
 
 .m3-card--interactive:active {
-  transform: translateY(0) scale(0.99);
+  transform: translateY(0) scale(0.98);
 }
 
 /* ---------- Suchfeld ---------- */
@@ -131,8 +137,18 @@
   height: 56px;
   padding: 0 20px;
   border-radius: var(--m3-shape-full);
-  background: var(--m3-surface-container-high);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   color: var(--m3-on-surface);
+  box-shadow: var(--glass-shadow);
+  transition: all 0.3s var(--m3-easing-standard);
+}
+
+.m3-search:focus-within {
+  border-color: var(--m3-primary);
+  box-shadow: 0 0 0 3px rgba(103, 80, 164, 0.2);
 }
 
 .m3-search input {
@@ -159,12 +175,14 @@
 .player-picker__list {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
   margin-bottom: 12px;
 }
 
 .player-picker__empty {
-  padding: 8px 4px;
+  padding: 12px 8px;
+  text-align: center;
+  color: var(--m3-on-surface-variant);
 }
 
 .player-row {
@@ -172,30 +190,72 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  min-height: 48px;
-  padding: 0 4px;
+  min-height: 56px;
+  padding: 4px 12px;
   border-radius: var(--m3-shape-sm);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.2s var(--m3-easing-standard);
+}
+
+.player-row:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .player-row__main {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   flex: 1;
   min-width: 0;
   cursor: pointer;
   padding: 8px 4px;
 }
 
+/* Custom premium Checkbox */
 .player-row__checkbox {
-  width: 20px;
-  height: 20px;
-  accent-color: var(--m3-primary);
+  appearance: none;
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--m3-outline);
+  border-radius: 6px;
+  display: inline-grid;
+  place-content: center;
+  cursor: pointer;
+  transition: all 0.2s var(--m3-easing-standard);
+  background: transparent;
   flex-shrink: 0;
+  position: relative;
+}
+
+.player-row__checkbox:checked {
+  background: var(--m3-primary);
+  border-color: var(--m3-primary);
+}
+
+.player-row__checkbox::before {
+  content: "";
+  width: 10px;
+  height: 6px;
+  border-left: 2px solid var(--m3-on-primary);
+  border-bottom: 2px solid var(--m3-on-primary);
+  transform: rotate(-45deg) scale(0);
+  transition: 120ms transform ease-in-out;
+  position: absolute;
+  top: 5px;
+  left: 4px;
+}
+
+.player-row__checkbox:checked::before {
+  transform: rotate(-45deg) scale(1);
 }
 
 .player-row__name {
-  font-size: 0.95rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--m3-on-surface);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -203,7 +263,7 @@
 
 .player-row__actions {
   display: flex;
-  gap: 2px;
+  gap: 4px;
   flex-shrink: 0;
 }
 
@@ -221,13 +281,15 @@
   flex: 1;
   min-width: 0;
   height: 44px;
-  padding: 0 12px;
+  padding: 0 16px;
   border-radius: var(--m3-shape-sm);
-  border: 1px solid var(--m3-primary);
+  border: 2px solid var(--m3-primary);
   background: var(--m3-surface-container-low);
   color: var(--m3-on-surface);
   font-size: 0.95rem;
   font-family: inherit;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(103, 80, 164, 0.15);
 }
 
 /* ---------- Switch (Einstellungen) ---------- */
@@ -251,21 +313,23 @@
   background: var(--m3-surface-container-highest);
   border: 2px solid var(--m3-outline);
   border-radius: var(--m3-shape-full);
-  transition: background-color var(--m3-duration-short) var(--m3-easing-standard);
+  transition: all var(--m3-duration-short) var(--m3-easing-standard);
   cursor: pointer;
 }
 
 .m3-switch__track::before {
   content: "";
   position: absolute;
-  top: 6px;
+  top: 5px;
   left: 6px;
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background: var(--m3-outline);
-  transition: transform var(--m3-duration-short) var(--m3-easing-emphasized), width var(--m3-duration-short),
-    height var(--m3-duration-short), background-color var(--m3-duration-short);
+  transition: transform var(--m3-duration-short) var(--m3-easing-emphasized),
+              width var(--m3-duration-short),
+              height var(--m3-duration-short),
+              background-color var(--m3-duration-short);
 }
 
 .m3-switch input:checked + .m3-switch__track {
@@ -274,11 +338,7 @@
 }
 
 .m3-switch input:checked + .m3-switch__track::before {
-  transform: translateX(20px);
-  width: 22px;
-  height: 22px;
-  top: 3px;
-  left: 3px;
+  transform: translateX(18px);
   background: var(--m3-on-primary);
 }
 
@@ -289,6 +349,8 @@
   max-width: 100%;
   border-radius: var(--m3-shape-full);
   border: 1px solid var(--m3-outline);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
   overflow: hidden;
 }
 
@@ -300,17 +362,24 @@
   padding: 10px 18px;
   cursor: pointer;
   font-size: 0.9rem;
+  font-family: inherit;
+  font-weight: 500;
   border-left: 1px solid var(--m3-outline);
+  transition: all 0.2s var(--m3-easing-standard);
 }
 
 .m3-segmented__option:first-child {
   border-left: none;
 }
 
+.m3-segmented__option:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
 .m3-segmented__option[aria-pressed="true"] {
-  background: var(--m3-secondary-container);
-  color: var(--m3-on-secondary-container);
-  font-weight: 500;
+  background: var(--m3-primary);
+  color: var(--m3-on-primary);
+  font-weight: 600;
 }
 
 /* ---------- Update-Banner (von pwa-helper.js eingefügt) ---------- */

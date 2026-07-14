@@ -10,7 +10,7 @@
    bleiben, statt dass die Kopfzeile volle Breite nutzt während der Inhalt
    darunter in einer schmaleren Spalte zentriert ist. */
 :root {
-  --app-max-width: 760px;
+  --app-max-width: 1080px;
 }
 
 .app-topbar {
@@ -23,7 +23,9 @@
   max-width: var(--app-max-width);
   margin: 0 auto;
   padding: 16px 20px;
-  background: var(--m3-background);
+  background: transparent;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .app-topbar .m3-search {
@@ -33,35 +35,54 @@
 .app-content {
   max-width: var(--app-max-width);
   margin: 0 auto;
-  padding: 8px 20px 48px;
+  padding: 16px 20px 64px;
 }
 
 /* ---------- Startseite: Widget-Grid ---------- */
 .game-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 16px;
-  margin-top: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  margin-top: 24px;
 }
 
 .game-widget {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  aspect-ratio: 1 / 1;
-  justify-content: space-between;
-  min-width: 0;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  text-align: left;
+  min-height: 104px;
+  border-radius: var(--m3-shape-lg);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  transition: all 0.3s var(--m3-easing-emphasized);
+}
+
+.game-widget:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: var(--glass-shadow);
+  border-color: rgba(103, 80, 164, 0.3);
 }
 
 .game-widget__icon {
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   border-radius: var(--m3-shape-md);
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--accent-container, var(--m3-primary-container));
   color: var(--m3-on-surface);
+  flex-shrink: 0;
+  transition: transform 0.3s var(--m3-easing-emphasized);
+}
+
+.game-widget:hover .game-widget__icon {
+  transform: scale(1.1) rotate(6deg);
 }
 
 .game-widget__icon .m3-icon {
@@ -81,20 +102,48 @@
   --accent-container: var(--game-green-container);
 }
 
+.game-widget__text-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
 .game-widget__title {
-  font-size: 1rem;
-  font-weight: 500;
+  font-family: var(--m3-font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--m3-on-surface);
 }
 
 .game-widget__description {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   color: var(--m3-on-surface-variant);
-  line-height: 1.3;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 /* ---------- Einstellungsseite ---------- */
 .settings-section {
   margin-top: 24px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-radius: var(--m3-shape-lg);
+  padding: 24px;
+  box-shadow: var(--glass-shadow);
+}
+
+.settings-section .m3-title {
+  font-family: var(--m3-font-display);
+  font-weight: 700;
+  font-size: 1.25rem;
+  margin-bottom: 8px;
 }
 
 .settings-row {
@@ -103,8 +152,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px 16px;
-  padding: 16px 4px;
-  border-bottom: 1px solid var(--m3-outline-variant);
+  padding: 16px 0;
+  border-bottom: 1px solid var(--glass-border);
 }
 
 .settings-row:last-child {
@@ -139,15 +188,19 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  max-width: 640px;
+  max-width: 960px;
   margin: 0 auto;
-  padding: 12px 20px;
+  padding: 16px 20px;
   width: 100%;
 }
 
 .game-topbar__title {
-  font-size: 1.1rem;
-  font-weight: 500;
+  font-family: var(--m3-font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .game-view {
@@ -155,7 +208,7 @@
   display: flex;
   flex-direction: column;
   padding: 0 20px 24px;
-  max-width: 640px;
+  max-width: 960px;
   margin: 0 auto;
   width: 100%;
 }
@@ -164,8 +217,26 @@
   display: none;
 }
 
+.setup-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .setup-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+}
+
 .game-section-title {
-  margin: 20px 0 12px;
+  font-family: var(--m3-font-display);
+  font-weight: 700;
+  font-size: 1.25rem;
+  margin: 20px 0 8px;
 }
 
 .player-input-row {
@@ -180,16 +251,24 @@
   padding: 0 16px;
   border-radius: var(--m3-shape-sm);
   border: 1px solid var(--m3-outline);
-  background: var(--m3-surface-container-low);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   color: var(--m3-on-surface);
   font-size: 0.95rem;
   font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.player-input-row input:focus {
+  border-color: var(--m3-primary);
+  outline: none;
 }
 
 .game-bottom-bar {
   position: sticky;
   bottom: 0;
-  padding: 16px 0 24px;
+  padding: 24px 0;
   background: linear-gradient(to top, var(--m3-background) 60%, transparent);
 }
 
@@ -203,6 +282,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 24px;
+  gap: 28px;
   text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+  width: 100%;
 }

@@ -5,26 +5,77 @@
 .cat-card {
   width: 100%;
   border-radius: var(--m3-shape-xl);
-  background: var(--game-green-container);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   color: var(--m3-on-surface);
-  padding: 32px 24px;
+  padding: 40px 24px;
   text-align: center;
-  box-shadow: var(--m3-elevation-1);
+  box-shadow: var(--glass-shadow);
+}
+
+.cat-card .m3-headline {
+  font-family: var(--m3-font-display);
+  font-weight: 800;
+  font-size: 2.2rem;
+  background: linear-gradient(135deg, var(--m3-primary), var(--m3-tertiary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .cat-letter {
-  font-size: 3rem;
-  font-weight: 700;
-  color: var(--game-green);
+  font-family: var(--m3-font-display);
+  font-size: 5rem;
+  font-weight: 800;
+  color: var(--m3-primary);
+  text-shadow: 0 4px 20px rgba(103, 80, 164, 0.2);
+  margin: 12px 0 0;
+  line-height: 1;
 }
 
-.cat-timer {
-  font-size: 3.5rem;
-  font-weight: 700;
+/* Timer styles featuring the circular progress ring */
+.timer-container {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 16px auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.progress-ring__circle {
+  transform: rotate(-90deg);
+  transform-origin: 60px 60px;
+  transition: stroke-dashoffset 0.1s linear, stroke 0.3s;
+}
+
+.timer-text {
+  font-family: var(--m3-font-display);
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--m3-on-surface);
   font-variant-numeric: tabular-nums;
-  margin: 0;
+  transition: color 0.3s;
 }
 
-.cat-timer[data-urgent="true"] {
+.timer-text[data-urgent="true"] {
   color: var(--m3-error);
+  animation: urgent-pulse 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes urgent-pulse {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.15);
+  }
 }
