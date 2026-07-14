@@ -5,6 +5,14 @@
  * jeweiligen public/games/<id>/<id>.css, NICHT hier.
  */
 
+/* Kopfzeile und Inhalt teilen sich dieselbe Spaltenbreite, damit sie auf
+   breiten (Tablet/Desktop-)Bildschirmen exakt untereinander ausgerichtet
+   bleiben, statt dass die Kopfzeile volle Breite nutzt während der Inhalt
+   darunter in einer schmaleren Spalte zentriert ist. */
+:root {
+  --app-max-width: 760px;
+}
+
 .app-topbar {
   position: sticky;
   top: 0;
@@ -12,6 +20,8 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  max-width: var(--app-max-width);
+  margin: 0 auto;
   padding: 16px 20px;
   background: var(--m3-background);
 }
@@ -21,7 +31,7 @@
 }
 
 .app-content {
-  max-width: 720px;
+  max-width: var(--app-max-width);
   margin: 0 auto;
   padding: 8px 20px 48px;
 }
@@ -129,7 +139,10 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 12px 12px 4px;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 12px 20px;
+  width: 100%;
 }
 
 .game-topbar__title {
