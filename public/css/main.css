@@ -1,0 +1,178 @@
+/* Global styles and CSS variables in Android 16 / Material Design 3 style */
+
+:root {
+  /* System Fonts - GDPR-compliant, no external servers */
+  --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* Animation Timings */
+  --transition-default: 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  --transition-slow: 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  --transition-bounce: 0.35s cubic-bezier(0.1, 0.9, 0.2, 1);
+
+  /* Corner Radii */
+  --radius-full: 100vmax;
+  --radius-large: 28px;
+  --radius-medium: 16px;
+  --radius-small: 12px;
+}
+
+/* Light Theme Variables */
+[data-theme="light"] {
+  --color-background: #F7F9FF;
+  --color-on-background: #1A1C22;
+  
+  --color-primary: #3F51B5;
+  --color-on-primary: #FFFFFF;
+  --color-primary-container: #E0E0FF;
+  --color-on-primary-container: #000B63;
+
+  --color-secondary: #5C5E78;
+  --color-on-secondary: #FFFFFF;
+  --color-secondary-container: #E1E2EC;
+  --color-on-secondary-container: #191B2C;
+
+  --color-tertiary: #B8006D;
+  --color-on-tertiary: #FFFFFF;
+  --color-tertiary-container: #FFD8EC;
+  --color-on-tertiary-container: #3E0021;
+
+  --color-surface: #FFFFFF;
+  --color-on-surface: #1A1C22;
+  --color-surface-variant: #F0F0FA;
+  --color-on-surface-variant: #44474F;
+
+  --color-outline: #74777F;
+  --color-error: #BA1A1A;
+  
+  --shadow-elevation-1: 0px 1px 3px 1px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
+  --shadow-elevation-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
+  --shadow-elevation-3: 0px 4px 8px 3px rgba(0, 0, 0, 0.15), 0px 1px 3px 0px rgba(0, 0, 0, 0.3);
+}
+
+/* Dark Theme Variables (Default) */
+[data-theme="dark"] {
+  --color-background: #111318;
+  --color-on-background: #E2E2E9;
+  
+  --color-primary: #B8C4FF;
+  --color-on-primary: #001A68;
+  --color-primary-container: #23399F;
+  --color-on-primary-container: #E0E0FF;
+
+  --color-secondary: #C5C6D0;
+  --color-on-secondary: #2C2E43;
+  --color-secondary-container: #43465B;
+  --color-on-secondary-container: #E1E2EC;
+
+  --color-tertiary: #FFB0D8;
+  --color-on-tertiary: #5E0035;
+  --color-tertiary-container: #8C0054;
+  --color-on-tertiary-container: #FFD8EC;
+
+  --color-surface: #1A1C22;
+  --color-on-surface: #E2E2E9;
+  --color-surface-variant: #282A33;
+  --color-on-surface-variant: #C4C6D0;
+
+  --color-outline: #8E9099;
+  --color-error: #FFB4AB;
+  
+  --shadow-elevation-1: 0px 1px 3px 1px rgba(0, 0, 0, 0.2), 0px 1px 2px 0px rgba(0, 0, 0, 0.4);
+  --shadow-elevation-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.2), 0px 1px 2px 0px rgba(0, 0, 0, 0.4);
+  --shadow-elevation-3: 0px 4px 8px 3px rgba(0, 0, 0, 0.2), 0px 1px 3px 0px rgba(0, 0, 0, 0.4);
+}
+
+/* Dynamic color theme adjustments based on seed color (stored in localStorage) */
+[data-accent="blue"] {
+  --color-primary: #AEC6FF;
+  --color-primary-container: #1C40A3;
+}
+[data-accent="purple"] {
+  --color-primary: #D0BCFF;
+  --color-primary-container: #4F378B;
+}
+[data-accent="green"] {
+  --color-primary: #A3F4B5;
+  --color-primary-container: #00522B;
+}
+[data-accent="orange"] {
+  --color-primary: #FFB77C;
+  --color-primary-container: #7E3700;
+}
+[data-accent="pink"] {
+  --color-primary: #FFB2D9;
+  --color-primary-container: #8C0054;
+}
+
+/* CSS Reset & General Base */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent; /* Remove blue highlight on mobile tap */
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  font-family: var(--font-family);
+  background-color: var(--color-background);
+  color: var(--color-on-background);
+  overflow-x: hidden;
+  user-select: none; /* Make game interactions feel like a native app */
+  transition: background-color var(--transition-default), color var(--transition-default);
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-background);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-secondary-container);
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-outline);
+}
+
+/* Screen layout container */
+#app-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 600px; /* Standardize mobile width on desktop */
+  height: 100%;
+  margin: 0 auto;
+  position: relative;
+  box-shadow: 0 0 40px rgba(0,0,0,0.1);
+  background-color: var(--color-background);
+}
+
+/* Utility classes */
+.hidden {
+  display: none !important;
+}
+
+.ripple-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Haptic feedback simulation */
+@keyframes press-scale {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+.haptic-press:active {
+  animation: press-scale 0.15s ease-out;
+}

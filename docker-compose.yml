@@ -1,0 +1,7 @@
+services:
+  anna:
+    image: ghcr.io/l8tenever/anna:latest
+    container_name: anna-game-server
+    ports:
+      - "8080:8080"
+    restart: unless-stopped

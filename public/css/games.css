@@ -1,0 +1,588 @@
+/* Game-specific layouts and screens */
+
+/* Active Game Screen Overlay */
+.game-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-background);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform var(--transition-slow);
+}
+
+.game-screen.show {
+  transform: translateX(0);
+}
+
+.game-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid var(--color-surface-variant);
+  background-color: var(--color-surface);
+}
+
+.back-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-on-surface);
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+}
+
+.back-btn:hover {
+  background-color: var(--color-surface-variant);
+}
+
+.back-btn svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
+
+.game-header-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-on-surface);
+}
+
+.game-indicators {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.indicator-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.indicator-wake-lock {
+  background-color: #E8F5E9;
+  color: #2E7D32;
+}
+
+.indicator-wake-lock.inactive {
+  background-color: #FFEBEE;
+  color: #C62828;
+}
+
+/* Setup Panel (Before Game starts) */
+.game-setup-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.setup-scroll-content {
+  flex: 1;
+}
+
+.setup-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.setup-desc {
+  font-size: 14px;
+  color: var(--color-on-surface-variant);
+  margin-bottom: 24px;
+}
+
+.setup-group {
+  margin-bottom: 24px;
+}
+
+.setup-group-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-primary);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+/* Player selection grid in setup */
+.setup-players-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.player-chip {
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-surface-variant);
+  color: var(--color-on-surface-variant);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: var(--transition-default);
+}
+
+.player-chip.active {
+  background-color: var(--color-primary-container);
+  color: var(--color-on-primary-container);
+  border-color: var(--color-primary);
+}
+
+.start-action-container {
+  padding: 16px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.btn-start-game {
+  height: 56px;
+  border-radius: var(--radius-large);
+  border: none;
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  box-shadow: var(--shadow-elevation-2);
+  transition: transform var(--transition-default), box-shadow var(--transition-default);
+}
+
+.btn-start-game:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-elevation-3);
+}
+
+/* GAMEPLAY: "Bombe" (Bomb Passing Game) */
+.game-play-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32px 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.current-player-turn {
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--color-primary);
+}
+
+.bomb-task-box {
+  width: 100%;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-surface-variant);
+  border-radius: var(--radius-medium);
+  padding: 24px;
+  text-align: center;
+  box-shadow: var(--shadow-elevation-1);
+}
+
+.bomb-task-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.bomb-task-text {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--color-on-surface);
+}
+
+/* Bomb SVG/Animation */
+.bomb-container {
+  width: 180px;
+  height: 180px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bomb-icon-svg {
+  width: 140px;
+  height: 140px;
+  fill: var(--color-on-surface);
+  transition: fill var(--transition-default);
+}
+
+.bomb-container.ticking .bomb-icon-svg {
+  animation: bomb-pulse 0.5s infinite alternate;
+}
+
+.bomb-container.fast-ticking .bomb-icon-svg {
+  animation: bomb-pulse-fast 0.25s infinite alternate, bomb-shake 0.15s infinite;
+  fill: var(--color-error);
+}
+
+.bomb-spark-svg {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 40px;
+  height: 40px;
+  fill: #FFD54F;
+  opacity: 0;
+}
+
+.bomb-container.ticking .bomb-spark-svg {
+  opacity: 1;
+  animation: spark-rotate 0.4s infinite linear;
+}
+
+/* Bomb Pass Action Button */
+.btn-pass-bomb {
+  width: 100%;
+  height: 72px;
+  border-radius: var(--radius-large);
+  border: none;
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow-elevation-2);
+  transition: var(--transition-default);
+}
+
+.btn-pass-bomb:active {
+  transform: scale(0.96);
+}
+
+/* Explosion Screen State */
+.explosion-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-error);
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  text-align: center;
+  color: white;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease-out;
+}
+
+.explosion-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+  animation: screen-red-flash 0.8s ease-out;
+}
+
+.explosion-title {
+  font-size: 48px;
+  font-weight: 800;
+  margin-bottom: 16px;
+}
+
+.explosion-loser {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 32px;
+}
+
+.btn-retry {
+  background: white;
+  color: var(--color-error);
+  border: none;
+  font-size: 18px;
+  font-weight: 700;
+  padding: 16px 32px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+/* GAMEPLAY: "Wahrheit oder Pflicht" (Truth or Dare) */
+.bottle-container {
+  width: 220px;
+  height: 220px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-surface);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-elevation-2);
+}
+
+.bottle-spinner {
+  width: 40px;
+  height: 160px;
+  background-color: var(--color-primary);
+  border-radius: var(--radius-full);
+  position: relative;
+  transition: transform 3s cubic-bezier(0.1, 0.8, 0.1, 1);
+  box-shadow: var(--shadow-elevation-1);
+}
+
+.bottle-spinner::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 10px;
+  width: 20px;
+  height: 20px;
+  background-color: var(--color-tertiary);
+  border-radius: 50%;
+}
+
+.bottle-center-pin {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: var(--color-on-surface);
+  position: absolute;
+  z-index: 5;
+}
+
+.player-names-circle {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.player-radial-name {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-on-surface);
+  white-space: nowrap;
+}
+
+.td-decision-box {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.td-prompt-card {
+  width: 100%;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-surface-variant);
+  border-radius: var(--radius-large);
+  padding: 32px 24px;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-shadow: var(--shadow-elevation-2);
+}
+
+.td-prompt-header {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-tertiary);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.td-prompt-body {
+  font-size: 20px;
+  line-height: 1.6;
+  font-weight: 600;
+}
+
+.btn-td-choice {
+  height: 56px;
+  border-radius: var(--radius-medium);
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  flex: 1;
+}
+
+.btn-truth {
+  background-color: var(--color-primary-container);
+  color: var(--color-on-primary-container);
+}
+
+.btn-dare {
+  background-color: var(--color-tertiary-container);
+  color: var(--color-on-tertiary-container);
+}
+
+.td-choices-row {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+/* GAMEPLAY: "Stadt Land Fluss" (Categories) */
+.letter-display-box {
+  width: 140px;
+  height: 140px;
+  border-radius: var(--radius-large);
+  background-color: var(--color-surface);
+  border: 2px dashed var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 80px;
+  font-weight: 800;
+  color: var(--color-primary);
+  box-shadow: var(--shadow-elevation-1);
+}
+
+.categories-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background-color: var(--color-surface);
+  padding: 16px;
+  border-radius: var(--radius-medium);
+  border: 1px solid var(--color-surface-variant);
+  box-shadow: var(--shadow-elevation-1);
+}
+
+.category-item-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--color-surface-variant);
+}
+
+.category-item-row:last-child {
+  border-bottom: none;
+}
+
+.category-label {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+/* Round Progress Timer Circle */
+.timer-container {
+  width: 100px;
+  height: 100px;
+  position: relative;
+}
+
+.timer-svg {
+  transform: rotate(-90deg);
+  width: 100px;
+  height: 100px;
+}
+
+.timer-circle-bg {
+  fill: none;
+  stroke: var(--color-surface-variant);
+  stroke-width: 8px;
+}
+
+.timer-circle-progress {
+  fill: none;
+  stroke: var(--color-primary);
+  stroke-width: 8px;
+  stroke-dasharray: 283; /* 2 * PI * r (r=45) */
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.1s linear, stroke var(--transition-default);
+  stroke-linecap: round;
+}
+
+.timer-circle-progress.warning {
+  stroke: var(--color-error);
+}
+
+.timer-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-on-surface);
+}
+
+/* Animations */
+@keyframes bomb-pulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.06); }
+}
+
+@keyframes bomb-pulse-fast {
+  from { transform: scale(1); }
+  to { transform: scale(1.15); }
+}
+
+@keyframes bomb-shake {
+  0% { transform: translate(1px, 1px) rotate(0deg); }
+  10% { transform: translate(-1px, -2px) rotate(-1deg); }
+  20% { transform: translate(-3px, 0px) rotate(1deg); }
+  30% { transform: translate(0px, 2px) rotate(0deg); }
+  40% { transform: translate(1px, -1px) rotate(1deg); }
+  50% { transform: translate(-1px, 2px) rotate(-1deg); }
+  60% { transform: translate(-3px, 1px) rotate(0deg); }
+  70% { transform: translate(2px, 1px) rotate(-1deg); }
+  80% { transform: translate(-1px, -1px) rotate(1deg); }
+  90% { transform: translate(2px, 2px) rotate(0deg); }
+  100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+
+@keyframes spark-rotate {
+  from { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.2); }
+  to { transform: rotate(360deg) scale(1); }
+}
+
+@keyframes screen-red-flash {
+  0% { background-color: var(--color-error); }
+  20% { background-color: white; }
+  40% { background-color: var(--color-error); }
+  60% { background-color: white; }
+  80% { background-color: var(--color-error); }
+}
+
+@keyframes rolling-letters {
+  0% { transform: scale(0.6); opacity: 0.3; }
+  50% { transform: scale(1.2); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.roll-letter-anim {
+  animation: rolling-letters 0.3s ease-out;
+}
