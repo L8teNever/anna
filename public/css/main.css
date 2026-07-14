@@ -176,3 +176,16 @@ body {
 .haptic-press:active {
   animation: press-scale 0.15s ease-out;
 }
+
+/* Desktop Responsiveness */
+@media (min-width: 768px) {
+  #app-container {
+    max-width: 1000px;
+    height: 90vh;
+    margin: 5vh auto;
+    border-radius: var(--radius-large);
+    border: 1px solid var(--color-surface-variant);
+    box-shadow: var(--shadow-elevation-3);
+    overflow: hidden;
+  }
+}

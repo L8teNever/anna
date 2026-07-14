@@ -145,41 +145,28 @@ function initSettings() {
 // --- Routing & Layout transitions ---
 function initRouting() {
   const settingsBtn = document.getElementById('global-settings-btn');
-  const settingsSheet = document.getElementById('settings-sheet');
-  const settingsCloseBtn = document.getElementById('settings-close-btn');
-  const modalBackdrop = document.getElementById('modal-backdrop');
-  
   const gameCards = document.querySelectorAll('.widget-card');
-  const gameScreen = document.getElementById('game-screen');
   const gameBackBtn = document.getElementById('game-back-btn');
   
   // Settings Panel trigger
   settingsBtn.onclick = () => {
-    settingsSheet.classList.add('show');
-    modalBackdrop.classList.add('show');
+    openSettings();
   };
 
-  const closeSettings = () => {
-    settingsSheet.classList.remove('show');
-    modalBackdrop.classList.remove('show');
-  };
+  document.getElementById('settings-close-btn').onclick = closeSettings;
+  document.getElementById('modal-backdrop').onclick = closeSettings;
 
-  settingsCloseBtn.onclick = closeSettings;
-  modalBackdrop.onclick = () => {
-    closeSettings();
-  };
-
-  // Game card click
+  // Game card click (updates URL hash)
   gameCards.forEach(card => {
     card.onclick = () => {
       const gameId = card.getAttribute('data-game-id');
-      launchGame(gameId);
+      window.location.hash = `#/game/${gameId}`;
     };
   });
 
-  // Back from Game Screen
+  // Back from Game Screen (updates URL hash)
   gameBackBtn.onclick = () => {
-    exitGame();
+    window.location.hash = '#/';
   };
 
   // Sound toggle inside game
@@ -190,6 +177,43 @@ function initRouting() {
     updateGameSoundBadge();
   };
   updateGameSoundBadge();
+
+  // Listen for hash changes
+  window.addEventListener('hashchange', handleHashRouting);
+  // Route initial load
+  handleHashRouting();
+}
+
+function openSettings() {
+  const settingsSheet = document.getElementById('settings-sheet');
+  const modalBackdrop = document.getElementById('modal-backdrop');
+  settingsSheet.classList.add('show');
+  modalBackdrop.classList.add('show');
+}
+
+function closeSettings() {
+  const settingsSheet = document.getElementById('settings-sheet');
+  const modalBackdrop = document.getElementById('modal-backdrop');
+  if (settingsSheet) settingsSheet.classList.remove('show');
+  if (modalBackdrop) modalBackdrop.classList.remove('show');
+}
+
+function handleHashRouting() {
+  const hash = window.location.hash;
+  closeSettings();
+
+  if (hash === '' || hash === '#/' || hash === '#') {
+    exitGame(false);
+  } else if (hash.startsWith('#/game/')) {
+    const gameId = hash.replace('#/game/', '');
+    if (state.games[gameId]) {
+      launchGame(gameId, false);
+    } else {
+      window.location.hash = '#/';
+    }
+  } else {
+    window.location.hash = '#/';
+  }
 }
 
 function updateGameSoundBadge() {
@@ -205,7 +229,12 @@ function updateGameSoundBadge() {
   }
 }
 
-function launchGame(gameId) {
+function launchGame(gameId, updateHash = true) {
+  if (updateHash) {
+    window.location.hash = `#/game/${gameId}`;
+    return;
+  }
+
   // Stop existing game if active
   if (state.activeGame) {
     state.activeGame.destroy();
@@ -242,7 +271,12 @@ function launchGame(gameId) {
   });
 }
 
-function exitGame() {
+function exitGame(updateHash = true) {
+  if (updateHash) {
+    window.location.hash = '#/';
+    return;
+  }
+
   if (state.activeGame) {
     state.activeGame.destroy();
     state.activeGame = null;

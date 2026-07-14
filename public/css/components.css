@@ -22,6 +22,12 @@
   transition: box-shadow var(--transition-default), background-color var(--transition-default);
 }
 
+@media (min-width: 768px) {
+  .search-bar-container {
+    max-width: 480px;
+  }
+}
+
 .search-bar-container:focus-within {
   box-shadow: var(--shadow-elevation-2);
   background-color: var(--color-surface);
@@ -123,9 +129,18 @@
   flex: 1;
   overflow-y: auto;
   padding: 8px 16px 24px;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 16px;
+  align-content: start;
+}
+
+@media (min-width: 768px) {
+  .widgets-container {
+    grid-template-columns: repeat(3, 1fr);
+    padding: 24px;
+    gap: 20px;
+  }
 }
 
 .widget-card {

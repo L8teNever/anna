@@ -89,6 +89,14 @@
   flex-direction: column;
   padding: 24px;
   overflow-y: auto;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .game-setup-panel {
+    max-width: 600px;
+    margin: 0 auto;
+  }
 }
 
 .setup-scroll-content {
@@ -183,6 +191,14 @@
   padding: 32px 24px;
   position: relative;
   overflow: hidden;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .game-play-area {
+    max-width: 600px;
+    margin: 0 auto;
+  }
 }
 
 .current-player-turn {
