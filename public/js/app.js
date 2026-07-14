@@ -9,66 +9,11 @@ const state = {
 
 document.addEventListener('DOMContentLoaded', () => {
   initSettings();
-  initPWA();
   initRouting();
   initSearch();
   initPlayerManagement();
   initGDPR();
 });
-
-// --- PWA Service Worker & Updates ---
-function initPWA() {
-  if ('serviceWorker' in navigator) {
-    let newWorker;
-
-    navigator.serviceWorker.register('sw.js')
-      .then((reg) => {
-        console.log('Service Worker Registered');
-
-        // Check if there is already a waiting worker on load
-        if (reg.waiting) {
-          showUpdateBanner(reg.waiting);
-        }
-
-        // Listen for updates
-        reg.addEventListener('updatefound', () => {
-          newWorker = reg.installing;
-          newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed') {
-              if (navigator.serviceWorker.controller) {
-                // New update available, show banner
-                showUpdateBanner(newWorker);
-              }
-            }
-          });
-        });
-      })
-      .catch((err) => {
-        console.error('Service Worker registration failed:', err);
-      });
-
-    // Handle skipWaiting reload
-    let refreshing = false;
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (!refreshing) {
-        window.location.reload();
-        refreshing = true;
-      }
-    });
-  }
-}
-
-function showUpdateBanner(worker) {
-  const banner = document.getElementById('pwa-update-banner');
-  const btn = document.getElementById('pwa-update-btn');
-  
-  banner.classList.add('show');
-  
-  btn.onclick = () => {
-    worker.postMessage({ action: 'skipWaiting' });
-    banner.classList.remove('show');
-  };
-}
 
 // --- App Settings (Theme, Accents, Sounds) ---
 function initSettings() {

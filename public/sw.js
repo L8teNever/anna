@@ -1,4 +1,4 @@
-const CACHE_NAME = 'party-games-cache-v3';
+const CACHE_NAME = 'party-games-cache-v4';
 const ASSETS = [
   '/',
   '/index.html',
@@ -18,6 +18,7 @@ const ASSETS = [
   '/js/app.js',
   '/js/wake-lock.js',
   '/js/audio.js',
+  '/js/pwa-helper.js',
   '/assets/icon-192.png',
   '/assets/icon-512.png'
 ];
