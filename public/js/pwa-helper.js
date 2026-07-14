@@ -15,8 +15,6 @@
 
     // 2. Register Service Worker (always absolute root path)
     if ('serviceWorker' in navigator) {
-      let newWorker;
-
       navigator.serviceWorker.register('/sw.js')
         .then((reg) => {
           console.log('Service Worker Registered globally');
@@ -26,29 +24,31 @@
             showUpdateBanner(reg.waiting);
           }
 
-          // Listen for updates
+          // Listen for updates found during this session
           reg.addEventListener('updatefound', () => {
-            newWorker = reg.installing;
+            const newWorker = reg.installing;
+            if (!newWorker) return;
             newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed') {
-                if (navigator.serviceWorker.controller) {
-                  // New update available, show banner
-                  showUpdateBanner(newWorker);
-                }
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                showUpdateBanner(newWorker);
               }
             });
+          });
+
+          // Actively poll for new versions in the background
+          setInterval(() => reg.update().catch(() => {}), 60 * 1000);
+          document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') reg.update().catch(() => {});
           });
         })
         .catch((err) => {
           console.error('Service Worker registration failed:', err);
         });
 
-      // Handle skipWaiting reload
-      let refreshing = false;
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (!refreshing) {
+      // Reload once the new worker confirms it has taken control
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'SW_UPDATED') {
           window.location.reload();
-          refreshing = true;
         }
       });
     }
@@ -60,8 +60,9 @@
     if (banner && btn) {
       banner.classList.add('show');
       btn.onclick = () => {
-        worker.postMessage({ action: 'skipWaiting' });
-        banner.classList.remove('show');
+        worker.postMessage({ type: 'SKIP_WAITING' });
+        // Fallback in case the SW_UPDATED confirmation is delayed
+        setTimeout(() => window.location.reload(), 400);
       };
     }
   }

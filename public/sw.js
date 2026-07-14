@@ -1,4 +1,4 @@
-const CACHE_NAME = 'party-games-cache-v5';
+const CACHE_NAME = 'party-games-cache-v6';
 const ASSETS = [
   '/',
   '/index.html',
@@ -24,14 +24,15 @@ const ASSETS = [
 ];
 
 // Install Event - Pre-cache all core assets
+// Deliberately does NOT call self.skipWaiting() here: the new worker must
+// stay in the "waiting" state until the user confirms via the update banner
+// (SKIP_WAITING message below), otherwise the update banner/button is a no-op
+// because the update has already applied itself by the time it renders.
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log('[Service Worker] Caching all app shell assets');
       return cache.addAll(ASSETS);
-    }).then(() => {
-      // Force the waiting service worker to become active
-      return self.skipWaiting();
     })
   );
 });
@@ -51,6 +52,11 @@ self.addEventListener('activate', (event) => {
     }).then(() => {
       // Claim clients immediately so the new worker controls the page right away
       return self.clients.claim();
+    }).then(() => {
+      // Tell every open tab the update is now active so it can reload itself
+      return self.clients.matchAll({ type: 'window' }).then((clients) => {
+        clients.forEach((client) => client.postMessage({ type: 'SW_UPDATED' }));
+      });
     })
   );
 });
@@ -125,7 +131,7 @@ self.addEventListener('fetch', (event) => {
 
 // Listen for the skip waiting message to activate the new version immediately
 self.addEventListener('message', (event) => {
-  if (event.data && event.data.action === 'skipWaiting') {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
   }
 });
