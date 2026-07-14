@@ -59,9 +59,6 @@
   const playView = document.getElementById("play-view");
   const backButton = document.getElementById("back-button");
 
-  const playerNameInput = document.getElementById("player-name-input");
-  const addPlayerButton = document.getElementById("add-player-button");
-  const playerChips = document.getElementById("player-chips");
   const modeSegmented = document.getElementById("mode-segmented");
   const startButton = document.getElementById("start-button");
 
@@ -74,43 +71,11 @@
   const nextTurnBar = document.getElementById("next-turn-bar");
   const nextTurnButton = document.getElementById("next-turn-button");
 
-  let players = Storage.getPlayers("truth_dare");
+  const playerPicker = PlayerPicker.create(document.getElementById("player-picker"), "truth_dare");
+  let players = [];
   let mode = "normal";
   let currentPlayerIndex = 0;
   const usedPrompts = new Set();
-
-  function renderPlayers() {
-    playerChips.innerHTML = "";
-    players.forEach((name, index) => {
-      const chip = document.createElement("span");
-      chip.className = "m3-chip";
-      chip.innerHTML = `${name} <button type="button" class="m3-chip__remove" aria-label="${name} entfernen"><svg class="m3-icon"><use href="#icon-close"></use></svg></button>`;
-      chip.querySelector(".m3-chip__remove").addEventListener("click", () => {
-        players.splice(index, 1);
-        Storage.setPlayers("truth_dare", players);
-        renderPlayers();
-      });
-      playerChips.appendChild(chip);
-    });
-  }
-
-  function addPlayer() {
-    const name = playerNameInput.value.trim();
-    if (!name) return;
-    players.push(name);
-    Storage.setPlayers("truth_dare", players);
-    playerNameInput.value = "";
-    renderPlayers();
-    playerNameInput.focus();
-  }
-
-  addPlayerButton.addEventListener("click", addPlayer);
-  playerNameInput.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      addPlayer();
-    }
-  });
 
   modeSegmented.addEventListener("click", (event) => {
     const button = event.target.closest(".m3-segmented__option");
@@ -166,11 +131,14 @@
   });
 
   startButton.addEventListener("click", () => {
-    currentPlayerIndex = 0;
+    players = playerPicker.getSelectedNames();
+    currentPlayerIndex = players.length > 0 ? Math.floor(Math.random() * players.length) : 0;
     turnName.textContent = currentPlayerName();
     resetCard();
     setupView.hidden = true;
     playView.hidden = false;
+
+    if (players.length > 0) Sound.say(`${currentPlayerName()} fängt an`);
   });
 
   backButton.addEventListener("click", () => {
@@ -181,6 +149,4 @@
     }
     window.location.href = "/";
   });
-
-  renderPlayers();
 })();

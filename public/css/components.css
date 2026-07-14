@@ -155,41 +155,78 @@
   display: inline-flex;
 }
 
-/* ---------- Chips (z.B. Spieler-Namen) ---------- */
-.m3-chip {
-  display: inline-flex;
+/* ---------- Spieler-Auswahl (player-picker.js) ---------- */
+.player-picker__list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.player-picker__empty {
+  padding: 8px 4px;
+}
+
+.player-row {
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
-  height: 36px;
-  padding: 0 8px 0 16px;
-  border-radius: var(--m3-shape-full);
-  background: var(--m3-secondary-container);
-  color: var(--m3-on-secondary-container);
-  font-size: 0.9rem;
+  min-height: 48px;
+  padding: 0 4px;
+  border-radius: var(--m3-shape-sm);
 }
 
-.m3-chip__remove {
-  appearance: none;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  color: inherit;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  display: inline-flex;
+.player-row__main {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 0.85rem;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+  padding: 8px 4px;
 }
 
-.m3-chip__remove:hover {
-  background: rgba(0, 0, 0, 0.08);
+.player-row__checkbox {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--m3-primary);
+  flex-shrink: 0;
 }
 
-.m3-chip__remove .m3-icon {
-  width: 16px;
-  height: 16px;
+.player-row__name {
+  font-size: 0.95rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player-row__actions {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.player-row__actions .m3-icon-button {
+  width: 40px;
+  height: 40px;
+}
+
+.player-row__actions .m3-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.player-row__rename-input {
+  flex: 1;
+  height: 44px;
+  padding: 0 12px;
+  border-radius: var(--m3-shape-sm);
+  border: 1px solid var(--m3-primary);
+  background: var(--m3-surface-container-low);
+  color: var(--m3-on-surface);
+  font-size: 0.95rem;
+  font-family: inherit;
 }
 
 /* ---------- Switch (Einstellungen) ---------- */

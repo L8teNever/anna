@@ -87,6 +87,12 @@
       tone({ freq: 659.25, duration: 0.12, volume: 0.2, delay: 0.1 });
       tone({ freq: 783.99, duration: 0.18, volume: 0.2, delay: 0.2 });
     },
+    say(text) {
+      if (!isEnabled() || !("speechSynthesis" in window)) return;
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "de-DE";
+      window.speechSynthesis.speak(utterance);
+    },
     boom() {
       noiseBurst({ duration: 0.7, volume: 0.6 });
       tone({ freq: 90, duration: 0.5, type: "sawtooth", volume: 0.3 });

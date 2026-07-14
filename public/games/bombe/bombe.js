@@ -10,10 +10,6 @@
   const playView = document.getElementById("play-view");
   const backButton = document.getElementById("back-button");
 
-  const playerNameInput = document.getElementById("player-name-input");
-  const addPlayerButton = document.getElementById("add-player-button");
-  const playerChips = document.getElementById("player-chips");
-
   const minSecondsInput = document.getElementById("min-seconds-input");
   const maxSecondsInput = document.getElementById("max-seconds-input");
   const startButton = document.getElementById("start-button");
@@ -26,7 +22,7 @@
   const restartButton = document.getElementById("restart-button");
   const exitButton = document.getElementById("exit-button");
 
-  let players = Storage.getPlayers("bombe");
+  const playerPicker = PlayerPicker.create(document.getElementById("player-picker"), "bombe");
   let tickTimeoutId = null;
   let roundActive = false;
 
@@ -41,39 +37,6 @@
   function saveFuseSettings(settings) {
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
   }
-
-  function renderPlayers() {
-    playerChips.innerHTML = "";
-    players.forEach((name, index) => {
-      const chip = document.createElement("span");
-      chip.className = "m3-chip";
-      chip.innerHTML = `${name} <button type="button" class="m3-chip__remove" aria-label="${name} entfernen"><svg class="m3-icon"><use href="#icon-close"></use></svg></button>`;
-      chip.querySelector(".m3-chip__remove").addEventListener("click", () => {
-        players.splice(index, 1);
-        Storage.setPlayers("bombe", players);
-        renderPlayers();
-      });
-      playerChips.appendChild(chip);
-    });
-  }
-
-  function addPlayer() {
-    const name = playerNameInput.value.trim();
-    if (!name) return;
-    players.push(name);
-    Storage.setPlayers("bombe", players);
-    playerNameInput.value = "";
-    renderPlayers();
-    playerNameInput.focus();
-  }
-
-  addPlayerButton.addEventListener("click", addPlayer);
-  playerNameInput.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      addPlayer();
-    }
-  });
 
   const fuseSettings = loadFuseSettings();
   minSecondsInput.value = fuseSettings.min;
@@ -123,11 +86,20 @@
     playActions.hidden = true;
     bombRing.classList.remove("bomb-ring--exploded");
     bombIconUse.setAttribute("href", "#icon-bomb");
-    playStatus.textContent = "Gib das Handy weiter…";
     playStatus.dataset.exploded = "false";
 
     Sound.unlock();
     WakeLock.enable();
+
+    const selectedNames = playerPicker.getSelectedNames();
+    if (selectedNames.length > 0) {
+      const starter = selectedNames[Math.floor(Math.random() * selectedNames.length)];
+      playStatus.textContent = `${starter} fängt an – gib dann weiter…`;
+      Sound.say(`${starter} fängt an`);
+    } else {
+      playStatus.textContent = "Gib das Handy weiter…";
+    }
+
     scheduleTick(totalMs, performance.now());
   }
 
@@ -171,6 +143,4 @@
   });
 
   window.addEventListener("beforeunload", stopRound);
-
-  renderPlayers();
 })();

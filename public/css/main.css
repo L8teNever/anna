@@ -169,14 +169,6 @@
   font-family: inherit;
 }
 
-.player-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 12px;
-  min-height: 36px;
-}
-
 .game-bottom-bar {
   position: sticky;
   bottom: 0;

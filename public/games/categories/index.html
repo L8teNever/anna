@@ -35,14 +35,9 @@
 
     <!-- ---------- Setup-Ansicht ---------- -->
     <section class="game-view" id="setup-view">
-      <h2 class="m3-title game-section-title">Mitspieler (optional)</h2>
-      <div class="player-input-row">
-        <input type="text" id="player-name-input" placeholder="Name hinzufügen…" maxlength="20" />
-        <button type="button" class="m3-button m3-button--tonal" id="add-player-button" aria-label="Spieler hinzufügen">
-          <svg class="m3-icon"><use href="#icon-add"></use></svg>
-        </button>
-      </div>
-      <div class="player-chips" id="player-chips"></div>
+      <h2 class="m3-title game-section-title">Mitspieler</h2>
+      <p class="m3-body">Anhaken, wer mitspielt – neue Spieler bleiben auch für andere Spiele gespeichert.</p>
+      <div class="player-picker" id="player-picker"></div>
 
       <h2 class="m3-title game-section-title">Zeit pro Kategorie</h2>
       <div class="player-input-row">
@@ -76,6 +71,7 @@
   </div>
 
   <script src="/js/storage.js"></script>
+  <script src="/js/player-picker.js"></script>
   <script src="/js/wake-lock.js"></script>
   <script src="/js/audio.js"></script>
   <script src="/games/categories/categories.js"></script>

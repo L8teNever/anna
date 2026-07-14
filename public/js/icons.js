@@ -30,6 +30,9 @@
     <symbol id="icon-add" viewBox="0 0 24 24">
       <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
     </symbol>
+    <symbol id="icon-edit" viewBox="0 0 24 24">
+      <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+    </symbol>
     <symbol id="icon-bomb" viewBox="0 0 24 24">
       <circle cx="10.5" cy="14.5" r="6.5"/>
       <line x1="14.8" y1="10.2" x2="18" y2="7"/>

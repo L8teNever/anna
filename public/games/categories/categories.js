@@ -16,9 +16,6 @@
   const playView = document.getElementById("play-view");
   const backButton = document.getElementById("back-button");
 
-  const playerNameInput = document.getElementById("player-name-input");
-  const addPlayerButton = document.getElementById("add-player-button");
-  const playerChips = document.getElementById("player-chips");
   const secondsInput = document.getElementById("seconds-input");
   const startButton = document.getElementById("start-button");
 
@@ -29,7 +26,7 @@
   const nextRoundButton = document.getElementById("next-round-button");
   const exitButton = document.getElementById("exit-button");
 
-  let players = Storage.getPlayers("categories");
+  PlayerPicker.create(document.getElementById("player-picker"), "categories");
   let intervalId = null;
   let remainingSeconds = 30;
 
@@ -44,39 +41,6 @@
   function saveSeconds(seconds) {
     localStorage.setItem(SETTINGS_KEY, JSON.stringify({ seconds }));
   }
-
-  function renderPlayers() {
-    playerChips.innerHTML = "";
-    players.forEach((name, index) => {
-      const chip = document.createElement("span");
-      chip.className = "m3-chip";
-      chip.innerHTML = `${name} <button type="button" class="m3-chip__remove" aria-label="${name} entfernen"><svg class="m3-icon"><use href="#icon-close"></use></svg></button>`;
-      chip.querySelector(".m3-chip__remove").addEventListener("click", () => {
-        players.splice(index, 1);
-        Storage.setPlayers("categories", players);
-        renderPlayers();
-      });
-      playerChips.appendChild(chip);
-    });
-  }
-
-  function addPlayer() {
-    const name = playerNameInput.value.trim();
-    if (!name) return;
-    players.push(name);
-    Storage.setPlayers("categories", players);
-    playerNameInput.value = "";
-    renderPlayers();
-    playerNameInput.focus();
-  }
-
-  addPlayerButton.addEventListener("click", addPlayer);
-  playerNameInput.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      addPlayer();
-    }
-  });
 
   secondsInput.value = loadSeconds();
 
@@ -148,6 +112,4 @@
   });
 
   window.addEventListener("beforeunload", stopGame);
-
-  renderPlayers();
 })();

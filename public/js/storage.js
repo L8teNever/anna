@@ -37,11 +37,25 @@
       write("settings", merged);
       return merged;
     },
-    getPlayers(gameId) {
-      return read(`players:${gameId}`, []);
+    // Globale Spieler-Liste (Roster) – über alle Spiele hinweg geteilt.
+    // Bleibt dauerhaft gespeichert, bis ein Name umbenannt oder gelöscht wird.
+    getRoster() {
+      return read("roster", []);
     },
-    setPlayers(gameId, players) {
-      write(`players:${gameId}`, players);
+    setRoster(names) {
+      write("roster", names);
+    },
+
+    // Welche Roster-Namen sind für ein bestimmtes Spiel angehakt (spielen
+    // mit)? Wird gegen das aktuelle Roster gefiltert, damit gelöschte
+    // Namen nirgends mehr auftauchen.
+    getSelectedPlayers(gameId) {
+      const roster = this.getRoster();
+      const selected = read(`selected:${gameId}`, []);
+      return selected.filter((name) => roster.includes(name));
+    },
+    setSelectedPlayers(gameId, names) {
+      write(`selected:${gameId}`, names);
     },
   };
 
