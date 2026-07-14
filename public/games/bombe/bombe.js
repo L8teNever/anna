@@ -5,6 +5,22 @@
  */
 (function () {
   const SETTINGS_KEY = "anna:bombe:settings";
+  const CATEGORY_SETTINGS_KEY = "anna:bombe:categories";
+
+  const CATEGORY_LIST = [
+    { id: "automarken", label: "Automarken", prompt: "Nenne eine Automarke" },
+    { id: "staedte", label: "Städte", prompt: "Nenne eine Stadt" },
+    { id: "tiere", label: "Tiere", prompt: "Nenne ein Tier" },
+    { id: "filme", label: "Filme", prompt: "Nenne einen Filmtitel" },
+    { id: "promis", label: "Promis", prompt: "Nenne einen Promi" },
+    { id: "essen", label: "Essen & Trinken", prompt: "Nenne etwas zu essen oder zu trinken" },
+    { id: "berufe", label: "Berufe", prompt: "Nenne einen Beruf" },
+    { id: "farben", label: "Farben", prompt: "Nenne eine Farbe" },
+    { id: "sportarten", label: "Sportarten", prompt: "Nenne eine Sportart" },
+    { id: "vornamen", label: "Vornamen", prompt: "Nenne einen Vornamen" },
+    { id: "marken", label: "Marken", prompt: "Nenne eine Marke" },
+    { id: "musikbands", label: "Musikbands", prompt: "Nenne eine Musikband" },
+  ];
 
   const setupView = document.getElementById("setup-view");
   const playView = document.getElementById("play-view");
@@ -13,10 +29,13 @@
   const minSecondsInput = document.getElementById("min-seconds-input");
   const maxSecondsInput = document.getElementById("max-seconds-input");
   const startButton = document.getElementById("start-button");
+  const categoryPicker = document.getElementById("category-picker");
 
   const bombRing = document.getElementById("bomb-ring");
   const bombIcon = document.getElementById("bomb-icon");
   const bombIconUse = bombIcon.querySelector("use");
+  const bombCategory = document.getElementById("bomb-category");
+  const bombCategoryText = document.getElementById("bomb-category-text");
   const playStatus = document.getElementById("play-status");
   const playActions = document.getElementById("play-actions");
   const restartButton = document.getElementById("restart-button");
@@ -48,6 +67,47 @@
     if (max < min) [min, max] = [max, min];
     saveFuseSettings({ min, max });
     return { min, max };
+  }
+
+  function loadSelectedCategories() {
+    try {
+      const ids = JSON.parse(localStorage.getItem(CATEGORY_SETTINGS_KEY) || "[]");
+      const validIds = new Set(CATEGORY_LIST.map((cat) => cat.id));
+      return new Set(ids.filter((id) => validIds.has(id)));
+    } catch (err) {
+      return new Set();
+    }
+  }
+
+  function saveSelectedCategories() {
+    localStorage.setItem(CATEGORY_SETTINGS_KEY, JSON.stringify(Array.from(selectedCategories)));
+  }
+
+  const selectedCategories = loadSelectedCategories();
+
+  function renderCategoryPicker() {
+    categoryPicker.innerHTML = CATEGORY_LIST.map((cat) => {
+      const active = selectedCategories.has(cat.id) ? " category-chip--active" : "";
+      return `<button type="button" class="category-chip${active}" data-id="${cat.id}">${cat.label}</button>`;
+    }).join("");
+  }
+
+  categoryPicker.addEventListener("click", (event) => {
+    const chip = event.target.closest(".category-chip");
+    if (!chip) return;
+    const id = chip.dataset.id;
+    if (selectedCategories.has(id)) selectedCategories.delete(id);
+    else selectedCategories.add(id);
+    saveSelectedCategories();
+    renderCategoryPicker();
+  });
+
+  renderCategoryPicker();
+
+  function pickCategory() {
+    if (selectedCategories.size === 0) return null;
+    const options = CATEGORY_LIST.filter((cat) => selectedCategories.has(cat.id));
+    return options[Math.floor(Math.random() * options.length)];
   }
 
   function pulse() {
@@ -91,14 +151,20 @@
     Sound.unlock();
     WakeLock.enable();
 
-    const selectedNames = playerPicker.getSelectedNames();
-    if (selectedNames.length > 0) {
-      const starter = selectedNames[Math.floor(Math.random() * selectedNames.length)];
-      playStatus.textContent = `${starter} fängt an – gib dann weiter…`;
-      Sound.say(`${starter} fängt an`);
+    const category = pickCategory();
+    if (category) {
+      bombCategoryText.textContent = category.label;
+      bombCategory.hidden = false;
     } else {
-      playStatus.textContent = "Gib das Handy weiter…";
+      bombCategory.hidden = true;
     }
+
+    const selectedNames = playerPicker.getSelectedNames();
+    const starter = selectedNames.length > 0 ? selectedNames[Math.floor(Math.random() * selectedNames.length)] : null;
+
+    const announcement = [starter ? `${starter} fängt an` : null, category ? category.prompt : null].filter(Boolean);
+    playStatus.textContent = announcement.length > 0 ? `${announcement.join(" – ")} – gib dann weiter…` : "Gib das Handy weiter…";
+    if (announcement.length > 0) Sound.say(announcement.join(". "));
 
     scheduleTick(totalMs, performance.now());
   }

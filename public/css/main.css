@@ -230,6 +230,10 @@
     grid-template-columns: 1fr 1fr;
     gap: 32px;
   }
+
+  .setup-grid__full {
+    grid-column: 1 / -1;
+  }
 }
 
 .game-section-title {

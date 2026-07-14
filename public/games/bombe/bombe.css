@@ -4,6 +4,55 @@
  * dieses Spiel einzigartig macht.
  */
 
+.category-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.category-chip {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid var(--m3-outline);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  color: var(--m3-on-surface);
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s var(--m3-easing-standard);
+}
+
+.category-chip:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.category-chip--active {
+  background: var(--m3-primary);
+  border-color: var(--m3-primary);
+  color: var(--m3-on-primary);
+}
+
+.bomb-category {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.bomb-category .m3-title {
+  font-family: var(--m3-font-display);
+  font-weight: 800;
+  font-size: 1.4rem;
+  background: linear-gradient(135deg, #ff5252, #ffb347);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .bomb-ring {
   width: 220px;
   height: 220px;

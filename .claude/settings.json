@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"import urllib.request; print\\(urllib.request.urlopen\\('http://localhost:8080/bombe'\\).read\\(\\)[:500]\\)\")",
+      "Bash(node --check public/games/bombe/bombe.js)",
+      "Bash(node -e \"require\\('jsdom'\\); console.log\\('has jsdom'\\)\")"
+    ]
+  }
+}
