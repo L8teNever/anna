@@ -67,7 +67,6 @@ function initSettings() {
   soundToggle.checked = window.AudioSynth.isEnabled();
   soundToggle.addEventListener('change', (e) => {
     window.AudioSynth.toggleSound(e.target.checked);
-    updateGameSoundBadge();
   });
 
   // 4. Load Players
