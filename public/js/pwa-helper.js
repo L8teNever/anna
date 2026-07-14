@@ -38,8 +38,8 @@
     banner.querySelector(".update-banner__confirm").addEventListener("click", () => {
       banner.querySelector(".update-banner__confirm").textContent = "Wird aktualisiert…";
       onConfirm();
-      // Fallback: falls "controllerchange" aus irgendeinem Grund nicht
-      // feuert, trotzdem neu laden, statt dass der Klick wirkungslos bleibt.
+      // Fallback: falls "SW_ACTIVATED" aus irgendeinem Grund nicht
+      // empfangen wird, trotzdem nach 4 Sekunden neu laden.
       setTimeout(reloadOnce, 4000);
     });
   }
@@ -50,6 +50,14 @@
     hasReloaded = true;
     window.location.reload();
   }
+
+  // Listen to messages from the Service Worker
+  navigator.serviceWorker.addEventListener("message", (event) => {
+    if (event.data && event.data.type === "SW_ACTIVATED") {
+      console.log("[anna] SW_ACTIVATED received. Clean reloading page.");
+      reloadOnce();
+    }
+  });
 
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("/sw.js").then((registration) => {
@@ -86,6 +94,10 @@
       console.warn("[anna] Service-Worker-Registrierung fehlgeschlagen:", err);
     });
 
-    navigator.serviceWorker.addEventListener("controllerchange", reloadOnce);
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      // controllerchange ist der Standard-Trigger, wir lassen ihn als Fallback aktiv
+      // falls der Worker die Aktivierungsnachricht nicht abschicken kann.
+      setTimeout(reloadOnce, 1000);
+    });
   });
 })();

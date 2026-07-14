@@ -15,7 +15,7 @@
  *     komplett offline mit dem neuen Stand.
  */
 
-const APP_VERSION = "1.4.0";
+const APP_VERSION = "1.5.0";
 const CACHE_NAME = `anna-cache-${APP_VERSION}`;
 
 importScripts("/js/game-registry.js");
@@ -91,6 +91,14 @@ self.addEventListener("activate", (event) => {
       .keys()
       .then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))))
       .then(() => self.clients.claim())
+      .then(() => {
+        // Notify all clients that the new SW is active and cache is clean!
+        return self.clients.matchAll().then((clients) => {
+          clients.forEach((client) => {
+            client.postMessage({ type: "SW_ACTIVATED" });
+          });
+        });
+      })
   );
 });
 
@@ -105,18 +113,20 @@ self.addEventListener("fetch", (event) => {
   if (request.method !== "GET" || !request.url.startsWith(self.location.origin)) return;
 
   event.respondWith(
-    caches.match(request).then((cached) => {
-      const networkFetch = fetch(request)
-        .then((response) => {
-          if (response && response.ok) {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-          }
-          return response;
-        })
-        .catch(() => cached);
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.match(request).then((cached) => {
+        const networkFetch = fetch(request)
+          .then((response) => {
+            if (response && response.ok) {
+              const clone = response.clone();
+              cache.put(request, clone);
+            }
+            return response;
+          })
+          .catch(() => cached);
 
-      return cached || networkFetch;
+        return cached || networkFetch;
+      });
     })
   );
 });
