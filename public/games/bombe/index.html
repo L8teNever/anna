@@ -54,14 +54,16 @@
         </div>
       </div>
 
-      <!-- Aufgaben-Kategorien – volle Breite unter dem Grid -->
+      <!-- Kategorien-Auswahl – volle Breite darunter -->
       <div class="bombe-cat-section">
-        <h2 class="m3-title game-section-title">Aufgaben-Kategorien</h2>
+        <h2 class="m3-title game-section-title">Kategorien</h2>
         <p class="m3-body">
-          Wer die Bombe hält, wenn sie explodiert, bekommt eine zufällige Aufgabe.
-          Wähle aus welchen Kategorien diese kommen soll – oder lass alle aus für klassisches Spielen ohne Aufgabe.
+          Beim Rundenstart wird eine zufällige Kategorie gezogen. Jeder muss
+          <strong>vor dem Weitergeben</strong> einen Begriff aus dieser Kategorie nennen –
+          wer die Bombe hält wenn sie explodiert, hat verloren.
+          Ohne Auswahl läuft die Bombe klassisch ohne Thema.
         </p>
-        <div class="bombe-cat-chips" id="category-picker" role="group" aria-label="Aufgaben-Kategorien wählen"></div>
+        <div id="category-picker"></div>
       </div>
 
       <div class="game-bottom-bar">
@@ -72,17 +74,20 @@
     <!-- ---------- Spiel-Ansicht ---------- -->
     <section class="game-view" id="play-view" hidden>
       <div class="game-play">
+
+        <!-- Aktive Kategorie – groß oben -->
+        <div class="active-cat" id="active-cat-badge" hidden>
+          <p class="active-cat__hint">Kategorie dieser Runde</p>
+          <p class="active-cat__label" id="active-cat-text"></p>
+          <p class="active-cat__rule">Nenn einen Begriff → dann weitergeben!</p>
+        </div>
+
         <div class="bomb-ring" id="bomb-ring">
           <svg class="m3-icon bomb-ring__icon" id="bomb-icon"><use href="#icon-bomb"></use></svg>
         </div>
         <p class="m3-title" id="play-status">Gib das Handy weiter…</p>
-
-        <!-- Task-Karte: erscheint nach der Explosion -->
-        <div class="bomb-task-card" id="task-card" hidden>
-          <span class="bomb-task-card__cat" id="task-category-label"></span>
-          <p class="bomb-task-card__text" id="task-text"></p>
-        </div>
       </div>
+
       <div class="game-bottom-bar" id="play-actions" hidden>
         <button type="button" class="m3-button m3-button--filled" id="restart-button">Neue Runde</button>
         <button type="button" class="m3-button m3-button--text" id="exit-button" style="margin-top: 8px">

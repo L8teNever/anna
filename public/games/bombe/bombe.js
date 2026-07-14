@@ -1,148 +1,71 @@
 /**
- * Tickende Bombe – klassisches "Pass das Handy weiter"-Spiel.
- * Die Zündzeit ist zufällig zwischen min/max Sekunden und wird bewusst nie
- * angezeigt: das Ticken wird nur hörbar/fühlbar schneller, bis es knallt.
- * Beim Explodieren bekommt der Verlierer eine zufällige Aufgabe aus den
- * gewählten Kategorien.
+ * Tickende Bombe – "Heiße Kartoffel"-Variante mit Kategorien.
+ *
+ * Spielprinzip:
+ *   Beim Rundenstart wird eine zufällige Kategorie aus den gewählten
+ *   Kategorien gezogen und deutlich angezeigt. Jeder, der die Bombe
+ *   hält, muss EINEN Begriff aus dieser Kategorie nennen, bevor er
+ *   weiterzugibt. Wer die Bombe hält, wenn sie explodiert, hat verloren.
  */
 (function () {
-  const SETTINGS_KEY  = "anna:bombe:settings";
-  const CATS_KEY      = "anna:bombe:categories";
+  const SETTINGS_KEY = "anna:bombe:settings";
+  const CATS_KEY     = "anna:bombe:categories";
 
   /* ------------------------------------------------------------------ */
-  /* Aufgaben-Datenbank                                                   */
+  /* Kategorien-Datenbank (nur Namen, keine Aufgaben)                    */
   /* ------------------------------------------------------------------ */
-  const CATEGORIES = [
-    {
-      id: "aktion",
-      label: "🏃 Aktionen",
-      color: "#e53935",
-      tasks: [
-        "Mach 10 Liegestütze!",
-        "Hüpfe 30 Sekunden lang auf einem Bein.",
-        "Mach einen Hampelmann – so schnell du kannst, 20 Stück.",
-        "Lauf einmal im Kreis durch den Raum.",
-        "Halte 20 Sekunden lang die Planke.",
-        "Knie nieder und steh 5× schnell auf.",
-        "Mach rückwärts 5 Schritte – ohne umzufallen.",
-        "Spring so hoch du kannst – 5×.",
-      ],
-    },
-    {
-      id: "imitieren",
-      label: "🎭 Imitieren",
-      color: "#8e24aa",
-      tasks: [
-        "Imitiere ein Auto, das anspringt und Gas gibt – mit Geräuschen!",
-        "Mach das Geräusch einer Katze – überzeuge die Gruppe.",
-        "Imitiere einen Hund, der bellt und wedelt.",
-        "Mach das Geräusch eines Hubschraubers beim Starten.",
-        "Imitiere einen Roboter – Bewegungen und Stimme.",
-        "Mach das Geräusch eines Zuges, der losfährt.",
-        "Imitiere einen schlafenden Bären – mit Schnarchen.",
-        "Tu so als ob du ein Motorrad bist – inkl. Startgeräusch.",
-        "Mach das Geräusch und die Bewegung einer alten Nähmaschine.",
-        "Imitiere einen wütenden Pinguin.",
-      ],
-    },
-    {
-      id: "wissen",
-      label: "🧠 Wissen",
-      color: "#1e88e5",
-      tasks: [
-        "Nenne 5 Automarken in 10 Sekunden.",
-        "Sage die Hauptstädte von 3 europäischen Ländern auf.",
-        "Nenne 5 verschiedene Sportarten in 8 Sekunden.",
-        "Zähle rückwärts von 20 auf 1 – ohne Fehler.",
-        "Nenne 4 Tiere, die in der Arktis leben.",
-        "Sage das Alphabet rückwärts – so weit du kommst in 10 Sekunden.",
-        "Nenne 5 Dinge, die man im Badezimmer findet.",
-        "Nenne 3 Erfinder und ihre Erfindungen.",
-        "Nenne 5 Länder ohne Meeresküste.",
-        "Sage 3 Wörter auf Englisch, die mindestens 8 Buchstaben haben.",
-      ],
-    },
-    {
-      id: "singen",
-      label: "🎤 Singen",
-      color: "#43a047",
-      tasks: [
-        "Singe die ersten 4 Zeilen deines Lieblingsliedes.",
-        "Singe \"Happy Birthday\" auf Englisch – komplett.",
-        "Singe einen Jingle aus der Werbung deiner Wahl.",
-        "Singe \"Alle meine Entchen\" mit vollem Einsatz.",
-        "Singe irgendetwas, das du gerade siehst – improvisiert.",
-        "Singe die Titelmelodie einer Zeichentrickserie.",
-        "Singe einen Zungenbrecher im Rap-Stil.",
-        "Singe deinen eigenen Namen als Opernarie.",
-      ],
-    },
-    {
-      id: "social",
-      label: "😄 Social",
-      color: "#fb8c00",
-      tasks: [
-        "Erzähle einen Witz – die Gruppe entscheidet, ob er gut ist.",
-        "Gib jedem in der Runde ein aufrichtiges Kompliment.",
-        "Mach ein Selfie mit deinem verrücktesten Gesicht und zeig es rum.",
-        "Beschreibe deinen Tag in genau 5 Wörtern.",
-        "Tu eine Minute lang so, als wärst du berühmt.",
-        "Sprich die nächsten 2 Minuten mit einem erfundenen Akzent.",
-        "Nenne das Lustigste, das du diese Woche erlebt hast.",
-        "Stelle dich selbst vor – als wärst du ein Superheld.",
-        "Sag der Person links von dir etwas Nettes auf eine ungewöhnliche Art.",
-        "Erfinde spontan einen Reim über jemanden in der Runde.",
-      ],
-    },
-    {
-      id: "challenge",
-      label: "🔥 Challenge",
-      color: "#d81b60",
-      tasks: [
-        "Halte 30 Sekunden lang die Luft an.",
-        "Versuche, deine Zunge an deine Nase zu berühren.",
-        "Schreibe deinen Namen mit der falschen Hand in die Luft.",
-        "Führe 1 Minute lang kein Wort – absolutes Schweigen.",
-        "Iss eine Prise Salz, ohne das Gesicht zu verziehen.",
-        "Berühre deinen Ellbogen mit der Hand derselben Seite – funktioniert das?",
-        "Mach die \"Gangnam Style\"-Bewegung für 15 Sekunden.",
-        "Stell dein Handy auf die Stirn – und hält es dort 10 Sekunden ohne Hände.",
-        "Falte deine Arme – jetzt wechsle sie andersherum. Versuche es 5×.",
-        "Klopfe mit einer Hand auf deinen Kopf und reibe gleichzeitig mit der anderen auf deinem Bauch.",
-      ],
-    },
+  const ALL_CATEGORIES = [
+    { id: "automarken",   label: "Automarken",          icon: "🚗" },
+    { id: "tiere",        label: "Tiere",               icon: "🐾" },
+    { id: "laender",      label: "Länder",              icon: "🌍" },
+    { id: "staedte",      label: "Städte",              icon: "🏙️" },
+    { id: "sportarten",   label: "Sportarten",          icon: "⚽" },
+    { id: "essen",        label: "Essen & Trinken",     icon: "🍕" },
+    { id: "filme",        label: "Filmtitel",           icon: "🎬" },
+    { id: "serien",       label: "Serien",              icon: "📺" },
+    { id: "musiker",      label: "Musiker & Bands",     icon: "🎵" },
+    { id: "instrumente",  label: "Musikinstrumente",    icon: "🎸" },
+    { id: "berufe",       label: "Berufe",              icon: "💼" },
+    { id: "videospiele",  label: "Videospiele",         icon: "🎮" },
+    { id: "suesswaren",   label: "Süßigkeiten",         icon: "🍬" },
+    { id: "urlaubsziele", label: "Urlaubsziele",        icon: "🏖️" },
+    { id: "superstars",   label: "Prominente",          icon: "⭐" },
+    { id: "pflanzungen",  label: "Pflanzen & Blumen",   icon: "🌺" },
+    { id: "marken",       label: "Marken & Firmen",     icon: "🏷️" },
+    { id: "farben",       label: "Dinge einer Farbe",   icon: "🎨" },
   ];
 
   /* ------------------------------------------------------------------ */
   /* DOM-Referenzen                                                        */
   /* ------------------------------------------------------------------ */
-  const setupView     = document.getElementById("setup-view");
-  const playView      = document.getElementById("play-view");
-  const backButton    = document.getElementById("back-button");
+  const setupView       = document.getElementById("setup-view");
+  const playView        = document.getElementById("play-view");
+  const backButton      = document.getElementById("back-button");
 
   const minSecondsInput = document.getElementById("min-seconds-input");
   const maxSecondsInput = document.getElementById("max-seconds-input");
   const startButton     = document.getElementById("start-button");
 
-  const bombRing      = document.getElementById("bomb-ring");
-  const bombIcon      = document.getElementById("bomb-icon");
-  const bombIconUse   = bombIcon.querySelector("use");
-  const playStatus    = document.getElementById("play-status");
-  const playActions   = document.getElementById("play-actions");
-  const restartButton = document.getElementById("restart-button");
-  const exitButton    = document.getElementById("exit-button");
+  const bombRing        = document.getElementById("bomb-ring");
+  const bombIcon        = document.getElementById("bomb-icon");
+  const bombIconUse     = bombIcon.querySelector("use");
+  const playStatus      = document.getElementById("play-status");
+  const playActions     = document.getElementById("play-actions");
+  const restartButton   = document.getElementById("restart-button");
+  const exitButton      = document.getElementById("exit-button");
 
   const categoryPicker  = document.getElementById("category-picker");
-  const taskCard        = document.getElementById("task-card");
-  const taskCategoryLbl = document.getElementById("task-category-label");
-  const taskText        = document.getElementById("task-text");
+
+  // Aktive Kategorieanzeige im Spielfeld
+  const activeCatBadge  = document.getElementById("active-cat-badge");
+  const activeCatText   = document.getElementById("active-cat-text");
 
   const playerPicker = PlayerPicker.create(document.getElementById("player-picker"), "bombe");
-  let tickTimeoutId = null;
-  let roundActive   = false;
+  let tickTimeoutId  = null;
+  let roundActive    = false;
 
   /* ------------------------------------------------------------------ */
-  /* Einstellungen                                                         */
+  /* Einstellungen laden / speichern                                      */
   /* ------------------------------------------------------------------ */
   function loadFuseSettings() {
     try { return Object.assign({ min: 30, max: 90 }, JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}")); }
@@ -153,15 +76,15 @@
   function loadSelectedCats() {
     try {
       const stored = JSON.parse(localStorage.getItem(CATS_KEY));
-      if (Array.isArray(stored)) return new Set(stored);
+      if (Array.isArray(stored) && stored.length) return new Set(stored);
     } catch {}
-    // Standard: alle Kategorien aktiv
-    return new Set(CATEGORIES.map((c) => c.id));
+    // Standard: alle aktiv
+    return new Set(ALL_CATEGORIES.map((c) => c.id));
   }
   function saveSelectedCats(set) { localStorage.setItem(CATS_KEY, JSON.stringify([...set])); }
 
-  const fuseSettings  = loadFuseSettings();
-  let selectedCats    = loadSelectedCats();
+  const fuseSettings = loadFuseSettings();
+  let selectedCats   = loadSelectedCats();
 
   minSecondsInput.value = fuseSettings.min;
   maxSecondsInput.value = fuseSettings.max;
@@ -171,38 +94,77 @@
   /* ------------------------------------------------------------------ */
   function buildCategoryPicker() {
     categoryPicker.innerHTML = "";
-    CATEGORIES.forEach((cat) => {
+
+    // "Alle" / "Keine" Schnell-Buttons
+    const toolbar = document.createElement("div");
+    toolbar.className = "bombe-cat-toolbar";
+
+    const allBtn = document.createElement("button");
+    allBtn.type = "button";
+    allBtn.textContent = "Alle";
+    allBtn.className = "bombe-cat-quick";
+    allBtn.addEventListener("click", () => {
+      selectedCats = new Set(ALL_CATEGORIES.map((c) => c.id));
+      saveSelectedCats(selectedCats);
+      updateChips();
+    });
+
+    const noneBtn = document.createElement("button");
+    noneBtn.type = "button";
+    noneBtn.textContent = "Keine";
+    noneBtn.className = "bombe-cat-quick";
+    noneBtn.addEventListener("click", () => {
+      selectedCats = new Set();
+      saveSelectedCats(selectedCats);
+      updateChips();
+    });
+
+    toolbar.append(allBtn, noneBtn);
+    categoryPicker.appendChild(toolbar);
+
+    // Chips
+    const grid = document.createElement("div");
+    grid.className = "bombe-cat-chips";
+    categoryPicker.appendChild(grid);
+
+    ALL_CATEGORIES.forEach((cat) => {
       const chip = document.createElement("button");
       chip.type = "button";
       chip.className = "bombe-cat-chip";
       chip.dataset.id = cat.id;
-      chip.style.setProperty("--cat-color", cat.color);
+      chip.innerHTML = `<span class="bombe-cat-chip__icon">${cat.icon}</span>${cat.label}`;
       chip.setAttribute("aria-pressed", selectedCats.has(cat.id) ? "true" : "false");
-      chip.textContent = cat.label;
       if (selectedCats.has(cat.id)) chip.classList.add("bombe-cat-chip--active");
 
       chip.addEventListener("click", () => {
         const active = chip.classList.toggle("bombe-cat-chip--active");
         chip.setAttribute("aria-pressed", active ? "true" : "false");
         if (active) selectedCats.add(cat.id);
-        else selectedCats.delete(cat.id);
+        else        selectedCats.delete(cat.id);
         saveSelectedCats(selectedCats);
       });
 
-      categoryPicker.appendChild(chip);
+      grid.appendChild(chip);
     });
   }
+
+  function updateChips() {
+    categoryPicker.querySelectorAll(".bombe-cat-chip").forEach((chip) => {
+      const active = selectedCats.has(chip.dataset.id);
+      chip.classList.toggle("bombe-cat-chip--active", active);
+      chip.setAttribute("aria-pressed", active ? "true" : "false");
+    });
+  }
+
   buildCategoryPicker();
 
   /* ------------------------------------------------------------------ */
-  /* Aufgabe ziehen                                                        */
+  /* Zufällige Kategorie für diese Runde ziehen                          */
   /* ------------------------------------------------------------------ */
-  function pickTask() {
-    const activeCats = CATEGORIES.filter((c) => selectedCats.has(c.id));
-    if (activeCats.length === 0) return null;
-    const cat  = activeCats[Math.floor(Math.random() * activeCats.length)];
-    const task = cat.tasks[Math.floor(Math.random() * cat.tasks.length)];
-    return { cat, task };
+  function pickCategory() {
+    const active = ALL_CATEGORIES.filter((c) => selectedCats.has(c.id));
+    if (!active.length) return null;
+    return active[Math.floor(Math.random() * active.length)];
   }
 
   /* ------------------------------------------------------------------ */
@@ -246,12 +208,23 @@
     setupView.hidden = true;
     playView.hidden  = false;
     playActions.hidden = true;
-    taskCard.hidden    = true;
 
     bombRing.classList.remove("bomb-ring--exploded");
     bombIconUse.setAttribute("href", "#icon-bomb");
     playStatus.dataset.exploded = "false";
-    playStatus.style.removeProperty("color");
+
+    // Kategorie ziehen und anzeigen
+    const cat = pickCategory();
+    if (cat && activeCatBadge) {
+      activeCatText.textContent = `${cat.icon}  ${cat.label}`;
+      activeCatBadge.hidden = false;
+      // Slide-in Animation neu starten
+      activeCatBadge.classList.remove("active-cat--in");
+      void activeCatBadge.offsetWidth;
+      activeCatBadge.classList.add("active-cat--in");
+    } else if (activeCatBadge) {
+      activeCatBadge.hidden = true;
+    }
 
     Sound.unlock();
     WakeLock.enable();
@@ -259,10 +232,10 @@
     const selectedNames = playerPicker.getSelectedNames();
     if (selectedNames.length > 0) {
       const starter = selectedNames[Math.floor(Math.random() * selectedNames.length)];
-      playStatus.textContent = `${starter} fängt an – gib dann weiter…`;
+      playStatus.textContent = `${starter} fängt an – nenn einen Begriff, dann weiterreichen!`;
       Sound.say(`${starter} fängt an`);
     } else {
-      playStatus.textContent = "Gib das Handy weiter…";
+      playStatus.textContent = "Nenn einen Begriff aus der Kategorie, dann weiterreichen!";
     }
 
     scheduleTick(totalMs, performance.now());
@@ -274,22 +247,9 @@
 
     bombIconUse.setAttribute("href", "#icon-burst");
     bombRing.classList.add("bomb-ring--exploded");
-    playStatus.textContent    = "💥 BOOM! Die Bombe ist hochgegangen.";
+    playStatus.textContent = "💥 BOOM! Die Bombe ist hochgegangen.";
     playStatus.dataset.exploded = "true";
     playActions.hidden = false;
-
-    // Aufgabe anzeigen
-    const drawn = pickTask();
-    if (drawn) {
-      taskCategoryLbl.textContent = drawn.cat.label;
-      taskCategoryLbl.style.setProperty("--cat-color", drawn.cat.color);
-      taskText.textContent = drawn.task;
-      taskCard.hidden = false;
-      // Slide-in animation rücksetzen
-      taskCard.classList.remove("bomb-task-card--in");
-      void taskCard.offsetWidth;
-      taskCard.classList.add("bomb-task-card--in");
-    }
 
     // Screen Shake
     document.body.classList.add("shake");
