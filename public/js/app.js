@@ -24,7 +24,7 @@
       card.dataset.color = game.color;
       card.setAttribute("aria-label", `${game.name} öffnen`);
       card.innerHTML = `
-        <span class="game-widget__icon">${game.icon}</span>
+        <span class="game-widget__icon"><svg class="m3-icon"><use href="#icon-${game.icon}"></use></svg></span>
         <span>
           <span class="game-widget__title">${game.name}</span>
           <span class="game-widget__description">${game.description}</span>

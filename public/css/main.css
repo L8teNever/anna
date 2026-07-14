@@ -49,8 +49,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
   background: var(--accent-container, var(--m3-primary-container));
+  color: var(--m3-on-surface);
+}
+
+.game-widget__icon .m3-icon {
+  width: 26px;
+  height: 26px;
 }
 
 .game-widget[data-color="red"] {

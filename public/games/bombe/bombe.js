@@ -20,6 +20,7 @@
 
   const bombRing = document.getElementById("bomb-ring");
   const bombIcon = document.getElementById("bomb-icon");
+  const bombIconUse = bombIcon.querySelector("use");
   const playStatus = document.getElementById("play-status");
   const playActions = document.getElementById("play-actions");
   const restartButton = document.getElementById("restart-button");
@@ -46,7 +47,7 @@
     players.forEach((name, index) => {
       const chip = document.createElement("span");
       chip.className = "m3-chip";
-      chip.innerHTML = `${name} <button type="button" class="m3-chip__remove" aria-label="${name} entfernen">✕</button>`;
+      chip.innerHTML = `${name} <button type="button" class="m3-chip__remove" aria-label="${name} entfernen"><svg class="m3-icon"><use href="#icon-close"></use></svg></button>`;
       chip.querySelector(".m3-chip__remove").addEventListener("click", () => {
         players.splice(index, 1);
         Storage.setPlayers("bombe", players);
@@ -121,7 +122,7 @@
     playView.hidden = false;
     playActions.hidden = true;
     bombRing.classList.remove("bomb-ring--exploded");
-    bombIcon.textContent = "💣";
+    bombIconUse.setAttribute("href", "#icon-bomb");
     playStatus.textContent = "Gib das Handy weiter…";
     playStatus.dataset.exploded = "false";
 
@@ -134,7 +135,7 @@
     roundActive = false;
     if (tickTimeoutId) clearTimeout(tickTimeoutId);
 
-    bombIcon.textContent = "💥";
+    bombIconUse.setAttribute("href", "#icon-burst");
     bombRing.classList.add("bomb-ring--exploded");
     playStatus.textContent = "BOOM! Die Bombe ist hochgegangen.";
     playStatus.dataset.exploded = "true";

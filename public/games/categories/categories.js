@@ -50,7 +50,7 @@
     players.forEach((name, index) => {
       const chip = document.createElement("span");
       chip.className = "m3-chip";
-      chip.innerHTML = `${name} <button type="button" class="m3-chip__remove" aria-label="${name} entfernen">✕</button>`;
+      chip.innerHTML = `${name} <button type="button" class="m3-chip__remove" aria-label="${name} entfernen"><svg class="m3-icon"><use href="#icon-close"></use></svg></button>`;
       chip.querySelector(".m3-chip__remove").addEventListener("click", () => {
         players.splice(index, 1);
         Storage.setPlayers("categories", players);

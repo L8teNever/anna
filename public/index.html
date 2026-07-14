@@ -23,12 +23,15 @@
   <link rel="stylesheet" href="/css/main.css" />
 </head>
 <body>
+  <script src="/js/icons.js"></script>
   <header class="app-topbar">
     <div class="m3-search">
-      <span class="m3-search__icon">🔍</span>
+      <span class="m3-search__icon"><svg class="m3-icon"><use href="#icon-search"></use></svg></span>
       <input id="search-input" type="search" placeholder="Spiele suchen…" aria-label="Spiele suchen" />
     </div>
-    <button class="m3-icon-button" id="settings-button" aria-label="Einstellungen" title="Einstellungen">⚙️</button>
+    <button class="m3-icon-button" id="settings-button" aria-label="Einstellungen" title="Einstellungen">
+      <svg class="m3-icon"><use href="#icon-settings"></use></svg>
+    </button>
   </header>
 
   <main class="app-content">
