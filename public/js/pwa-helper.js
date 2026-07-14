@@ -8,6 +8,12 @@
 (function () {
   if (!("serviceWorker" in navigator)) return;
 
+  // Wie oft aktiv nach einer neueren sw.js gefragt wird, während die Seite
+  // offen bleibt. Diese Party-App wird oft einmal geöffnet und stundenlang
+  // durchgereicht – ohne das würde ein Update erst beim nächsten kompletten
+  // Neustart der App erkannt.
+  const UPDATE_CHECK_INTERVAL_MS = 20 * 60 * 1000;
+
   function showUpdateBanner(onConfirm) {
     if (document.querySelector(".update-banner")) return;
 
@@ -32,7 +38,17 @@
     banner.querySelector(".update-banner__confirm").addEventListener("click", () => {
       banner.querySelector(".update-banner__confirm").textContent = "Wird aktualisiert…";
       onConfirm();
+      // Fallback: falls "controllerchange" aus irgendeinem Grund nicht
+      // feuert, trotzdem neu laden, statt dass der Klick wirkungslos bleibt.
+      setTimeout(reloadOnce, 4000);
     });
+  }
+
+  let hasReloaded = false;
+  function reloadOnce() {
+    if (hasReloaded) return;
+    hasReloaded = true;
+    window.location.reload();
   }
 
   window.addEventListener("load", () => {
@@ -57,15 +73,19 @@
           }
         });
       });
+
+      // Aktiv nachfragen statt nur auf die (seltenen) automatischen
+      // Browser-Checks zu warten: sobald die Seite wieder sichtbar wird
+      // (App aus dem Hintergrund geholt) und danach regelmäßig, solange
+      // sie offen bleibt.
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") registration.update().catch(() => {});
+      });
+      setInterval(() => registration.update().catch(() => {}), UPDATE_CHECK_INTERVAL_MS);
     }).catch((err) => {
       console.warn("[anna] Service-Worker-Registrierung fehlgeschlagen:", err);
     });
 
-    let hasReloaded = false;
-    navigator.serviceWorker.addEventListener("controllerchange", () => {
-      if (hasReloaded) return;
-      hasReloaded = true;
-      window.location.reload();
-    });
+    navigator.serviceWorker.addEventListener("controllerchange", reloadOnce);
   });
 })();

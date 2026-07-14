@@ -15,7 +15,7 @@
  *     komplett offline mit dem neuen Stand.
  */
 
-const APP_VERSION = "1.2.0";
+const APP_VERSION = "1.2.1";
 const CACHE_NAME = `anna-cache-${APP_VERSION}`;
 
 importScripts("/js/game-registry.js");
@@ -46,6 +46,25 @@ const GAME_ASSETS = (self.GAMES || []).flatMap((game) => [`/${game.id}`, ...game
 
 const PRECACHE_URLS = [...CORE_ASSETS, ...GAME_ASSETS];
 
+// cache.addAll() bricht beim ERSTEN fehlgeschlagenen Request komplett ab –
+// dann würde die ganze Installation (und damit das Update-Banner) lautlos
+// nie erscheinen, nur weil eine einzelne Datei kurz nicht erreichbar war.
+// Stattdessen jede Datei einzeln versuchen, damit ein Ausreißer nie das
+// gesamte Update blockiert.
+async function precacheAll(cache, urls) {
+  await Promise.all(
+    urls.map(async (url) => {
+      try {
+        const response = await fetch(url, { cache: "no-store" });
+        if (response.ok) await cache.put(url, response);
+      } catch (err) {
+        // Einzelner Asset-Fehler darf das Update nicht blockieren; der
+        // Fetch-Handler unten holt fehlende Dateien bei Bedarf nach.
+      }
+    })
+  );
+}
+
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.keys().then(async (existingCacheNames) => {
@@ -59,7 +78,7 @@ self.addEventListener("install", (event) => {
       const isFirstAnnaInstall = !existingCacheNames.some((name) => name.startsWith("anna-cache-"));
 
       const cache = await caches.open(CACHE_NAME);
-      await cache.addAll(PRECACHE_URLS);
+      await precacheAll(cache, PRECACHE_URLS);
 
       if (isFirstAnnaInstall) self.skipWaiting();
     })
