@@ -42,15 +42,7 @@
     <!-- SETUP VIEW PANEL -->
     <div id="setup-panel" class="game-setup-panel">
       <div class="setup-scroll-content">
-        <h2 class="setup-title">Bomben-Setup</h2>
-        <p class="setup-desc">Wähle die Mitspieler aus und stelle die Spieldauer ein. Wer die Bombe hält, wenn sie explodiert, verliert!</p>
-        
-        <div class="setup-group">
-          <span class="setup-group-label">Wer spielt mit? (Mind. 2 benötigt)</span>
-          <div class="setup-players-toggle" id="bomb-players-list">
-            <!-- Dynamically populated player chips -->
-          </div>
-        </div>
+        <p class="setup-desc">Stelle die Spieldauer ein. Wer die Bombe hält, wenn sie explodiert, verliert!</p>
         
         <div class="setup-group">
           <span class="setup-group-label">Ungefähre Spieldauer</span>
@@ -74,7 +66,7 @@
 
     <!-- PLAY VIEW PANEL (Hidden by default) -->
     <div id="play-panel" class="game-play-area hidden">
-      <div id="bomb-turn-indicator" class="current-player-turn">Anna hat die Bombe!</div>
+      
       
       <div class="bomb-task-box">
         <div class="bomb-task-label">Kategorie</div>
@@ -93,7 +85,7 @@
         </svg>
       </div>
       
-      <button id="btn-pass-bomb" class="btn-pass-bomb ripple-effect haptic-press">Weitergeben (Tippen)</button>
+      <div class="current-player-turn" style="margin-top: 24px; font-weight: 500;">Gib das Handy im Uhrzeigersinn weiter!</div>
       
       <!-- Red Flash Explosion Overlay -->
       <div id="bomb-explosion-overlay" class="explosion-overlay">

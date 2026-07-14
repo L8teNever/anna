@@ -34,10 +34,9 @@
   ];
 
   let tickTimeout = null;
-  let activePlayers = [];
-  let currentPlayerIndex = 0;
   let startTime = 0;
   let duration = 0;
+  let selectedDuration = "short";
 
   document.addEventListener('DOMContentLoaded', () => {
     initSoundBadge();
@@ -88,45 +87,7 @@
   }
 
   function initSetup() {
-    // 1. Load players list from localStorage
-    let players = ['Anna', 'Ben', 'Clara', 'David'];
-    const saved = localStorage.getItem('party_players');
-    if (saved) {
-      try {
-        players = JSON.parse(saved);
-      } catch (e) {
-        console.error("Failed to parse players", e);
-      }
-    }
-
-    // Render chips
-    const listContainer = document.getElementById('bomb-players-list');
-    listContainer.innerHTML = '';
-    const selectedPlayers = [...players];
-
-    players.forEach(player => {
-      const chip = document.createElement('span');
-      chip.className = "player-chip active";
-      chip.textContent = player;
-      chip.onclick = () => {
-        if (chip.classList.contains('active')) {
-          if (selectedPlayers.length <= 2) {
-            alert("Du brauchst mindestens 2 Spieler!");
-            return;
-          }
-          chip.classList.remove('active');
-          const idx = selectedPlayers.indexOf(player);
-          if (idx > -1) selectedPlayers.splice(idx, 1);
-        } else {
-          chip.classList.add('active');
-          selectedPlayers.push(player);
-        }
-      };
-      listContainer.appendChild(chip);
-    });
-
     // Duration Selector Toggles
-    let selectedDuration = "short";
     const durationChips = document.getElementById('bomb-duration-selector').querySelectorAll('.player-chip');
     durationChips.forEach(chip => {
       chip.onclick = () => {
@@ -138,14 +99,11 @@
 
     // Start Button trigger
     document.getElementById('btn-start-bomb-game').onclick = () => {
-      startGame(selectedPlayers, selectedDuration);
+      startGame(selectedDuration);
     };
   }
 
-  function startGame(players, durationKey) {
-    activePlayers = players;
-    currentPlayerIndex = Math.floor(Math.random() * activePlayers.length);
-
+  function startGame(durationKey) {
     // Calculate game length
     let minSec = 15, maxSec = 30;
     if (durationKey === "medium") { minSec = 30; maxSec = 50; }
@@ -161,31 +119,15 @@
     // Turn wake lock on
     window.WakeLock.request();
 
-    // Load first turn
-    nextTurn();
-
-    // Pass bomb button click
-    const passBtn = document.getElementById('btn-pass-bomb');
-    passBtn.onclick = () => {
-      currentPlayerIndex = (currentPlayerIndex + 1) % activePlayers.length;
-      nextTurn();
-    };
-
-    // Begin ticking loop
-    tickLoop();
-  }
-
-  function nextTurn() {
-    const turnInd = document.getElementById('bomb-turn-indicator');
-    if (turnInd) {
-      turnInd.textContent = `${activePlayers[currentPlayerIndex]} hat die Bombe!`;
-    }
-
+    // Load category/task
     const taskText = document.getElementById('bomb-task-text');
     if (taskText) {
       const randomTask = TASKS[Math.floor(Math.random() * TASKS.length)];
       taskText.textContent = randomTask;
     }
+
+    // Begin ticking loop
+    tickLoop();
   }
 
   function tickLoop() {
@@ -219,9 +161,7 @@
 
   function explode() {
     const overlay = document.getElementById('bomb-explosion-overlay');
-    const loserText = document.getElementById('bomb-loser-text');
-    if (overlay && loserText) {
-      loserText.textContent = `${activePlayers[currentPlayerIndex]} hat verloren!`;
+    if (overlay) {
       overlay.classList.add('show');
     }
 
@@ -232,7 +172,7 @@
     const restartBtn = document.getElementById('btn-bomb-restart');
     restartBtn.onclick = () => {
       overlay.classList.remove('show');
-      startGame(activePlayers, document.getElementById('bomb-duration-selector').querySelector('.player-chip.active').getAttribute('data-duration'));
+      startGame(selectedDuration);
     };
   }
 })();
