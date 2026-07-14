@@ -82,7 +82,7 @@
         document.getElementById('bomb-explosion-overlay').classList.remove('show');
       } else {
         // Return to homepage
-        window.location.href = '../index.html';
+        window.location.href = '../';
       }
     };
   }

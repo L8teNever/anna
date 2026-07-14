@@ -89,7 +89,7 @@
         setupPanel.classList.remove('hidden');
       } else {
         // From setup screen, return to homepage
-        window.location.href = '../index.html';
+        window.location.href = '../';
       }
     };
   }

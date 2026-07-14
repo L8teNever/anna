@@ -79,7 +79,7 @@
         setupPanel.classList.remove('hidden');
       } else {
         // Return to homepage
-        window.location.href = '../index.html';
+        window.location.href = '../';
       }
     };
   }

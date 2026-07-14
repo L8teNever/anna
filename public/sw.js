@@ -1,10 +1,16 @@
-const CACHE_NAME = 'party-games-cache-v2';
+const CACHE_NAME = 'party-games-cache-v3';
 const ASSETS = [
   '/',
   '/index.html',
-  '/games/bombe.html',
-  '/games/truth_dare.html',
-  '/games/categories.html',
+  '/bombe/',
+  '/bombe/index.html',
+  '/bombe/bombe.js',
+  '/truth_dare/',
+  '/truth_dare/index.html',
+  '/truth_dare/truth_dare.js',
+  '/categories/',
+  '/categories/index.html',
+  '/categories/categories.js',
   '/manifest.json',
   '/css/main.css',
   '/css/components.css',
@@ -12,9 +18,6 @@ const ASSETS = [
   '/js/app.js',
   '/js/wake-lock.js',
   '/js/audio.js',
-  '/js/games/bombe.js',
-  '/js/games/truth_dare.js',
-  '/js/games/categories.js',
   '/assets/icon-192.png',
   '/assets/icon-512.png'
 ];

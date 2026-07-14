@@ -148,11 +148,11 @@ function initRouting() {
   document.getElementById('settings-close-btn').onclick = closeSettings;
   document.getElementById('modal-backdrop').onclick = closeSettings;
 
-  // Game card click (navigates to HTML page)
+  // Game card click (navigates to clean directory URL)
   gameCards.forEach(card => {
     card.onclick = () => {
       const gameId = card.getAttribute('data-game-id');
-      window.location.href = `games/${gameId}.html`;
+      window.location.href = `${gameId}/`;
     };
   });
 }
