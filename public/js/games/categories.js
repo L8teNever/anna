@@ -1,5 +1,4 @@
 // Game Module: Stadt Land Fluss (Categories)
-
 (function() {
   const CATEGORIES = [
     "Stadt",
@@ -28,59 +27,85 @@
     "Todesursache im Krimi"
   ];
 
-  const LETTERS = "ABCDEFGHIJKLMNOPRSTUVW"; // Exclude Q, X, Y, Z for better gameplay flow
+  const LETTERS = "ABCDEFGHIJKLMNOPRSTUVW";
 
   let timerInterval = null;
   let remainingTime = 0;
-  let totalTime = 60; // default 60s
+  let totalTime = 60;
   let activePlayers = [];
 
-  function setup(container, config) {
-    container.innerHTML = `
-      <div class="game-setup-panel">
-        <div class="setup-scroll-content">
-          <h2 class="setup-title">Stadt Land Fluss</h2>
-          <p class="setup-desc">Finde Begriffe zu den vorgegebenen Kategorien, die mit dem gewürfelten Buchstaben beginnen.</p>
-          
-          <div class="setup-group">
-            <span class="setup-group-label">Spieler (nur zur Anzeige)</span>
-            <div class="setup-players-toggle" id="cat-players-list">
-              <!-- Injected player chips -->
-            </div>
-          </div>
+  document.addEventListener('DOMContentLoaded', () => {
+    initSoundBadge();
+    initSetup();
+    initBackButton();
+  });
 
-          <div class="setup-group">
-            <span class="setup-group-label">Timer-Dauer</span>
-            <div class="setup-players-toggle" id="cat-timer-selector">
-              <span class="player-chip" data-time="30">30 Sekunden</span>
-              <span class="player-chip active" data-time="60">60 Sekunden</span>
-              <span class="player-chip" data-time="90">90 Sekunden</span>
-              <span class="player-chip" data-time="120">2 Minuten</span>
-            </div>
-          </div>
-        </div>
-        
-        <div class="start-action-container">
-          <button id="btn-start-cat-game" class="btn-start-game ripple-effect haptic-press">
-            <span>Spiel starten</span>
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-              <path d="M8 5v14l11-7z"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-    `;
+  // Sound Badge state management
+  function initSoundBadge() {
+    const soundBadge = document.getElementById('game-sound-badge');
+    const updateSoundBadge = () => {
+      if (window.AudioSynth.isEnabled()) {
+        soundBadge.textContent = "Ton: Ein";
+        soundBadge.style.backgroundColor = "var(--color-primary-container)";
+        soundBadge.style.color = "var(--color-on-primary-container)";
+      } else {
+        soundBadge.textContent = "Ton: Aus";
+        soundBadge.style.backgroundColor = "var(--color-surface-variant)";
+        soundBadge.style.color = "var(--color-on-surface-variant)";
+      }
+    };
+
+    soundBadge.onclick = () => {
+      window.AudioSynth.toggleSound(!window.AudioSynth.isEnabled());
+      updateSoundBadge();
+    };
+    updateSoundBadge();
+  }
+
+  // Dual duty back navigation
+  function initBackButton() {
+    const backBtn = document.getElementById('game-back-btn');
+    backBtn.onclick = () => {
+      const setupPanel = document.getElementById('setup-panel');
+      const playPanel = document.getElementById('play-panel');
+      const timeUpPanel = document.getElementById('time-up-panel');
+
+      if (!playPanel.classList.contains('hidden') || !timeUpPanel.classList.contains('hidden')) {
+        // Exit active gameplay and return to setup panel
+        clearInterval(timerInterval);
+        window.WakeLock.release();
+        playPanel.classList.add('hidden');
+        timeUpPanel.classList.add('hidden');
+        setupPanel.classList.remove('hidden');
+      } else {
+        // Return to homepage
+        window.location.href = '../index.html';
+      }
+    };
+  }
+
+  function initSetup() {
+    let players = ['Anna', 'Ben', 'Clara', 'David'];
+    const saved = localStorage.getItem('party_players');
+    if (saved) {
+      try {
+        players = JSON.parse(saved);
+      } catch (e) {
+        console.error("Failed to parse players", e);
+      }
+    }
 
     // Render players
     const list = document.getElementById('cat-players-list');
-    config.globalPlayers.forEach(p => {
+    list.innerHTML = '';
+    players.forEach(p => {
       const chip = document.createElement('span');
       chip.className = "player-chip active";
       chip.textContent = p;
       list.appendChild(chip);
     });
 
-    // Timer duration selection
+    // Timer selector toggles
     let selectedTime = 60;
     const timerChips = document.getElementById('cat-timer-selector').querySelectorAll('.player-chip');
     timerChips.forEach(chip => {
@@ -91,22 +116,42 @@
       };
     });
 
+    // Start Button trigger
     document.getElementById('btn-start-cat-game').onclick = () => {
-      config.onStart(config.globalPlayers, { time: selectedTime });
+      startGame(selectedTime);
     };
   }
 
-  function start(container, players, config) {
-    activePlayers = players;
-    totalTime = config.time || 60;
+  function startGame(timeSeconds) {
+    totalTime = timeSeconds;
     remainingTime = totalTime;
 
-    generateRound(container);
+    // Toggle panels
+    document.getElementById('setup-panel').classList.add('hidden');
+    document.getElementById('time-up-panel').classList.add('hidden');
+    document.getElementById('play-panel').classList.remove('hidden');
+
+    window.WakeLock.request();
+
+    generateRound();
+
+    // Stop timer trigger
+    document.getElementById('btn-stop-timer').onclick = () => {
+      timeIsUp();
+    };
   }
 
-  function generateRound(container) {
+  function generateRound() {
     // Pick random letter
     const letter = LETTERS[Math.floor(Math.random() * LETTERS.length)];
+    const letterBox = document.getElementById('letter-box');
+    if (letterBox) {
+      letterBox.textContent = letter;
+      // Trigger CSS entry animation
+      letterBox.classList.remove('roll-letter-anim');
+      void letterBox.offsetWidth; // trigger reflow
+      letterBox.classList.add('roll-letter-anim');
+    }
     
     // Pick 5 unique random categories
     const selectedCats = [];
@@ -116,40 +161,20 @@
       selectedCats.push(tempCats.splice(idx, 1)[0]);
     }
 
-    // Render Play UI
-    container.innerHTML = `
-      <div class="game-play-area">
-        <div class="letter-display-box roll-letter-anim" id="letter-box">${letter}</div>
-        
-        <div class="categories-list">
-          ${selectedCats.map(cat => `
-            <div class="category-item-row">
-              <span class="category-label">${cat}</span>
-              <span style="color: var(--color-outline); font-size: 13px;">mit ${letter}</span>
-            </div>
-          `).join('')}
-        </div>
-        
-        <!-- SVGCircular progress timer -->
-        <div class="timer-container">
-          <svg class="timer-svg" viewBox="0 0 100 100">
-            <circle class="timer-circle-bg" cx="50" cy="50" r="45"/>
-            <circle id="timer-progress" class="timer-circle-progress" cx="50" cy="50" r="45"/>
-          </svg>
-          <div id="timer-text-val" class="timer-text">${remainingTime}</div>
-        </div>
-        
-        <button id="btn-stop-timer" class="btn-pass-bomb ripple-effect haptic-press" style="background-color: var(--color-error);">STOP / FERTIG</button>
+    // Populate categories list HTML
+    const listContainer = document.getElementById('categories-list-container');
+    listContainer.innerHTML = selectedCats.map(cat => `
+      <div class="category-item-row">
+        <span class="category-label">${cat}</span>
+        <span style="color: var(--color-outline); font-size: 13px;">mit ${letter}</span>
       </div>
-    `;
+    `).join('');
 
-    // Screen wake lock
-    window.WakeLock.request();
-
-    // Start countdown
+    // Start interval timer
     remainingTime = totalTime;
     updateTimerVisual();
-    
+
+    clearInterval(timerInterval);
     timerInterval = setInterval(() => {
       remainingTime--;
       
@@ -157,15 +182,11 @@
         timeIsUp();
       } else {
         updateTimerVisual();
-        // Play tick sound at 1s intervals, pitching up slightly when <10s
+        // Tick alarm sounds
         const isWarning = remainingTime <= 10;
         window.AudioSynth.playTick(isWarning ? 1400 : 900);
       }
     }, 1000);
-
-    document.getElementById('btn-stop-timer').onclick = () => {
-      timeIsUp();
-    };
   }
 
   function updateTimerVisual() {
@@ -176,13 +197,12 @@
     
     if (circle) {
       const radius = 45;
-      const circumference = 2 * Math.PI * radius; // ~282.7
+      const circumference = 2 * Math.PI * radius;
       const progressFraction = remainingTime / totalTime;
       const offset = circumference * (1 - progressFraction);
       
       circle.style.strokeDashoffset = offset;
       
-      // Warn when less than 10 seconds remaining
       if (remainingTime <= 10) {
         circle.classList.add('warning');
       } else {
@@ -195,35 +215,15 @@
     clearInterval(timerInterval);
     window.WakeLock.release();
 
-    // Play buzzer alarm
     window.AudioSynth.playBuzzer();
 
-    const container = document.getElementById('game-dynamic-container');
-    container.innerHTML = `
-      <div class="game-play-area" style="justify-content: center; gap: 32px;">
-        <h2 class="current-player-turn" style="font-size: 32px; color: var(--color-error);">ZEIT ABGELAUFEN!</h2>
-        <p style="font-size: 16px; text-align: center; color: var(--color-on-surface-variant);">Vergleicht eure aufgeschriebenen Wörter und verteilt die Punkte.</p>
-        
-        <button id="btn-next-round-cat" class="btn-pass-bomb ripple-effect haptic-press" style="background-color: var(--color-primary); max-width: 250px;">Nächste Runde</button>
-      </div>
-    `;
+    // Toggle panels
+    document.getElementById('play-panel').classList.add('hidden');
+    document.getElementById('time-up-panel').classList.remove('hidden');
 
+    // Next round trigger
     document.getElementById('btn-next-round-cat').onclick = () => {
-      container.innerHTML = "";
-      remainingTime = totalTime;
-      generateRound(container);
+      startGame(totalTime);
     };
   }
-
-  function destroy() {
-    clearInterval(timerInterval);
-    window.WakeLock.release();
-  }
-
-  window.CategoriesGame = {
-    name: "Stadt Land Fluss",
-    setup: setup,
-    start: start,
-    destroy: destroy
-  };
 })();

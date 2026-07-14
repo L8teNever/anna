@@ -1,5 +1,4 @@
 // Game Module: Wahrheit oder Pflicht
-
 (function() {
   const TRUTHS = [
     "Was ist dein peinlichstes Erlebnis in der Schule/Arbeit?",
@@ -40,37 +39,77 @@
   let activePlayers = [];
   let currentRotation = 0;
   let isSpinning = false;
+  let lastWinnerName = "";
 
-  function setup(container, config) {
-    container.innerHTML = `
-      <div class="game-setup-panel">
-        <div class="setup-scroll-content">
-          <h2 class="setup-title">Flaschendrehen</h2>
-          <p class="setup-desc">Wähle die Mitspieler aus. Die Flasche entscheidet, wer an der Reihe ist!</p>
-          
-          <div class="setup-group">
-            <span class="setup-group-label">Wer spielt mit? (Mind. 2 benötigt)</span>
-            <div class="setup-players-toggle" id="td-players-list">
-              <!-- Injected player chips -->
-            </div>
-          </div>
-        </div>
-        
-        <div class="start-action-container">
-          <button id="btn-start-td-game" class="btn-start-game ripple-effect haptic-press">
-            <span>Spiel starten</span>
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-              <path d="M8 5v14l11-7z"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-    `;
+  document.addEventListener('DOMContentLoaded', () => {
+    initSoundBadge();
+    initSetup();
+    initBackButton();
+  });
 
-    const playersListContainer = document.getElementById('td-players-list');
-    const selectedPlayers = [...config.globalPlayers];
+  // Sound Badge state management
+  function initSoundBadge() {
+    const soundBadge = document.getElementById('game-sound-badge');
+    const updateSoundBadge = () => {
+      if (window.AudioSynth.isEnabled()) {
+        soundBadge.textContent = "Ton: Ein";
+        soundBadge.style.backgroundColor = "var(--color-primary-container)";
+        soundBadge.style.color = "var(--color-on-primary-container)";
+      } else {
+        soundBadge.textContent = "Ton: Aus";
+        soundBadge.style.backgroundColor = "var(--color-surface-variant)";
+        soundBadge.style.color = "var(--color-on-surface-variant)";
+      }
+    };
 
-    config.globalPlayers.forEach(player => {
+    soundBadge.onclick = () => {
+      window.AudioSynth.toggleSound(!window.AudioSynth.isEnabled());
+      updateSoundBadge();
+    };
+    updateSoundBadge();
+  }
+
+  // Dual/triple duty back navigation
+  function initBackButton() {
+    const backBtn = document.getElementById('game-back-btn');
+    backBtn.onclick = () => {
+      const setupPanel = document.getElementById('setup-panel');
+      const playBottlePanel = document.getElementById('play-bottle-panel');
+      const playPromptPanel = document.getElementById('play-prompt-panel');
+
+      if (!playPromptPanel.classList.contains('hidden')) {
+        // From prompt page, return to bottle spin board
+        playPromptPanel.classList.add('hidden');
+        playBottlePanel.classList.remove('hidden');
+        resetActionArea();
+      } else if (!playBottlePanel.classList.contains('hidden')) {
+        // From bottle spin board, return to setup screen
+        window.WakeLock.release();
+        playBottlePanel.classList.add('hidden');
+        setupPanel.classList.remove('hidden');
+      } else {
+        // From setup screen, return to homepage
+        window.location.href = '../index.html';
+      }
+    };
+  }
+
+  function initSetup() {
+    let players = ['Anna', 'Ben', 'Clara', 'David'];
+    const saved = localStorage.getItem('party_players');
+    if (saved) {
+      try {
+        players = JSON.parse(saved);
+      } catch (e) {
+        console.error("Failed to parse players", e);
+      }
+    }
+
+    const listContainer = document.getElementById('td-players-list');
+    listContainer.innerHTML = '';
+    const selectedPlayers = [...players];
+
+    players.forEach(player => {
       const chip = document.createElement('span');
       chip.className = "player-chip active";
       chip.textContent = player;
@@ -88,41 +127,28 @@
           selectedPlayers.push(player);
         }
       };
-      playersListContainer.appendChild(chip);
+      listContainer.appendChild(chip);
     });
 
     document.getElementById('btn-start-td-game').onclick = () => {
-      config.onStart(selectedPlayers, {});
+      startGame(selectedPlayers);
     };
   }
 
-  function start(container, players, config) {
+  function startGame(players) {
     activePlayers = players;
     currentRotation = 0;
     isSpinning = false;
 
-    renderBoard(container);
-  }
+    // Toggle panels
+    document.getElementById('setup-panel').classList.add('hidden');
+    document.getElementById('play-bottle-panel').classList.remove('hidden');
 
-  function renderBoard(container) {
-    container.innerHTML = `
-      <div class="game-play-area" style="justify-content: space-around;">
-        <h2 id="td-status-text" class="current-player-turn">Drehe die Flasche!</h2>
-        
-        <div class="bottle-container">
-          <div class="player-names-circle" id="radial-names-container"></div>
-          <div id="bottle-spinner" class="bottle-spinner"></div>
-          <div class="bottle-center-pin"></div>
-        </div>
-        
-        <div class="td-decision-box" id="td-action-area">
-          <button id="btn-spin-bottle" class="btn-pass-bomb ripple-effect haptic-press" style="background-color: var(--color-primary);">Flasche drehen</button>
-        </div>
-      </div>
-    `;
+    window.WakeLock.request();
 
     // Render radial names
     const namesContainer = document.getElementById('radial-names-container');
+    namesContainer.innerHTML = '';
     const total = activePlayers.length;
     
     activePlayers.forEach((player, idx) => {
@@ -130,21 +156,32 @@
       nameEl.className = "player-radial-name";
       nameEl.textContent = player;
       
-      // Calculate layout angle in degrees
       const angle = (idx / total) * 360;
-      
-      // Adjust transform: rotate, translate outwards, then rotate back so text remains horizontal
-      // Adjust translate radius depending on list length
       const radius = total > 6 ? 85 : 75;
       nameEl.style.transform = `translate(-50%, -50%) rotate(${angle}deg) translate(${radius}px) rotate(${-angle}deg)`;
       namesContainer.appendChild(nameEl);
     });
 
-    // Spin trigger
+    resetActionArea();
+  }
+
+  function resetActionArea() {
+    document.getElementById('td-status-text').textContent = "Drehe die Flasche!";
+    const actionArea = document.getElementById('td-action-area');
+    actionArea.innerHTML = `<button id="btn-spin-bottle" class="btn-pass-bomb ripple-effect haptic-press" style="background-color: var(--color-primary);">Flasche drehen</button>`;
+    
     document.getElementById('btn-spin-bottle').onclick = () => {
       if (isSpinning) return;
       spinBottle();
     };
+
+    // Reset names font size and color
+    const names = document.querySelectorAll('.player-radial-name');
+    names.forEach(name => {
+      name.style.color = "var(--color-on-surface)";
+      name.style.fontSize = "13px";
+      name.style.fontWeight = "600";
+    });
   }
 
   function spinBottle() {
@@ -153,48 +190,44 @@
     
     const spinner = document.getElementById('bottle-spinner');
     
-    // Choose random winner
     const winnerIdx = Math.floor(Math.random() * activePlayers.length);
     const winnerName = activePlayers[winnerIdx];
+    lastWinnerName = winnerName;
     
-    // Total steps/spins: e.g. 5-7 spins
     const totalSpins = 4 + Math.floor(Math.random() * 4);
-    // Radial angle for this winner
     const winnerAngle = (winnerIdx / activePlayers.length) * 360;
-    
-    // Target degrees: must add up to current rotation so it spins forward smoothly
-    // In CSS rotate, 0deg points UP. Our bottle spinner points UP. So target is winnerAngle.
     const targetDegrees = currentRotation + (totalSpins * 360) + winnerAngle;
     
     spinner.style.transform = `rotate(${targetDegrees}deg)`;
     currentRotation = targetDegrees;
 
-    // Simulate sound ticks during spin
+    // Spin sound clicks
     let tickCount = 0;
     const playSpinTicks = () => {
       if (tickCount < 20) {
         window.AudioSynth.playTick(1200 - (tickCount * 40));
         tickCount++;
-        setTimeout(playSpinTicks, 100 + (tickCount * 12)); // exponential deceleration
+        setTimeout(playSpinTicks, 100 + (tickCount * 12));
       }
     };
     playSpinTicks();
 
-    // End of spin duration (3 seconds transition)
+    // 3 seconds rotation transition
     setTimeout(() => {
       isSpinning = false;
       document.getElementById('td-status-text').textContent = `${winnerName} wurde ausgewählt!`;
       
-      // Play ding sound
       window.AudioSynth.playTick(1800);
 
-      // Flash winner name
+      // Highlight winner name radial text
       const names = document.querySelectorAll('.player-radial-name');
-      names[winnerIdx].style.color = "var(--color-primary)";
-      names[winnerIdx].style.fontSize = "16px";
-      names[winnerIdx].style.fontWeight = "800";
+      if (names[winnerIdx]) {
+        names[winnerIdx].style.color = "var(--color-primary)";
+        names[winnerIdx].style.fontSize = "16px";
+        names[winnerIdx].style.fontWeight = "800";
+      }
 
-      // Render Truth/Dare buttons
+      // Show Truth or Dare buttons
       showChoiceButtons(winnerName);
     }, 3000);
   }
@@ -218,36 +251,21 @@
   }
 
   function showPrompt(playerName, type, list) {
-    const container = document.getElementById('game-dynamic-container');
     const prompt = list[Math.floor(Math.random() * list.length)];
 
-    container.innerHTML = `
-      <div class="game-play-area">
-        <h2 class="current-player-turn">${playerName} (${type})</h2>
-        
-        <div class="td-prompt-card">
-          <div class="td-prompt-header">${type}</div>
-          <div class="td-prompt-body">${prompt}</div>
-        </div>
-        
-        <button id="btn-prompt-done" class="btn-pass-bomb ripple-effect haptic-press" style="background-color: var(--color-primary);">Aufgabe erledigt</button>
-      </div>
-    `;
+    // Populate elements
+    document.getElementById('td-prompt-player').textContent = `${playerName} (${type})`;
+    document.getElementById('td-prompt-header').textContent = type;
+    document.getElementById('td-prompt-body').textContent = prompt;
+
+    // Toggle panels
+    document.getElementById('play-bottle-panel').classList.add('hidden');
+    document.getElementById('play-prompt-panel').classList.remove('hidden');
 
     document.getElementById('btn-prompt-done').onclick = () => {
-      // Return to board
-      renderBoard(container);
+      document.getElementById('play-prompt-panel').classList.add('hidden');
+      document.getElementById('play-bottle-panel').classList.remove('hidden');
+      resetActionArea();
     };
   }
-
-  function destroy() {
-    isSpinning = false;
-  }
-
-  window.TruthDareGame = {
-    name: "Wahrheit oder Pflicht",
-    setup: setup,
-    start: start,
-    destroy: destroy
-  };
 })();

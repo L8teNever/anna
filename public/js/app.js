@@ -2,15 +2,9 @@
 
 // Global State
 const state = {
-  activeGame: null,
   players: ['Anna', 'Ben', 'Clara', 'David'],
   theme: 'dark',
-  accent: 'blue',
-  games: {
-    bombe: window.BombeGame,
-    truth_dare: window.TruthDareGame,
-    categories: window.CategoriesGame
-  }
+  accent: 'blue'
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -141,12 +135,10 @@ function initSettings() {
     }
   }
 }
-
 // --- Routing & Layout transitions ---
 function initRouting() {
   const settingsBtn = document.getElementById('global-settings-btn');
   const gameCards = document.querySelectorAll('.widget-card');
-  const gameBackBtn = document.getElementById('game-back-btn');
   
   // Settings Panel trigger
   settingsBtn.onclick = () => {
@@ -156,32 +148,13 @@ function initRouting() {
   document.getElementById('settings-close-btn').onclick = closeSettings;
   document.getElementById('modal-backdrop').onclick = closeSettings;
 
-  // Game card click (updates URL hash)
+  // Game card click (navigates to HTML page)
   gameCards.forEach(card => {
     card.onclick = () => {
       const gameId = card.getAttribute('data-game-id');
-      window.location.hash = `#/game/${gameId}`;
+      window.location.href = `games/${gameId}.html`;
     };
   });
-
-  // Back from Game Screen (updates URL hash)
-  gameBackBtn.onclick = () => {
-    window.location.hash = '#/';
-  };
-
-  // Sound toggle inside game
-  const soundBadge = document.getElementById('game-sound-badge');
-  soundBadge.onclick = () => {
-    const isNowEnabled = window.AudioSynth.toggleSound(!window.AudioSynth.isEnabled());
-    document.getElementById('settings-sound-toggle').checked = isNowEnabled;
-    updateGameSoundBadge();
-  };
-  updateGameSoundBadge();
-
-  // Listen for hash changes
-  window.addEventListener('hashchange', handleHashRouting);
-  // Route initial load
-  handleHashRouting();
 }
 
 function openSettings() {
@@ -196,95 +169,6 @@ function closeSettings() {
   const modalBackdrop = document.getElementById('modal-backdrop');
   if (settingsSheet) settingsSheet.classList.remove('show');
   if (modalBackdrop) modalBackdrop.classList.remove('show');
-}
-
-function handleHashRouting() {
-  const hash = window.location.hash;
-  closeSettings();
-
-  if (hash === '' || hash === '#/' || hash === '#') {
-    exitGame(false);
-  } else if (hash.startsWith('#/game/')) {
-    const gameId = hash.replace('#/game/', '');
-    if (state.games[gameId]) {
-      launchGame(gameId, false);
-    } else {
-      window.location.hash = '#/';
-    }
-  } else {
-    window.location.hash = '#/';
-  }
-}
-
-function updateGameSoundBadge() {
-  const badge = document.getElementById('game-sound-badge');
-  if (window.AudioSynth.isEnabled()) {
-    badge.textContent = "Ton: Ein";
-    badge.style.backgroundColor = "var(--color-primary-container)";
-    badge.style.color = "var(--color-on-primary-container)";
-  } else {
-    badge.textContent = "Ton: Aus";
-    badge.style.backgroundColor = "var(--color-surface-variant)";
-    badge.style.color = "var(--color-on-surface-variant)";
-  }
-}
-
-function launchGame(gameId, updateHash = true) {
-  if (updateHash) {
-    window.location.hash = `#/game/${gameId}`;
-    return;
-  }
-
-  // Stop existing game if active
-  if (state.activeGame) {
-    state.activeGame.destroy();
-  }
-
-  const game = state.games[gameId];
-  if (!game) {
-    console.error("Game module not found:", gameId);
-    return;
-  }
-
-  state.activeGame = game;
-  
-  const gameScreen = document.getElementById('game-screen');
-  const container = document.getElementById('game-dynamic-container');
-  const titleSpan = document.getElementById('game-screen-title');
-  
-  container.innerHTML = ""; // Clear existing layout
-  titleSpan.textContent = game.name;
-  
-  // Slide in screen
-  gameScreen.classList.add('show');
-
-  // Trigger setup phase
-  game.setup(container, {
-    globalPlayers: state.players,
-    onStart: (activePlayers, customConfig) => {
-      // Clear container and start game
-      container.innerHTML = "";
-      // Initialize audio context dynamically on user touch start
-      window.AudioSynth.init();
-      game.start(container, activePlayers, customConfig);
-    }
-  });
-}
-
-function exitGame(updateHash = true) {
-  if (updateHash) {
-    window.location.hash = '#/';
-    return;
-  }
-
-  if (state.activeGame) {
-    state.activeGame.destroy();
-    state.activeGame = null;
-  }
-  
-  const gameScreen = document.getElementById('game-screen');
-  gameScreen.classList.remove('show');
-  window.WakeLock.release();
 }
 
 // --- Game Search feature ---

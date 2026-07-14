@@ -1,7 +1,10 @@
-const CACHE_NAME = 'party-games-cache-v1';
+const CACHE_NAME = 'party-games-cache-v2';
 const ASSETS = [
   '/',
   '/index.html',
+  '/games/bombe.html',
+  '/games/truth_dare.html',
+  '/games/categories.html',
   '/manifest.json',
   '/css/main.css',
   '/css/components.css',

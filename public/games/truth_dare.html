@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wahrheit oder Pflicht - Anna</title>
+  
+  <!-- Critical metadata for standalone PWA behaviour in subfolders -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="../css/main.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/games.css">
+  
+  <!-- Inline theme/accent initialiser to prevent visual flashing -->
+  <script>
+    const theme = localStorage.getItem('settings_theme') || 'dark';
+    const accent = localStorage.getItem('settings_accent') || 'blue';
+    document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.setAttribute('data-accent', accent);
+  </script>
+</head>
+<body>
+  <div id="app-container">
+    
+    <!-- Game Header -->
+    <header class="game-header">
+      <button id="game-back-btn" class="back-btn ripple-effect haptic-press" aria-label="Zurück zur Startseite">
+        <svg viewBox="0 0 24 24">
+          <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+        </svg>
+      </button>
+      <span class="game-header-title">Wahrheit oder Pflicht</span>
+      <div class="game-indicators">
+        <span id="game-sound-badge" class="indicator-badge" style="background-color: var(--color-primary-container); color: var(--color-on-primary-container); cursor: pointer;">Ton: Ein</span>
+        <span id="game-wake-badge" class="indicator-badge indicator-wake-lock inactive">Screen Auto</span>
+      </div>
+    </header>
+
+    <!-- SETUP VIEW PANEL -->
+    <div id="setup-panel" class="game-setup-panel">
+      <div class="setup-scroll-content">
+        <h2 class="setup-title">Flaschendrehen</h2>
+        <p class="setup-desc">Wähle die Mitspieler aus. Die Flasche entscheidet, wer an der Reihe ist!</p>
+        
+        <div class="setup-group">
+          <span class="setup-group-label">Wer spielt mit? (Mind. 2 benötigt)</span>
+          <div class="setup-players-toggle" id="td-players-list">
+            <!-- Dynamically populated player chips -->
+          </div>
+        </div>
+      </div>
+      
+      <div class="start-action-container">
+        <button id="btn-start-td-game" class="btn-start-game ripple-effect haptic-press">
+          <span>Spiel starten</span>
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- PLAY BOTTLE PANEL (Hidden by default) -->
+    <div id="play-bottle-panel" class="game-play-area hidden" style="justify-content: space-around;">
+      <h2 id="td-status-text" class="current-player-turn">Drehe die Flasche!</h2>
+      
+      <div class="bottle-container">
+        <div class="player-names-circle" id="radial-names-container"></div>
+        <div id="bottle-spinner" class="bottle-spinner"></div>
+        <div class="bottle-center-pin"></div>
+      </div>
+      
+      <div class="td-decision-box" id="td-action-area">
+        <button id="btn-spin-bottle" class="btn-pass-bomb ripple-effect haptic-press" style="background-color: var(--color-primary);">Flasche drehen</button>
+      </div>
+    </div>
+
+    <!-- PLAY PROMPT PANEL (Hidden by default) -->
+    <div id="play-prompt-panel" class="game-play-area hidden">
+      <h2 id="td-prompt-player" class="current-player-turn">Anna (Wahrheit)</h2>
+      
+      <div class="td-prompt-card">
+        <div id="td-prompt-header" class="td-prompt-header">Wahrheit</div>
+        <div id="td-prompt-body" class="td-prompt-body">Lädt...</div>
+      </div>
+      
+      <button id="btn-prompt-done" class="btn-pass-bomb ripple-effect haptic-press" style="background-color: var(--color-primary);">Aufgabe erledigt</button>
+    </div>
+
+  </div>
+
+  <!-- Shared Javascript utilities -->
+  <script src="../js/wake-lock.js"></script>
+  <script src="../js/audio.js"></script>
+  
+  <!-- Game logic script -->
+  <script src="../js/games/truth_dare.js"></script>
+</body>
+</html>
