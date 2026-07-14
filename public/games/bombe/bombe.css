@@ -146,3 +146,98 @@
   20% { background: #ffaa44; }
   100% { opacity: 0; }
 }
+
+/* ---------- Kategorie-Sektion (Setup) ---------- */
+.bombe-cat-section {
+  max-width: 960px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 20px;
+}
+
+.bombe-cat-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+  margin-bottom: 8px;
+}
+
+.bombe-cat-chip {
+  appearance: none;
+  border: 2px solid var(--cat-color, var(--m3-outline));
+  background: transparent;
+  color: var(--m3-on-surface);
+  padding: 8px 18px;
+  border-radius: var(--m3-shape-full);
+  font-size: 0.9rem;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s var(--m3-easing-standard),
+              color 0.2s var(--m3-easing-standard),
+              transform 0.15s var(--m3-easing-standard),
+              box-shadow 0.2s var(--m3-easing-standard);
+}
+
+.bombe-cat-chip:hover {
+  background: color-mix(in srgb, var(--cat-color, var(--m3-primary)) 12%, transparent);
+  transform: translateY(-2px);
+}
+
+.bombe-cat-chip--active {
+  background: var(--cat-color, var(--m3-primary));
+  color: #fff;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--cat-color, var(--m3-primary)) 40%, transparent);
+}
+
+.bombe-cat-chip--active:hover {
+  filter: brightness(1.1);
+}
+
+/* ---------- Aufgaben-Karte (Play-Ansicht) ---------- */
+.bomb-task-card {
+  width: 100%;
+  max-width: 480px;
+  border-radius: var(--m3-shape-xl);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  padding: 24px 28px;
+  box-shadow: var(--glass-shadow);
+  text-align: center;
+  opacity: 0;
+  transform: translateY(32px) scale(0.95);
+}
+
+.bomb-task-card--in {
+  animation: task-card-reveal 0.45s var(--m3-easing-emphasized) forwards;
+}
+
+@keyframes task-card-reveal {
+  0%   { opacity: 0; transform: translateY(32px) scale(0.95); }
+  60%  { opacity: 1; transform: translateY(-6px) scale(1.02); }
+  100% { opacity: 1; transform: translateY(0)   scale(1); }
+}
+
+.bomb-task-card__cat {
+  display: inline-block;
+  background: var(--cat-color, var(--m3-primary));
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 4px 14px;
+  border-radius: var(--m3-shape-full);
+  margin-bottom: 14px;
+}
+
+.bomb-task-card__text {
+  font-family: var(--m3-font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--m3-on-surface);
+}
