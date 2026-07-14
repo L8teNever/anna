@@ -10,6 +10,16 @@ class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=DIRECTORY, **kwargs)
 
+    def do_GET(self):
+        # Redirect legacy /games/<game> to /<game>
+        if self.path.startswith('/games/'):
+            new_path = self.path.replace('/games/', '/', 1)
+            self.send_response(301)
+            self.send_header('Location', new_path)
+            self.end_headers()
+            return
+        super().do_GET()
+
     def end_headers(self):
         # Set headers to prevent service worker and manifest from caching
         if self.path.endswith('sw.js') or self.path.endswith('manifest.json'):

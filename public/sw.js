@@ -1,4 +1,4 @@
-const CACHE_NAME = 'party-games-cache-v4';
+const CACHE_NAME = 'party-games-cache-v5';
 const ASSETS = [
   '/',
   '/index.html',
@@ -63,6 +63,44 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   // Only handle requests inside our scope
   if (url.origin !== self.location.origin) return;
+
+  // Handle legacy /games/ redirects offline
+  if (url.pathname.startsWith('/games/')) {
+    const newPath = url.pathname.replace('/games/', '/');
+    const redirectUrl = url.origin + newPath + url.search;
+    try {
+      event.respondWith(Response.redirect(redirectUrl, 302));
+      return;
+    } catch (e) {
+      // Fallback: serve target directly if Response.redirect fails
+      event.respondWith(
+        caches.match(newPath).then((cachedResponse) => {
+          if (cachedResponse) return cachedResponse;
+          return fetch(redirectUrl);
+        })
+      );
+      return;
+    }
+  }
+
+  // Trailing slash normalization: redirect '/bombe' to '/bombe/' so relative assets resolve correctly
+  const path = url.pathname;
+  if (!path.endsWith('/') && !path.split('/').pop().includes('.')) {
+    const normalizedUrl = url.origin + path + '/' + url.search;
+    try {
+      event.respondWith(Response.redirect(normalizedUrl, 302));
+      return;
+    } catch (e) {
+      // Fallback: serve target directly if Response.redirect is unsupported
+      event.respondWith(
+        caches.match(normalizedUrl).then((cachedResponse) => {
+          if (cachedResponse) return cachedResponse;
+          return fetch(event.request);
+        })
+      );
+      return;
+    }
+  }
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
