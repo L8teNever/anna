@@ -15,7 +15,7 @@
  *     komplett offline mit dem neuen Stand.
  */
 
-const APP_VERSION = "1.7.0";
+const APP_VERSION = "2.0.0";
 const CACHE_NAME = `anna-cache-${APP_VERSION}`;
 
 importScripts("/js/game-registry.js");
@@ -36,6 +36,9 @@ const CORE_ASSETS = [
   "/js/wake-lock.js",
   "/js/audio.js",
   "/js/pwa-helper.js",
+  "/js/ripple.js",
+  "/js/toast.js",
+  "/js/view-nav.js",
   "/assets/icons/icon-192.png",
   "/assets/icons/icon-192-maskable.png",
   "/assets/icons/icon-512.png",

@@ -11,7 +11,7 @@
     })();
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#6750a4" />
+  <meta name="theme-color" content="#0f1014" />
   <title>Anna – Partyspiele</title>
   <link rel="manifest" href="/manifest.json" />
   <link rel="icon" href="/assets/icons/icon-192.png" />
@@ -20,33 +20,144 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/css/material.css" />
   <link rel="stylesheet" href="/css/components.css" />
   <link rel="stylesheet" href="/css/main.css" />
 </head>
 <body>
   <script src="/js/icons.js"></script>
-  <header class="app-topbar">
-    <div class="m3-search">
-      <span class="m3-search__icon"><svg class="m3-icon"><use href="#icon-search"></use></svg></span>
-      <input id="search-input" type="search" placeholder="Spiele suchen…" aria-label="Spiele suchen" />
+
+  <div class="app-shell">
+    <!-- ---------- Header mit Morph-Suche ---------- -->
+    <header class="app-topbar" id="app-topbar">
+      <div class="app-topbar__title-wrap">
+        <div class="app-topbar__title">Anna</div>
+        <div class="app-topbar__search">
+          <div class="m3-search" style="height: 100%">
+            <span class="m3-search__icon"><svg class="m3-icon"><use href="#icon-search"></use></svg></span>
+            <input id="search-input" type="search" placeholder="Spiel suchen…" aria-label="Spiele suchen" />
+            <button type="button" class="m3-icon-button" id="clear-search-button" style="width: 36px; height: 36px" hidden>
+              <svg class="m3-icon" style="width: 18px; height: 18px"><use href="#icon-close"></use></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="app-topbar__actions">
+        <button type="button" class="m3-icon-button app-topbar__filter-btn" id="filter-toggle-button" aria-label="Filter" title="Filter">
+          <svg class="m3-icon"><use href="#icon-sliders"></use></svg>
+        </button>
+        <button type="button" class="m3-icon-button" id="search-trigger-button" aria-label="Suche öffnen" title="Suche öffnen" style="color: var(--m3-primary)">
+          <svg class="m3-icon"><use href="#icon-search"></use></svg>
+        </button>
+        <button type="button" class="m3-icon-button" id="settings-button" aria-label="Einstellungen" title="Einstellungen">
+          <span class="app-topbar__settings-icon">
+            <span id="settings-icon-gear" style="opacity: 1; transform: none">
+              <svg class="m3-icon"><use href="#icon-settings"></use></svg>
+            </span>
+            <span id="settings-icon-close" style="opacity: 0; transform: rotate(-90deg) scale(0.7)">
+              <svg class="m3-icon" style="color: var(--m3-primary)"><use href="#icon-close"></use></svg>
+            </span>
+          </span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ---------- Filter-Panel ---------- -->
+    <div class="filter-panel" id="filter-panel">
+      <div class="filter-panel__row">
+        <div class="filter-panel__row-label">
+          <svg class="m3-icon" style="width: 16px; height: 16px; color: #f36c8a" fill="#f36c8a"><use href="#icon-heart"></use></svg>
+          Nur Favoriten anzeigen
+        </div>
+        <label class="m3-switch">
+          <input type="checkbox" id="fav-filter-toggle" />
+          <span class="m3-switch__track"></span>
+        </label>
+      </div>
+      <div class="filter-panel__group">
+        <span class="filter-panel__group-title">Spieleranzahl</span>
+        <div class="filter-panel__chips" id="player-chips-container">
+          <button type="button" class="m3-chip" data-value="all" aria-pressed="true">Alle</button>
+          <button type="button" class="m3-chip" data-value="1">1 Spieler</button>
+          <button type="button" class="m3-chip" data-value="2">2 Spieler</button>
+          <button type="button" class="m3-chip" data-value="4">4 Spieler</button>
+          <button type="button" class="m3-chip" data-value="8">8+ Spieler</button>
+        </div>
+      </div>
     </div>
-    <button class="m3-icon-button" id="settings-button" aria-label="Einstellungen" title="Einstellungen">
-      <svg class="m3-icon"><use href="#icon-settings"></use></svg>
-    </button>
-  </header>
 
-  <main class="app-content">
-    <h1 class="m3-headline">Anna</h1>
-    <p class="m3-body">Wähle ein Spiel für deine Runde – alles läuft direkt auf euren Handys, auch offline.</p>
+    <!-- ---------- Spiele-Grid ---------- -->
+    <main>
+      <p class="m3-empty" id="empty-state" hidden>
+        <svg class="m3-icon" style="width: 36px; height: 36px; color: var(--m3-on-surface-variant)"><use href="#icon-info"></use></svg>
+        <span>Keine Ergebnisse</span>
+        <button type="button" class="m3-button m3-button--text" id="reset-search-button">Suche zurücksetzen</button>
+      </p>
+      <div class="game-grid" id="game-grid"></div>
+    </main>
+  </div>
 
-    <div class="game-grid" id="game-grid"></div>
-    <p class="m3-empty" id="empty-state" hidden>Kein Spiel gefunden.</p>
-  </main>
+  <!-- ---------- Einstellungen-Modal ---------- -->
+  <div id="settings-modal" class="m3-modal" hidden>
+    <div class="m3-modal__backdrop" id="settings-modal-backdrop"></div>
+    <div class="m3-modal__dialog">
+      <div class="m3-modal__header">
+        <h3 class="m3-modal__title">
+          <svg class="m3-icon" style="width: 20px; height: 20px; color: var(--m3-primary)"><use href="#icon-settings"></use></svg>
+          Einstellungen
+        </h3>
+        <button type="button" class="m3-icon-button" id="settings-modal-close" style="width: 36px; height: 36px">
+          <svg class="m3-icon" style="width: 18px; height: 18px"><use href="#icon-close"></use></svg>
+        </button>
+      </div>
+
+      <div class="m3-list-row">
+        <div class="m3-list-row__label">
+          <span class="m3-list-row__title">Design</span>
+          <span class="m3-list-row__hint">Hell, dunkel oder wie im Systemmodus</span>
+        </div>
+        <div class="m3-segmented" id="theme-segmented" role="group" aria-label="Design wählen">
+          <button type="button" class="m3-segmented__option" data-value="system">Auto</button>
+          <button type="button" class="m3-segmented__option" data-value="light">Hell</button>
+          <button type="button" class="m3-segmented__option" data-value="dark">Dunkel</button>
+        </div>
+      </div>
+
+      <div class="m3-list-row">
+        <div class="m3-list-row__label">
+          <span class="m3-list-row__title">Ton abspielen</span>
+          <span class="m3-list-row__hint">Ton-Effekte in den Spielen</span>
+        </div>
+        <label class="m3-switch">
+          <input type="checkbox" id="sound-toggle" />
+          <span class="m3-switch__track"></span>
+        </label>
+      </div>
+
+      <div class="m3-list-row">
+        <div class="m3-list-row__label">
+          <span class="m3-list-row__title">Vibration (Haptik)</span>
+          <span class="m3-list-row__hint">Klick-Feedback & Ereignisse</span>
+        </div>
+        <label class="m3-switch">
+          <input type="checkbox" id="vibration-toggle" />
+          <span class="m3-switch__track"></span>
+        </label>
+      </div>
+
+      <div class="m3-modal__actions">
+        <button type="button" class="m3-button m3-button--tonal" id="update-check-button">Nach Updates suchen</button>
+      </div>
+      <p class="m3-body" style="text-align: center; font-size: 10px; font-family: monospace">ANNA // BUILD_2026</p>
+    </div>
+  </div>
 
   <script src="/js/storage.js"></script>
   <script src="/js/game-registry.js"></script>
+  <script src="/js/toast.js"></script>
+  <script src="/js/ripple.js"></script>
   <script src="/js/app.js"></script>
   <script src="/js/pwa-helper.js"></script>
 </body>

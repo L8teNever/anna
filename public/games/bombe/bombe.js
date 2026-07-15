@@ -10,37 +10,41 @@
 (function () {
   const SETTINGS_KEY = "anna:bombe:settings";
   const CATS_KEY     = "anna:bombe:categories";
+  const MIN_PLAYERS  = 2;
+  const MAX_PLAYERS  = 8;
 
   /* ------------------------------------------------------------------ */
   /* Kategorien-Datenbank (nur Namen, keine Aufgaben)                    */
   /* ------------------------------------------------------------------ */
   const ALL_CATEGORIES = [
-    { id: "automarken",   label: "Automarken",          icon: "🚗" },
-    { id: "tiere",        label: "Tiere",               icon: "🐾" },
-    { id: "laender",      label: "Länder",              icon: "🌍" },
-    { id: "staedte",      label: "Städte",              icon: "🏙️" },
-    { id: "sportarten",   label: "Sportarten",          icon: "⚽" },
-    { id: "essen",        label: "Essen & Trinken",     icon: "🍕" },
-    { id: "filme",        label: "Filmtitel",           icon: "🎬" },
-    { id: "serien",       label: "Serien",              icon: "📺" },
-    { id: "musiker",      label: "Musiker & Bands",     icon: "🎵" },
-    { id: "instrumente",  label: "Musikinstrumente",    icon: "🎸" },
-    { id: "berufe",       label: "Berufe",              icon: "💼" },
-    { id: "videospiele",  label: "Videospiele",         icon: "🎮" },
-    { id: "suesswaren",   label: "Süßigkeiten",         icon: "🍬" },
-    { id: "urlaubsziele", label: "Urlaubsziele",        icon: "🏖️" },
-    { id: "superstars",   label: "Prominente",          icon: "⭐" },
-    { id: "pflanzungen",  label: "Pflanzen & Blumen",   icon: "🌺" },
-    { id: "marken",       label: "Marken & Firmen",     icon: "🏷️" },
-    { id: "farben",       label: "Dinge einer Farbe",   icon: "🎨" },
+    { id: "automarken",   label: "Automarken",          icon: "🚗", desc: "Marken und Modelle von Autos." },
+    { id: "tiere",        label: "Tiere",               icon: "🐾", desc: "Vom Haustier bis zum Wildtier." },
+    { id: "laender",      label: "Länder",              icon: "🌍", desc: "Staaten rund um die Welt." },
+    { id: "staedte",      label: "Städte",              icon: "🏙️", desc: "Groß- und Kleinstädte weltweit." },
+    { id: "sportarten",   label: "Sportarten",          icon: "⚽", desc: "Disziplinen und Ballsportarten." },
+    { id: "essen",        label: "Essen & Trinken",     icon: "🍕", desc: "Gerichte, Snacks und Getränke." },
+    { id: "filme",        label: "Filmtitel",           icon: "🎬", desc: "Bekannte Filme aller Genres." },
+    { id: "serien",       label: "Serien",              icon: "📺", desc: "TV- und Streaming-Serien." },
+    { id: "musiker",      label: "Musiker & Bands",     icon: "🎵", desc: "Interpreten und Bands." },
+    { id: "instrumente",  label: "Musikinstrumente",    icon: "🎸", desc: "Von Gitarre bis Triangel." },
+    { id: "berufe",       label: "Berufe",              icon: "💼", desc: "Jobs und Tätigkeiten." },
+    { id: "videospiele",  label: "Videospiele",         icon: "🎮", desc: "Games aller Plattformen." },
+    { id: "suesswaren",   label: "Süßigkeiten",         icon: "🍬", desc: "Naschereien und Süßkram." },
+    { id: "urlaubsziele", label: "Urlaubsziele",        icon: "🏖️", desc: "Beliebte Reiseziele." },
+    { id: "superstars",   label: "Prominente",          icon: "⭐", desc: "Bekannte Persönlichkeiten." },
+    { id: "pflanzungen",  label: "Pflanzen & Blumen",   icon: "🌺", desc: "Gewächse und Blüten." },
+    { id: "marken",       label: "Marken & Firmen",     icon: "🏷️", desc: "Bekannte Unternehmen." },
+    { id: "farben",       label: "Dinge einer Farbe",   icon: "🎨", desc: "Alles rund um Farben." },
   ];
 
   /* ------------------------------------------------------------------ */
   /* DOM-Referenzen                                                        */
   /* ------------------------------------------------------------------ */
-  const setupView       = document.getElementById("setup-view");
-  const playView        = document.getElementById("play-view");
-  const backButton      = document.getElementById("back-button");
+  const setupView          = document.getElementById("setup-view");
+  const categorySelectView = document.getElementById("view-category-select");
+  const playerSelectView   = document.getElementById("view-player-select");
+  const playView           = document.getElementById("play-view");
+  const backButton         = document.getElementById("back-button");
 
   const minSecondsInput = document.getElementById("min-seconds-input");
   const maxSecondsInput = document.getElementById("max-seconds-input");
@@ -54,13 +58,27 @@
   const restartButton   = document.getElementById("restart-button");
   const exitButton      = document.getElementById("exit-button");
 
-  const categoryPicker  = document.getElementById("category-picker");
+  const categoriesPool       = document.getElementById("categories-pool");
+  const categorySummary      = document.getElementById("category-select-summary");
+  const openCategorySelectBtn = document.getElementById("open-category-select-button");
+  const categoryBackButton    = document.getElementById("category-select-back-button");
+  const categoryConfirmButton = document.getElementById("category-select-confirm-button");
+  const categoryBulkAllBtn    = document.getElementById("category-bulk-all");
+  const categoryBulkNoneBtn   = document.getElementById("category-bulk-none");
+
+  const playerSummary        = document.getElementById("player-select-summary");
+  const openPlayerSelectBtn  = document.getElementById("open-player-select-button");
+  const playerBackButton     = document.getElementById("player-select-back-button");
+  const playerConfirmButton  = document.getElementById("player-select-confirm-button");
+
+  const validationWarning     = document.getElementById("validation-warning");
+  const validationWarningText = document.getElementById("validation-warning-text");
 
   // Aktive Kategorieanzeige im Spielfeld
   const activeCatBadge  = document.getElementById("active-cat-badge");
   const activeCatText   = document.getElementById("active-cat-text");
 
-  const playerPicker = PlayerPicker.create(document.getElementById("player-picker"), "bombe");
+  const playerPicker = PlayerPicker.create("bombe");
   let tickTimeoutId  = null;
   let roundActive    = false;
 
@@ -90,73 +108,92 @@
   maxSecondsInput.value = fuseSettings.max;
 
   /* ------------------------------------------------------------------ */
-  /* Kategorie-Chip-Picker aufbauen                                        */
+  /* Kategorie-Liste (Vollbild-Ansicht) aufbauen                          */
   /* ------------------------------------------------------------------ */
-  function buildCategoryPicker() {
-    categoryPicker.innerHTML = "";
-
-    // "Alle" / "Keine" Schnell-Buttons
-    const toolbar = document.createElement("div");
-    toolbar.className = "bombe-cat-toolbar";
-
-    const allBtn = document.createElement("button");
-    allBtn.type = "button";
-    allBtn.textContent = "Alle";
-    allBtn.className = "bombe-cat-quick";
-    allBtn.addEventListener("click", () => {
-      selectedCats = new Set(ALL_CATEGORIES.map((c) => c.id));
-      saveSelectedCats(selectedCats);
-      updateChips();
-    });
-
-    const noneBtn = document.createElement("button");
-    noneBtn.type = "button";
-    noneBtn.textContent = "Keine";
-    noneBtn.className = "bombe-cat-quick";
-    noneBtn.addEventListener("click", () => {
-      selectedCats = new Set();
-      saveSelectedCats(selectedCats);
-      updateChips();
-    });
-
-    toolbar.append(allBtn, noneBtn);
-    categoryPicker.appendChild(toolbar);
-
-    // Chips
-    const grid = document.createElement("div");
-    grid.className = "bombe-cat-chips";
-    categoryPicker.appendChild(grid);
-
-    ALL_CATEGORIES.forEach((cat) => {
-      const chip = document.createElement("button");
-      chip.type = "button";
-      chip.className = "bombe-cat-chip";
-      chip.dataset.id = cat.id;
-      chip.innerHTML = `<span class="bombe-cat-chip__icon">${cat.icon}</span>${cat.label}`;
-      chip.setAttribute("aria-pressed", selectedCats.has(cat.id) ? "true" : "false");
-      if (selectedCats.has(cat.id)) chip.classList.add("bombe-cat-chip--active");
-
-      chip.addEventListener("click", () => {
-        const active = chip.classList.toggle("bombe-cat-chip--active");
-        chip.setAttribute("aria-pressed", active ? "true" : "false");
-        if (active) selectedCats.add(cat.id);
-        else        selectedCats.delete(cat.id);
-        saveSelectedCats(selectedCats);
-      });
-
-      grid.appendChild(chip);
-    });
+  function updateCategorySummary() {
+    if (!categorySummary) return;
+    if (selectedCats.size === ALL_CATEGORIES.length) {
+      categorySummary.textContent = "Alle Kategorien aktiv";
+    } else if (selectedCats.size === 0) {
+      categorySummary.textContent = "Keine Kategorie aktiv";
+    } else {
+      categorySummary.textContent = `${selectedCats.size} von ${ALL_CATEGORIES.length} aktiv`;
+    }
   }
 
-  function updateChips() {
-    categoryPicker.querySelectorAll(".bombe-cat-chip").forEach((chip) => {
-      const active = selectedCats.has(chip.dataset.id);
-      chip.classList.toggle("bombe-cat-chip--active", active);
-      chip.setAttribute("aria-pressed", active ? "true" : "false");
-    });
+  function renderCategoriesPool() {
+    categoriesPool.innerHTML = ALL_CATEGORIES.map((cat) => `
+      <div class="category-row" data-id="${cat.id}">
+        <div class="category-row__text">
+          <span class="category-row__title">${cat.icon} ${cat.label}</span>
+          <span class="category-row__desc">${cat.desc}</span>
+        </div>
+        <label class="m3-switch">
+          <input type="checkbox" class="category-row__checkbox" ${selectedCats.has(cat.id) ? "checked" : ""} />
+          <span class="m3-switch__track"></span>
+        </label>
+      </div>
+    `).join("");
+    updateCategorySummary();
   }
 
-  buildCategoryPicker();
+  categoriesPool.addEventListener("change", (event) => {
+    const checkbox = event.target.closest(".category-row__checkbox");
+    if (!checkbox) return;
+    const id = checkbox.closest(".category-row").dataset.id;
+    if (checkbox.checked) selectedCats.add(id);
+    else selectedCats.delete(id);
+    saveSelectedCats(selectedCats);
+    updateCategorySummary();
+  });
+
+  categoryBulkAllBtn.addEventListener("click", () => {
+    selectedCats = new Set(ALL_CATEGORIES.map((c) => c.id));
+    saveSelectedCats(selectedCats);
+    renderCategoriesPool();
+  });
+
+  categoryBulkNoneBtn.addEventListener("click", () => {
+    selectedCats = new Set();
+    saveSelectedCats(selectedCats);
+    renderCategoriesPool();
+  });
+
+  renderCategoriesPool();
+
+  /* ------------------------------------------------------------------ */
+  /* Ansichten wechseln                                                    */
+  /* ------------------------------------------------------------------ */
+  openCategorySelectBtn.addEventListener("click", () => {
+    renderCategoriesPool();
+    ViewNav.transition(setupView, categorySelectView);
+  });
+  categoryBackButton.addEventListener("click", () => ViewNav.transition(categorySelectView, setupView));
+  categoryConfirmButton.addEventListener("click", () => ViewNav.transition(categorySelectView, setupView));
+
+  function updatePlayerSummary() {
+    const count = playerPicker.getActiveCount();
+    playerSummary.textContent = count === 1 ? "1 Spieler ausgewählt" : `${count} Spieler ausgewählt`;
+    updateValidation(count);
+  }
+
+  function updateValidation(count) {
+    const valid = count >= MIN_PLAYERS && count <= MAX_PLAYERS;
+    validationWarning.hidden = valid;
+    if (!valid) {
+      validationWarningText.textContent = count < MIN_PLAYERS
+        ? `Mindestens ${MIN_PLAYERS} Mitspieler nötig (aktuell ${count}).`
+        : `Höchstens ${MAX_PLAYERS} Mitspieler möglich (aktuell ${count}).`;
+    }
+    startButton.disabled = !valid;
+  }
+
+  playerPicker.onChange(() => updatePlayerSummary());
+  updatePlayerSummary();
+
+  openPlayerSelectBtn.addEventListener("click", () => ViewNav.transition(setupView, playerSelectView));
+  playerBackButton.addEventListener("click", () => ViewNav.transition(playerSelectView, setupView));
+  playerConfirmButton.addEventListener("click", () => ViewNav.transition(playerSelectView, setupView));
 
   /* ------------------------------------------------------------------ */
   /* Zufällige Kategorie für diese Runde ziehen                          */
@@ -201,6 +238,8 @@
   /* Runden-Steuerung                                                     */
   /* ------------------------------------------------------------------ */
   function startRound() {
+    if (playerPicker.getActiveCount() < MIN_PLAYERS || playerPicker.getActiveCount() > MAX_PLAYERS) return;
+
     const { min, max } = currentFuseRange();
     const totalMs = (min + Math.random() * (max - min)) * 1000;
 
@@ -285,6 +324,10 @@
     if (!playView.hidden && setupView.hidden) {
       setupView.hidden = false;
       playView.hidden  = true;
+      return;
+    }
+    if (!categorySelectView.hidden || !playerSelectView.hidden) {
+      ViewNav.transition(categorySelectView.hidden ? playerSelectView : categorySelectView, setupView);
       return;
     }
     window.location.href = "/";

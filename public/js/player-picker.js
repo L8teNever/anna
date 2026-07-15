@@ -3,9 +3,14 @@
  * Roster (siehe storage.js: Storage.getRoster/setRoster), das über alle
  * Spiele hinweg erhalten bleibt, bis ein Name umbenannt oder gelöscht
  * wird. Jedes Spiel hakt daraus nur an, wer diese Runde mitspielt
- * (gespeichert pro gameId), statt bei jedem Spiel neu Namen einzutippen.
+ * (gespeichert pro gameId).
  *
- * Nutzung: const picker = PlayerPicker.create(containerEl, "bombe");
+ * Rendert in die feste Vollbild-Ansicht "Mitspieler auswählen" jeder
+ * Spielseite (IDs: select-players-scroll, player-active-counter,
+ * combined-player-input, create-player-inline-btn, player-bulk-all/none).
+ * Das Umbenennen-Dialogfenster wird bei Bedarf selbst ins <body> injiziert.
+ *
+ * Nutzung: const picker = PlayerPicker.create("bombe");
  *          picker.getSelectedNames() // -> string[]
  */
 (function (root) {
@@ -19,45 +24,84 @@
     })[ch]);
   }
 
-  function create(container, gameId) {
-    let roster = Storage.getRoster();
-    let selected = new Set(Storage.getSelectedPlayers(gameId));
-    let editingName = null;
+  function ensureRenameModal() {
+    let modal = document.getElementById("player-rename-modal");
+    if (modal) return modal;
 
-    container.innerHTML = `
-      <div class="player-picker__list"></div>
-      <div class="player-input-row">
-        <input type="text" class="player-picker__new-input" placeholder="Neuen Spieler hinzufügen…" maxlength="20" />
-        <button type="button" class="m3-button m3-button--tonal player-picker__add-button" aria-label="Spieler hinzufügen">
-          <svg class="m3-icon"><use href="#icon-add"></use></svg>
-        </button>
+    modal = document.createElement("div");
+    modal.id = "player-rename-modal";
+    modal.className = "m3-modal";
+    modal.hidden = true;
+    modal.innerHTML = `
+      <div class="m3-modal__backdrop" data-rename-backdrop></div>
+      <div class="m3-modal__dialog" style="max-width: 320px">
+        <h3 class="m3-modal__title">
+          <svg class="m3-icon" style="width: 18px; height: 18px; color: var(--m3-primary)"><use href="#icon-edit"></use></svg>
+          Name ändern
+        </h3>
+        <input type="text" class="player-row__rename-input" id="rename-modal-input" maxlength="20" style="width: 100%" />
+        <div class="m3-modal__actions">
+          <button type="button" class="m3-button m3-button--text" data-rename-cancel>Abbrechen</button>
+          <button type="button" class="m3-button m3-button--filled" data-rename-save>Speichern</button>
+        </div>
       </div>
     `;
+    document.body.appendChild(modal);
+    return modal;
+  }
 
-    const list = container.querySelector(".player-picker__list");
-    const newInput = container.querySelector(".player-picker__new-input");
-    const addButton = container.querySelector(".player-picker__add-button");
+  function create(gameId) {
+    let roster = Storage.getRoster();
+    let selected = new Set(Storage.getSelectedPlayers(gameId));
+    let searchQuery = "";
+    let renamingName = null;
+    let changeCallback = null;
+
+    const listEl = document.getElementById("select-players-scroll");
+    const counterEl = document.getElementById("player-active-counter");
+    const combinedInput = document.getElementById("combined-player-input");
+    const createInlineBtn = document.getElementById("create-player-inline-btn");
+    const bulkAllBtn = document.getElementById("player-bulk-all");
+    const bulkNoneBtn = document.getElementById("player-bulk-none");
+
+    const renameModal = ensureRenameModal();
+    const renameInput = renameModal.querySelector("#rename-modal-input");
+
+    function updateCounter() {
+      if (counterEl) counterEl.textContent = `Aktiv: ${selected.size}`;
+    }
 
     function persistSelection() {
       Storage.setSelectedPlayers(gameId, Array.from(selected));
+      updateCounter();
+      if (changeCallback) changeCallback(getSelectedNames());
+    }
+
+    function visibleRoster() {
+      const query = searchQuery.trim().toLowerCase();
+      if (!query) return roster;
+      return roster.filter((name) => name.toLowerCase().includes(query));
     }
 
     function render() {
+      if (!listEl) return;
+
       if (roster.length === 0) {
-        list.innerHTML = `<p class="m3-body player-picker__empty">Noch keine Spieler – unten hinzufügen.</p>`;
+        listEl.innerHTML = `<p class="m3-body player-picker__empty">Noch keine Spieler – oben eintippen und Enter drücken.</p>`;
+        updateCounter();
         return;
       }
 
-      list.innerHTML = roster
+      const visible = visibleRoster();
+      if (visible.length === 0) {
+        listEl.innerHTML = `<p class="m3-body player-picker__empty">Kein Spieler gefunden.</p>`;
+        updateCounter();
+        return;
+      }
+
+      listEl.innerHTML = visible
         .map((name) => {
           const checked = selected.has(name) ? "checked" : "";
-          if (editingName === name) {
-            return `
-              <div class="player-row" data-name="${escapeHtml(name)}">
-                <input type="text" class="player-row__rename-input" value="${escapeHtml(name)}" maxlength="20" />
-              </div>
-            `;
-          }
           return `
             <div class="player-row" data-name="${escapeHtml(name)}">
               <label class="player-row__main">
@@ -77,46 +121,23 @@
         })
         .join("");
 
-      const renameInput = list.querySelector(".player-row__rename-input");
-      if (renameInput) {
-        renameInput.focus();
-        renameInput.select();
-      }
+      updateCounter();
     }
 
     function addPlayer(rawName) {
       const name = rawName.trim();
       if (!name) return;
-      if (roster.some((existing) => existing.toLowerCase() === name.toLowerCase())) return;
+      if (roster.some((existing) => existing.toLowerCase() === name.toLowerCase())) {
+        if (window.Toast) Toast.show("Spieler existiert bereits", "alert-triangle");
+        return;
+      }
 
       roster = [...roster, name];
       Storage.setRoster(roster);
       selected.add(name);
       persistSelection();
       render();
-    }
-
-    function commitRename(oldName, rawNewName) {
-      const newName = rawNewName.trim();
-      editingName = null;
-
-      if (!newName || newName === oldName) {
-        render();
-        return;
-      }
-      if (roster.some((existing) => existing !== oldName && existing.toLowerCase() === newName.toLowerCase())) {
-        render();
-        return;
-      }
-
-      roster = roster.map((name) => (name === oldName ? newName : name));
-      Storage.setRoster(roster);
-      if (selected.has(oldName)) {
-        selected.delete(oldName);
-        selected.add(newName);
-        persistSelection();
-      }
-      render();
+      if (window.Toast) Toast.show(`${name} hinzugefügt`, "check");
     }
 
     function deletePlayer(name) {
@@ -127,71 +148,134 @@
       render();
     }
 
-    addButton.addEventListener("click", () => {
-      addPlayer(newInput.value);
-      newInput.value = "";
-      newInput.focus();
-    });
+    function openRename(name) {
+      renamingName = name;
+      renameInput.value = name;
+      renameModal.hidden = false;
+      setTimeout(() => {
+        renameInput.focus();
+        renameInput.select();
+      }, 50);
+    }
 
-    newInput.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        addPlayer(newInput.value);
-        newInput.value = "";
+    function closeRename() {
+      renameModal.hidden = true;
+      renamingName = null;
+    }
+
+    function commitRename() {
+      const oldName = renamingName;
+      const newName = renameInput.value.trim();
+      closeRename();
+      if (!oldName || !newName || newName === oldName) return;
+      if (roster.some((existing) => existing !== oldName && existing.toLowerCase() === newName.toLowerCase())) {
+        if (window.Toast) Toast.show("Name bereits vergeben", "alert-triangle");
+        return;
       }
-    });
 
-    list.addEventListener("change", (event) => {
-      const checkbox = event.target.closest(".player-row__checkbox");
-      if (!checkbox) return;
-      const name = checkbox.closest(".player-row").dataset.name;
-      if (checkbox.checked) selected.add(name);
-      else selected.delete(name);
-      persistSelection();
-    });
+      roster = roster.map((existing) => (existing === oldName ? newName : existing));
+      Storage.setRoster(roster);
+      if (selected.has(oldName)) {
+        selected.delete(oldName);
+        selected.add(newName);
+        persistSelection();
+      }
+      render();
+    }
 
-    list.addEventListener("click", (event) => {
-      const button = event.target.closest("[data-action]");
-      if (!button) return;
-      const name = button.closest(".player-row").dataset.name;
+    function updateInlineAddVisibility() {
+      const trimmed = combinedInput.value.trim();
+      const existsExactly = roster.some((existing) => existing.toLowerCase() === trimmed.toLowerCase());
+      createInlineBtn.classList.toggle("picker-search-create__add--visible", trimmed.length > 0 && !existsExactly);
+    }
 
-      if (button.dataset.action === "rename") {
-        editingName = name;
+    if (combinedInput) {
+      combinedInput.addEventListener("input", () => {
+        searchQuery = combinedInput.value;
+        updateInlineAddVisibility();
         render();
-      } else if (button.dataset.action === "delete") {
-        deletePlayer(name);
-      }
-    });
+      });
 
-    list.addEventListener("keydown", (event) => {
-      const input = event.target.closest(".player-row__rename-input");
-      if (!input) return;
-      const oldName = input.closest(".player-row").dataset.name;
-      if (event.key === "Enter") {
-        event.preventDefault();
-        commitRename(oldName, input.value);
-      } else if (event.key === "Escape") {
-        editingName = null;
+      combinedInput.addEventListener("keypress", (event) => {
+        if (event.key !== "Enter") return;
+        const trimmed = combinedInput.value.trim();
+        const existsExactly = roster.some((existing) => existing.toLowerCase() === trimmed.toLowerCase());
+        if (trimmed && !existsExactly) {
+          addPlayer(trimmed);
+          combinedInput.value = "";
+          searchQuery = "";
+          updateInlineAddVisibility();
+          render();
+        }
+      });
+    }
+
+    if (createInlineBtn) {
+      createInlineBtn.addEventListener("click", () => {
+        addPlayer(combinedInput.value);
+        combinedInput.value = "";
+        searchQuery = "";
+        updateInlineAddVisibility();
         render();
-      }
-    });
+      });
+    }
 
-    list.addEventListener(
-      "blur",
-      (event) => {
-        const input = event.target.closest && event.target.closest(".player-row__rename-input");
-        if (!input) return;
-        const oldName = input.closest(".player-row").dataset.name;
-        commitRename(oldName, input.value);
-      },
-      true
-    );
+    if (listEl) {
+      listEl.addEventListener("change", (event) => {
+        const checkbox = event.target.closest(".player-row__checkbox");
+        if (!checkbox) return;
+        const name = checkbox.closest(".player-row").dataset.name;
+        if (checkbox.checked) selected.add(name);
+        else selected.delete(name);
+        persistSelection();
+      });
+
+      listEl.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-action]");
+        if (!button) return;
+        const name = button.closest(".player-row").dataset.name;
+        if (button.dataset.action === "rename") openRename(name);
+        else if (button.dataset.action === "delete") deletePlayer(name);
+      });
+    }
+
+    if (bulkAllBtn) {
+      bulkAllBtn.addEventListener("click", () => {
+        selected = new Set(roster);
+        persistSelection();
+        render();
+      });
+    }
+
+    if (bulkNoneBtn) {
+      bulkNoneBtn.addEventListener("click", () => {
+        selected = new Set();
+        persistSelection();
+        render();
+      });
+    }
+
+    renameModal.querySelector("[data-rename-save]").addEventListener("click", commitRename);
+    renameModal.querySelector("[data-rename-cancel]").addEventListener("click", closeRename);
+    renameModal.querySelector("[data-rename-backdrop]").addEventListener("click", closeRename);
+    renameInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") commitRename();
+      else if (event.key === "Escape") closeRename();
+    });
 
     render();
 
+    function getSelectedNames() {
+      return roster.filter((name) => selected.has(name));
+    }
+
     return {
-      getSelectedNames() {
-        return roster.filter((name) => selected.has(name));
+      getSelectedNames,
+      getActiveCount() {
+        return selected.size;
+      },
+      onChange(callback) {
+        changeCallback = callback;
       },
     };
   }

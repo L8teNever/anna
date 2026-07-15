@@ -1,58 +1,59 @@
 /**
  * Material 3 Design-Tokens (Farben, Formen, Bewegung, Typografie).
- * Basiert auf der offiziellen M3-Baseline-Palette (Seed #6750A4) und den
- * "Expressive"-Formwerten (größere Radien), wie sie seit Android 16 im
- * System-UI verwendet werden. Andere CSS-Dateien greifen ausschließlich
- * über diese Custom Properties auf Farben/Formen zu – ein Theme-Wechsel
- * (Light/Dark) passiert dadurch zentral an einer Stelle.
+ * Flache, "tonale" Dark-Baseline-Palette (Seed: neutrales Blaugrau) statt
+ * Glassmorphism – Karten/Flächen sind massive Surface-Container-Töne mit
+ * dünner Outline, wie im aktuellen Anna-Design. Andere CSS-Dateien greifen
+ * ausschließlich über diese Custom Properties auf Farben/Formen zu – ein
+ * Theme-Wechsel (Light/Dark) passiert dadurch zentral an einer Stelle.
  */
 
 :root {
-  color-scheme: light dark;
+  color-scheme: dark;
 
-  /* ---- Farben: Light (Default) ---- */
-  --m3-primary: #6750a4;
-  --m3-on-primary: #ffffff;
-  --m3-primary-container: #eaddff;
-  --m3-on-primary-container: #21005d;
+  /* ---- Farben: Dark (Default) ---- */
+  --m3-background: #0f1014;
+  --m3-on-background: #f1f0f7;
+  --m3-surface: #17181c;
+  --m3-on-surface: #f1f0f7;
+  --m3-surface-variant: #2f3033;
+  --m3-on-surface-variant: #c4c6cf;
 
-  --m3-secondary: #625b71;
-  --m3-on-secondary: #ffffff;
-  --m3-secondary-container: #e8def8;
-  --m3-on-secondary-container: #1d192b;
+  --m3-surface-container-lowest: #0b0c0f;
+  --m3-surface-container-low: #17181c;
+  --m3-surface-container: #202125;
+  --m3-surface-container-high: #2a2b2f;
+  --m3-surface-container-highest: #35363a;
 
-  --m3-tertiary: #7d5260;
-  --m3-on-tertiary: #ffffff;
-  --m3-tertiary-container: #ffd8e4;
-  --m3-on-tertiary-container: #31111d;
+  --m3-primary: #a8c7fa;
+  --m3-on-primary: #062e6f;
+  --m3-primary-container: #0842a0;
+  --m3-on-primary-container: #d3e3fd;
 
-  --m3-error: #b3261e;
-  --m3-on-error: #ffffff;
-  --m3-error-container: #f9dedc;
-  --m3-on-error-container: #410e0b;
+  --m3-secondary: #c2c6d6;
+  --m3-on-secondary: #2c3040;
+  --m3-secondary-container: #3c4048;
+  --m3-on-secondary-container: #e1e2e5;
 
-  --m3-background: #fffbfe;
-  --m3-on-background: #1c1b1f;
-  --m3-surface: #fffbfe;
-  --m3-on-surface: #1c1b1f;
-  --m3-surface-variant: #e7e0ec;
-  --m3-on-surface-variant: #49454f;
+  --m3-tertiary: #e3b8c8;
+  --m3-on-tertiary: #492532;
+  --m3-tertiary-container: #633b48;
+  --m3-on-tertiary-container: #ffd8e4;
 
-  --m3-outline: #79747e;
-  --m3-outline-variant: #cac4d0;
+  --m3-error: #f2b8b5;
+  --m3-on-error: #601410;
+  --m3-error-container: #8c1d18;
+  --m3-on-error-container: #f9dedc;
 
-  --m3-surface-container-lowest: #ffffff;
-  --m3-surface-container-low: #f7f2fa;
-  --m3-surface-container: #f3edf7;
-  --m3-surface-container-high: #ece6f0;
-  --m3-surface-container-highest: #e6e0e9;
+  --m3-outline: #8b8d94;
+  --m3-outline-variant: #44474e;
 
   /* ---- Formen (Expressive: großzügigere Radien) ---- */
   --m3-shape-xs: 8px;
   --m3-shape-sm: 12px;
   --m3-shape-md: 16px;
   --m3-shape-lg: 20px;
-  --m3-shape-xl: 28px;
+  --m3-shape-xl: 24px;
+  --m3-shape-xxl: 28px;
   --m3-shape-full: 999px;
 
   /* ---- Bewegung ---- */
@@ -63,137 +64,117 @@
   --m3-duration-long: 420ms;
 
   /* ---- Elevation ---- */
-  --m3-elevation-1: 0 1px 2px rgba(0, 0, 0, 0.12), 0 1px 3px 1px rgba(0, 0, 0, 0.05);
-  --m3-elevation-2: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.05);
-  --m3-elevation-3: 0 12px 30px rgba(0, 0, 0, 0.12), 0 4px 10px rgba(0, 0, 0, 0.05);
+  --m3-elevation-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
+  --m3-elevation-2: 0 4px 12px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(0, 0, 0, 0.2);
+  --m3-elevation-3: 0 12px 30px rgba(0, 0, 0, 0.45), 0 4px 10px rgba(0, 0, 0, 0.2);
 
   /* ---- Typografie ---- */
-  --m3-font: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
-  --m3-font-display: "Outfit", var(--m3-font);
+  --m3-font: "Plus Jakarta Sans", "Roboto", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --m3-font-display: "Plus Jakarta Sans", var(--m3-font);
 
-  /* ---- Glassmorphism (Light) ---- */
-  --glass-bg: rgba(255, 255, 255, 0.45);
-  --glass-border: rgba(255, 255, 255, 0.6);
-  --glass-shadow: 0 8px 32px 0 rgba(103, 80, 164, 0.08);
-  --glass-blur: 16px;
-
-  /* ---- Ambient BG Glows (Light) ---- */
-  --bg-glow-1: rgba(103, 80, 164, 0.08);
-  --bg-glow-2: rgba(56, 106, 32, 0.06);
+  /* ---- Spielfarben (nur fürs Dark-Theme nötig – Karten sind hier eh dunkel) --- */
+  --game-red: #f2b8b5;
+  --game-red-container: rgba(242, 184, 181, 0.16);
+  --game-purple: #a8c7fa;
+  --game-purple-container: rgba(168, 199, 250, 0.16);
+  --game-green: #b7ecb0;
+  --game-green-container: rgba(183, 236, 176, 0.16);
 }
 
-:root[data-theme="dark"] {
-  color-scheme: dark;
+:root[data-theme="light"] {
+  color-scheme: light;
 
-  --m3-primary: #d0bcff;
-  --m3-on-primary: #381e72;
-  --m3-primary-container: #4f378b;
-  --m3-on-primary-container: #eaddff;
+  --m3-background: #f9f9fc;
+  --m3-on-background: #1a1c1e;
+  --m3-surface: #ffffff;
+  --m3-on-surface: #1a1c1e;
+  --m3-surface-variant: #e1e2e8;
+  --m3-on-surface-variant: #44474e;
 
-  --m3-secondary: #ccc2dc;
-  --m3-on-secondary: #332d41;
-  --m3-secondary-container: #4a4458;
-  --m3-on-secondary-container: #e8def8;
+  --m3-surface-container-lowest: #ffffff;
+  --m3-surface-container-low: #f3f3f7;
+  --m3-surface-container: #edeef2;
+  --m3-surface-container-high: #e7e8ec;
+  --m3-surface-container-highest: #e1e2e6;
 
-  --m3-tertiary: #efb8c8;
-  --m3-on-tertiary: #492532;
-  --m3-tertiary-container: #633b48;
-  --m3-on-tertiary-container: #ffd8e4;
+  --m3-primary: #0b57cf;
+  --m3-on-primary: #ffffff;
+  --m3-primary-container: #d3e3fd;
+  --m3-on-primary-container: #041e49;
 
-  --m3-error: #f2b8b5;
-  --m3-on-error: #601410;
-  --m3-error-container: #8c1d18;
-  --m3-on-error-container: #f9dedc;
+  --m3-secondary: #575e71;
+  --m3-on-secondary: #ffffff;
+  --m3-secondary-container: #dbe2f9;
+  --m3-on-secondary-container: #141b2c;
 
-  --m3-background: #0f0e13;
-  --m3-on-background: #e6e1e5;
-  --m3-surface: #141218;
-  --m3-on-surface: #e6e1e5;
-  --m3-surface-variant: #49454f;
-  --m3-on-surface-variant: #cac4d0;
+  --m3-tertiary: #74536a;
+  --m3-on-tertiary: #ffffff;
+  --m3-tertiary-container: #ffd7f1;
+  --m3-on-tertiary-container: #2b1226;
 
-  --m3-outline: #938f99;
-  --m3-outline-variant: #49454f;
+  --m3-error: #b3261e;
+  --m3-on-error: #ffffff;
+  --m3-error-container: #f9dedc;
+  --m3-on-error-container: #410e0b;
 
-  --m3-surface-container-lowest: #0b090e;
-  --m3-surface-container-low: #1d1b20;
-  --m3-surface-container: #211f26;
-  --m3-surface-container-high: #2b2930;
-  --m3-surface-container-highest: #36343b;
+  --m3-outline: #74777f;
+  --m3-outline-variant: #c4c6d0;
 
-  /* ---- Glassmorphism (Dark) ---- */
-  --glass-bg: rgba(20, 18, 24, 0.45);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-  --glass-blur: 20px;
-
-  /* ---- Ambient BG Glows (Dark) ---- */
-  --bg-glow-1: rgba(162, 126, 255, 0.12);
-  --bg-glow-2: rgba(94, 180, 50, 0.08);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]):not([data-theme="dark"]) {
-    color-scheme: dark;
-
-    --m3-primary: #d0bcff;
-    --m3-on-primary: #381e72;
-    --m3-primary-container: #4f378b;
-    --m3-on-primary-container: #eaddff;
-
-    --m3-secondary: #ccc2dc;
-    --m3-on-secondary: #332d41;
-    --m3-secondary-container: #4a4458;
-    --m3-on-secondary-container: #e8def8;
-
-    --m3-tertiary: #efb8c8;
-    --m3-on-tertiary: #492532;
-    --m3-tertiary-container: #633b48;
-    --m3-on-tertiary-container: #ffd8e4;
-
-    --m3-error: #f2b8b5;
-    --m3-on-error: #601410;
-    --m3-error-container: #8c1d18;
-    --m3-on-error-container: #f9dedc;
-
-    --m3-background: #0f0e13;
-    --m3-on-background: #e6e1e5;
-    --m3-surface: #141218;
-    --m3-on-surface: #e6e1e5;
-    --m3-surface-variant: #49454f;
-    --m3-on-surface-variant: #cac4d0;
-
-    --m3-outline: #938f99;
-    --m3-outline-variant: #49454f;
-
-    --m3-surface-container-lowest: #0b090e;
-    --m3-surface-container-low: #1d1b20;
-    --m3-surface-container: #211f26;
-    --m3-surface-container-high: #2b2930;
-    --m3-surface-container-highest: #36343b;
-
-    /* ---- Glassmorphism (Dark) ---- */
-    --glass-bg: rgba(20, 18, 24, 0.45);
-    --glass-border: rgba(255, 255, 255, 0.08);
-    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-    --glass-blur: 20px;
-
-    /* ---- Ambient BG Glows (Dark) ---- */
-    --bg-glow-1: rgba(162, 126, 255, 0.12);
-    --bg-glow-2: rgba(94, 180, 50, 0.08);
-  }
-}
-
-/* Spielfarben – jedes Spiel ordnet sich in der Registry (game-registry.js)
-   einer dieser Akzentfarben zu, damit Widgets sich unterscheiden lassen,
-   ohne dass jedes Spiel eigene Farbtokens definieren muss. */
-:root {
   --game-red: #b3261e;
   --game-red-container: #f9dedc;
-  --game-purple: #6750a4;
-  --game-purple-container: #eaddff;
+  --game-purple: #0b57cf;
+  --game-purple-container: #d3e3fd;
   --game-green: #386a20;
   --game-green-container: #d7f8c3;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="light"]):not([data-theme="dark"]) {
+    color-scheme: light;
+
+    --m3-background: #f9f9fc;
+    --m3-on-background: #1a1c1e;
+    --m3-surface: #ffffff;
+    --m3-on-surface: #1a1c1e;
+    --m3-surface-variant: #e1e2e8;
+    --m3-on-surface-variant: #44474e;
+
+    --m3-surface-container-lowest: #ffffff;
+    --m3-surface-container-low: #f3f3f7;
+    --m3-surface-container: #edeef2;
+    --m3-surface-container-high: #e7e8ec;
+    --m3-surface-container-highest: #e1e2e6;
+
+    --m3-primary: #0b57cf;
+    --m3-on-primary: #ffffff;
+    --m3-primary-container: #d3e3fd;
+    --m3-on-primary-container: #041e49;
+
+    --m3-secondary: #575e71;
+    --m3-on-secondary: #ffffff;
+    --m3-secondary-container: #dbe2f9;
+    --m3-on-secondary-container: #141b2c;
+
+    --m3-tertiary: #74536a;
+    --m3-on-tertiary: #ffffff;
+    --m3-tertiary-container: #ffd7f1;
+    --m3-on-tertiary-container: #2b1226;
+
+    --m3-error: #b3261e;
+    --m3-on-error: #ffffff;
+    --m3-error-container: #f9dedc;
+    --m3-on-error-container: #410e0b;
+
+    --m3-outline: #74777f;
+    --m3-outline-variant: #c4c6d0;
+
+    --game-red: #b3261e;
+    --game-red-container: #f9dedc;
+    --game-purple: #0b57cf;
+    --game-purple-container: #d3e3fd;
+    --game-green: #386a20;
+    --game-green-container: #d7f8c3;
+  }
 }
 
 * {
@@ -211,14 +192,13 @@ body {
 
 body {
   font-family: var(--m3-font);
-  background: radial-gradient(circle at 10% 20%, var(--bg-glow-1) 0%, transparent 40%),
-              radial-gradient(circle at 90% 80%, var(--bg-glow-2) 0%, transparent 45%),
-              var(--m3-background);
-  background-attachment: fixed;
+  background: var(--m3-background);
   color: var(--m3-on-background);
   -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
   min-height: 100vh;
-  transition: background var(--m3-duration-medium) var(--m3-easing-standard);
+  transition: background var(--m3-duration-medium) var(--m3-easing-standard),
+    color var(--m3-duration-medium) var(--m3-easing-standard);
 }
 
 h1,
@@ -234,19 +214,21 @@ button {
 
 .m3-display {
   font-size: 2.5rem;
-  font-weight: 400;
+  font-weight: 700;
   line-height: 1.15;
+  letter-spacing: -0.01em;
 }
 
 .m3-headline {
   font-size: 1.75rem;
-  font-weight: 500;
+  font-weight: 700;
   line-height: 1.25;
+  letter-spacing: -0.01em;
 }
 
 .m3-title {
   font-size: 1.1rem;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.3;
 }
 
@@ -259,6 +241,6 @@ button {
 
 .m3-label {
   font-size: 0.8rem;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 0.02em;
 }

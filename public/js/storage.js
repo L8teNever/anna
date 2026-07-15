@@ -57,6 +57,19 @@
     setSelectedPlayers(gameId, names) {
       write(`selected:${gameId}`, names);
     },
+
+    // Als Favorit markierte Spiele (Startseiten-Filter "Nur Favoriten").
+    getFavorites() {
+      return read("favorites", []);
+    },
+    toggleFavorite(gameId) {
+      const favorites = this.getFavorites();
+      const index = favorites.indexOf(gameId);
+      if (index === -1) favorites.push(gameId);
+      else favorites.splice(index, 1);
+      write("favorites", favorites);
+      return favorites;
+    },
   };
 
   root.Storage = Storage;

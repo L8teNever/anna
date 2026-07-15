@@ -55,7 +55,11 @@
     },
   };
 
+  const MIN_PLAYERS = 2;
+  const MAX_PLAYERS = 12;
+
   const setupView = document.getElementById("setup-view");
+  const playerSelectView = document.getElementById("view-player-select");
   const playView = document.getElementById("play-view");
   const backButton = document.getElementById("back-button");
 
@@ -72,11 +76,38 @@
   const nextTurnBar = document.getElementById("next-turn-bar");
   const nextTurnButton = document.getElementById("next-turn-button");
 
-  const playerPicker = PlayerPicker.create(document.getElementById("player-picker"), "truth_dare");
+  const playerSummary = document.getElementById("player-select-summary");
+  const openPlayerSelectBtn = document.getElementById("open-player-select-button");
+  const playerBackButton = document.getElementById("player-select-back-button");
+  const playerConfirmButton = document.getElementById("player-select-confirm-button");
+  const validationWarning = document.getElementById("validation-warning");
+  const validationWarningText = document.getElementById("validation-warning-text");
+
+  const playerPicker = PlayerPicker.create("truth_dare");
   let players = [];
   let mode = "normal";
   let currentPlayerIndex = 0;
   const usedPrompts = new Set();
+
+  function updatePlayerSummary() {
+    const count = playerPicker.getActiveCount();
+    playerSummary.textContent = count === 1 ? "1 Spieler ausgewählt" : `${count} Spieler ausgewählt`;
+    const valid = count >= MIN_PLAYERS && count <= MAX_PLAYERS;
+    validationWarning.hidden = valid;
+    if (!valid) {
+      validationWarningText.textContent = count < MIN_PLAYERS
+        ? `Mindestens ${MIN_PLAYERS} Mitspieler nötig (aktuell ${count}).`
+        : `Höchstens ${MAX_PLAYERS} Mitspieler möglich (aktuell ${count}).`;
+    }
+    startButton.disabled = !valid;
+  }
+
+  playerPicker.onChange(() => updatePlayerSummary());
+  updatePlayerSummary();
+
+  openPlayerSelectBtn.addEventListener("click", () => ViewNav.transition(setupView, playerSelectView));
+  playerBackButton.addEventListener("click", () => ViewNav.transition(playerSelectView, setupView));
+  playerConfirmButton.addEventListener("click", () => ViewNav.transition(playerSelectView, setupView));
 
   modeSegmented.addEventListener("click", (event) => {
     const button = event.target.closest(".m3-segmented__option");
@@ -142,6 +173,9 @@
   });
 
   startButton.addEventListener("click", () => {
+    const count = playerPicker.getActiveCount();
+    if (count < MIN_PLAYERS || count > MAX_PLAYERS) return;
+
     players = playerPicker.getSelectedNames();
     currentPlayerIndex = players.length > 0 ? Math.floor(Math.random() * players.length) : 0;
     turnName.textContent = currentPlayerName();
@@ -156,6 +190,10 @@
     if (!playView.hidden && setupView.hidden) {
       setupView.hidden = false;
       playView.hidden = true;
+      return;
+    }
+    if (!playerSelectView.hidden && setupView.hidden) {
+      ViewNav.transition(playerSelectView, setupView);
       return;
     }
     window.location.href = "/";

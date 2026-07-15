@@ -12,7 +12,10 @@
   ];
   const LETTER_POOL = "ABCDEFGHIJKLMNOPRSTW".split("");
 
+  const MIN_PLAYERS = 1;
+
   const setupView = document.getElementById("setup-view");
+  const playerSelectView = document.getElementById("view-player-select");
   const playView = document.getElementById("play-view");
   const backButton = document.getElementById("back-button");
 
@@ -26,7 +29,29 @@
   const nextRoundButton = document.getElementById("next-round-button");
   const exitButton = document.getElementById("exit-button");
 
-  PlayerPicker.create(document.getElementById("player-picker"), "categories");
+  const playerSummary = document.getElementById("player-select-summary");
+  const openPlayerSelectBtn = document.getElementById("open-player-select-button");
+  const playerBackButton = document.getElementById("player-select-back-button");
+  const playerConfirmButton = document.getElementById("player-select-confirm-button");
+  const validationWarning = document.getElementById("validation-warning");
+
+  const playerPicker = PlayerPicker.create("categories");
+
+  function updatePlayerSummary() {
+    const count = playerPicker.getActiveCount();
+    playerSummary.textContent = count === 1 ? "1 Spieler ausgewählt" : `${count} Spieler ausgewählt`;
+    const valid = count >= MIN_PLAYERS;
+    validationWarning.hidden = valid;
+    startButton.disabled = !valid;
+  }
+
+  playerPicker.onChange(() => updatePlayerSummary());
+  updatePlayerSummary();
+
+  openPlayerSelectBtn.addEventListener("click", () => ViewNav.transition(setupView, playerSelectView));
+  playerBackButton.addEventListener("click", () => ViewNav.transition(playerSelectView, setupView));
+  playerConfirmButton.addEventListener("click", () => ViewNav.transition(playerSelectView, setupView));
+
   let intervalId = null;
   let remainingSeconds = 30;
   const circle = document.querySelector(".progress-ring__circle");
@@ -115,6 +140,7 @@
   }
 
   startButton.addEventListener("click", () => {
+    if (playerPicker.getActiveCount() < MIN_PLAYERS) return;
     setupView.hidden = true;
     playView.hidden = false;
     Sound.unlock();
@@ -134,6 +160,10 @@
       stopGame();
       setupView.hidden = false;
       playView.hidden = true;
+      return;
+    }
+    if (!playerSelectView.hidden && setupView.hidden) {
+      ViewNav.transition(playerSelectView, setupView);
       return;
     }
     window.location.href = "/";

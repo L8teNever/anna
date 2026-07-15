@@ -11,13 +11,13 @@
     })();
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#6750a4" />
+  <meta name="theme-color" content="#0f1014" />
   <title>Wahrheit oder Pflicht – Anna</title>
   <link rel="manifest" href="/manifest.json" />
   <link rel="icon" href="/assets/icons/icon-192.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/css/material.css" />
   <link rel="stylesheet" href="/css/components.css" />
   <link rel="stylesheet" href="/css/main.css" />
@@ -37,29 +37,94 @@
     </header>
 
     <!-- ---------- Setup-Ansicht ---------- -->
-    <section class="game-view" id="setup-view">
-      <div class="setup-grid">
-        <div class="setup-grid__left">
-          <h2 class="m3-title game-section-title">Mitspieler</h2>
-          <p class="m3-body">Anhaken, wer mitspielt – neue Spieler bleiben auch für andere Spiele gespeichert.</p>
-          <div class="player-picker" id="player-picker"></div>
+    <section class="game-view app-view" id="setup-view">
+      <div class="game-detail-card">
+        <div class="game-detail-card__top">
+          <span class="m3-tag" style="background: var(--game-purple-container); color: var(--game-purple)">Klassiker</span>
+          <span class="game-detail-card__limit">2–12 Spieler</span>
         </div>
-        <div class="setup-grid__right">
-          <h2 class="m3-title game-section-title">Modus</h2>
-          <div class="m3-segmented" id="mode-segmented" role="group" aria-label="Modus wählen" style="margin-top: 12px">
+        <p class="m3-body">
+          Reihum an der Reihe: Wahrheit oder Pflicht wählen und eine zufällige Frage oder Aufgabe aus dem
+          gewählten Modus bekommen.
+        </p>
+      </div>
+
+      <div class="game-options-card">
+        <h2 class="game-section-title">
+          <svg class="m3-icon"><use href="#icon-sliders"></use></svg> Einstellungen
+        </h2>
+        <div class="game-option-row">
+          <span class="game-option-row__label">Modus</span>
+          <div class="m3-segmented" id="mode-segmented" role="group" aria-label="Modus wählen">
             <button type="button" class="m3-segmented__option" data-value="normal">Normal</button>
             <button type="button" class="m3-segmented__option" data-value="party">Party</button>
           </div>
         </div>
       </div>
 
+      <button type="button" class="picker-launch-btn" id="open-player-select-button">
+        <div class="picker-launch-btn__left">
+          <div class="picker-launch-btn__icon"><svg class="m3-icon"><use href="#icon-users"></use></svg></div>
+          <div>
+            <p class="picker-launch-btn__title">Mitspieler auswählen</p>
+            <p class="picker-launch-btn__hint" id="player-select-summary">0 Spieler ausgewählt</p>
+          </div>
+        </div>
+        <svg class="m3-icon"><use href="#icon-chevron-right"></use></svg>
+      </button>
+
+      <div class="validation-warning" id="validation-warning" hidden>
+        <svg class="m3-icon" style="width: 16px; height: 16px"><use href="#icon-alert-triangle"></use></svg>
+        <span id="validation-warning-text">Für dieses Spiel werden 2–12 Mitspieler benötigt.</span>
+      </div>
+
       <div class="game-bottom-bar">
-        <button type="button" class="m3-button m3-button--filled" id="start-button">Spiel starten</button>
+        <button type="button" class="m3-button m3-button--filled" id="start-button">
+          <svg class="m3-icon" style="width: 18px; height: 18px"><use href="#icon-play"></use></svg> Spiel starten
+        </button>
+      </div>
+    </section>
+
+    <!-- ---------- Mitspieler-Auswahl (Vollbild) ---------- -->
+    <section class="game-view app-view" id="view-player-select" hidden>
+      <header class="picker-view-header">
+        <div class="picker-view-header__left">
+          <button type="button" class="m3-icon-button" id="player-select-back-button" aria-label="Zurück">
+            <svg class="m3-icon"><use href="#icon-arrow-back"></use></svg>
+          </button>
+          <span class="picker-view-header__title">Mitspieler</span>
+        </div>
+        <div class="picker-view-header__bulk">
+          <button type="button" class="picker-view-header__bulk-btn picker-view-header__bulk-btn--primary" id="player-bulk-all">Alle</button>
+          <div class="picker-view-header__divider"></div>
+          <button type="button" class="picker-view-header__bulk-btn" id="player-bulk-none">Keine</button>
+        </div>
+      </header>
+
+      <div class="picker-search-create">
+        <svg class="m3-icon" style="width: 18px; height: 18px; color: var(--m3-on-surface-variant)"><use href="#icon-search"></use></svg>
+        <input type="text" id="combined-player-input" placeholder="Spieler suchen oder eingeben zum Erstellen…" />
+        <button type="button" class="picker-search-create__add" id="create-player-inline-btn" title="Spieler hinzufügen">
+          <svg class="m3-icon" style="width: 18px; height: 18px"><use href="#icon-add"></use></svg>
+        </button>
+      </div>
+
+      <div class="picker-list-toolbar">
+        <span>Spielerpool</span>
+        <span class="picker-list-toolbar__count" id="player-active-counter">Aktiv: 0</span>
+      </div>
+
+      <div class="player-picker__list" id="select-players-scroll"></div>
+
+      <div class="game-bottom-bar">
+        <button type="button" class="m3-button m3-button--tonal" id="player-select-confirm-button">
+          <svg class="m3-icon"><use href="#icon-check"></use></svg> Auswahl bestätigen
+        </button>
       </div>
     </section>
 
     <!-- ---------- Spiel-Ansicht ---------- -->
-    <section class="game-view" id="play-view" hidden>
+    <section class="game-view app-view" id="play-view" hidden>
       <div class="game-play">
         <p class="m3-label" id="turn-label">SPIELER AM ZUG</p>
         <p class="m3-headline" id="turn-name">Spieler 1</p>
@@ -81,6 +146,10 @@
   </div>
 
   <script src="/js/storage.js"></script>
+  <script src="/js/game-registry.js"></script>
+  <script src="/js/toast.js"></script>
+  <script src="/js/ripple.js"></script>
+  <script src="/js/view-nav.js"></script>
   <script src="/js/player-picker.js"></script>
   <script src="/js/audio.js"></script>
   <script src="/games/truth_dare/truth_dare.js"></script>

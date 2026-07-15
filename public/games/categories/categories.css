@@ -5,14 +5,11 @@
 .cat-card {
   width: 100%;
   border-radius: var(--m3-shape-xl);
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
+  background: var(--m3-surface-container);
+  border: 1px solid var(--m3-outline-variant);
   color: var(--m3-on-surface);
   padding: 40px 24px;
   text-align: center;
-  box-shadow: var(--glass-shadow);
 }
 
 .cat-card .m3-headline {
