@@ -1,7 +1,7 @@
 {
   "name": "Anna – Partyspiele",
   "short_name": "Anna",
-  "description": "Offline-Partyspiele für unterwegs: Tickende Bombe, Wahrheit oder Pflicht, Kategorien und mehr.",
+  "description": "Offline-Partyspiele für unterwegs: Tickende Bombe und mehr.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

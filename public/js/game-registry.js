@@ -22,30 +22,6 @@
       maxPlayers: 8,
       assets: ["/games/bombe/bombe.js", "/games/bombe/bombe.css", "/games/bombe/categories.json"],
     },
-    {
-      id: "truth_dare",
-      name: "Wahrheit oder Pflicht",
-      tag: "Klassiker",
-      description: "Klassiker für die Runde – ehrlich oder mutig?",
-      detail: "Reihum an der Reihe: Wahrheit oder Pflicht wählen und eine zufällige Frage oder Aufgabe aus dem gewählten Modus bekommen.",
-      icon: "masks",
-      color: "purple",
-      minPlayers: 2,
-      maxPlayers: 12,
-      assets: ["/games/truth_dare/truth_dare.js", "/games/truth_dare/truth_dare.css", "/games/truth_dare/prompts.json"],
-    },
-    {
-      id: "categories",
-      name: "Kategorien",
-      tag: "Schnell",
-      description: "Schnell Begriffe zu einer Kategorie finden, bevor die Zeit abläuft.",
-      detail: "Zu einer zufälligen Kategorie und einem zufälligen Buchstaben muss reihum laut ein passender Begriff genannt werden, bevor der Timer abläuft.",
-      icon: "grid",
-      color: "green",
-      minPlayers: 1,
-      maxPlayers: 12,
-      assets: ["/games/categories/categories.js", "/games/categories/categories.css", "/games/categories/categories.json"],
-    },
   ];
 
   root.GAMES = GAMES;
