@@ -28,11 +28,11 @@
     "words": ["Berlin", "Paris", "London", "Rom", "Barcelona", "New York", "Tokio", "Wien", "Amsterdam", "Prag", "Istanbul", "Dubai", "Sydney", "Hamburg", "München", "Venedig"]
   },
   {
-    "id": "sportarten",
-    "label": "Sportarten",
+    "id": "fussballspieler",
+    "label": "Fußballspieler",
     "icon": "⚽",
-    "desc": "Disziplinen und Ballsportarten.",
-    "words": ["Fußball", "Basketball", "Tennis", "Volleyball", "Schwimmen", "Handball", "Boxen", "Golf", "Skifahren", "Leichtathletik", "Radfahren", "Klettern", "Turnen", "Eishockey", "Rudern", "Surfen"]
+    "desc": "Aktuelle und legendäre Profis.",
+    "words": ["Messi", "Ronaldo", "Neymar", "Mbappé", "Haaland", "Kroos", "Müller", "Modric", "Salah", "Kane", "Lewandowski", "Bellingham", "Rodri", "De Bruyne", "Vinicius Jr", "Musiala"]
   },
   {
     "id": "essen",
@@ -63,11 +63,11 @@
     "words": ["Beyoncé", "Ed Sheeran", "Adele", "Taylor Swift", "Rihanna", "Eminem", "Coldplay", "Queen", "ABBA", "Metallica", "Helene Fischer", "Rammstein", "Madonna", "Elvis Presley", "The Beatles"]
   },
   {
-    "id": "instrumente",
-    "label": "Musikinstrumente",
-    "icon": "🎸",
-    "desc": "Von Gitarre bis Triangel.",
-    "words": ["Gitarre", "Klavier", "Schlagzeug", "Violine", "Trompete", "Flöte", "Saxophon", "Cello", "Harfe", "Ukulele", "Klarinette", "Akkordeon", "Triangel", "Bassgitarre", "Mundharmonika"]
+    "id": "vornamen",
+    "label": "Vornamen",
+    "icon": "🧑",
+    "desc": "Klassiker und moderne Vornamen.",
+    "words": ["Anna", "Max", "Lea", "Paul", "Mia", "Ben", "Emma", "Finn", "Laura", "Jonas", "Lena", "Felix", "Sarah", "Lukas", "Marie", "Tim"]
   },
   {
     "id": "berufe",
