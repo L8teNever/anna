@@ -134,3 +134,10 @@
   opacity: 0.9;
 }
 
+.active-cat__example {
+  margin-top: 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--m3-on-surface-variant);
+}
+

@@ -20,7 +20,7 @@
       color: "red",
       minPlayers: 2,
       maxPlayers: 8,
-      assets: ["/games/bombe/bombe.js", "/games/bombe/bombe.css"],
+      assets: ["/games/bombe/bombe.js", "/games/bombe/bombe.css", "/games/bombe/categories.json"],
     },
     {
       id: "truth_dare",
@@ -32,7 +32,7 @@
       color: "purple",
       minPlayers: 2,
       maxPlayers: 12,
-      assets: ["/games/truth_dare/truth_dare.js", "/games/truth_dare/truth_dare.css"],
+      assets: ["/games/truth_dare/truth_dare.js", "/games/truth_dare/truth_dare.css", "/games/truth_dare/prompts.json"],
     },
     {
       id: "categories",
@@ -44,7 +44,7 @@
       color: "green",
       minPlayers: 1,
       maxPlayers: 12,
-      assets: ["/games/categories/categories.js", "/games/categories/categories.css"],
+      assets: ["/games/categories/categories.js", "/games/categories/categories.css", "/games/categories/categories.json"],
     },
   ];
 

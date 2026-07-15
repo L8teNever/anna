@@ -4,56 +4,23 @@
  * jeweiligen Fragen-/Aufgaben-Pool (abhängig vom gewählten Modus).
  */
 (function () {
-  const PROMPTS = {
-    normal: {
-      truth: [
-        "Was war dein peinlichster Moment in der Schule/Arbeit?",
-        "Wen in dieser Runde würdest du am ehesten um Rat fragen?",
-        "Was ist die größte Lüge, die du je erzählt hast?",
-        "Worauf bist du am meisten stolz?",
-        "Was ist dein größtes Laster?",
-        "Wann hast du zuletzt geweint und warum?",
-        "Was würdest du an dir selbst ändern, wenn du könntest?",
-        "Welche App checkst du am häufigsten?",
-        "Was ist das Peinlichste in deinem Suchverlauf?",
-        "Wen in dieser Runde kennst du am wenigsten gut?",
-      ],
-      dare: [
-        "Mach 10 Kniebeugen.",
-        "Sprich für die nächsten zwei Runden nur im Flüsterton.",
-        "Lass dir von jemandem ein Wort ins Gesicht schreiben (mit Finger, ohne Stift).",
-        "Imitiere eine Person aus der Runde, bis sie erraten wird.",
-        "Erzähle einen Witz – wenn keiner lacht, trinkst/isst du etwas.",
-        "Tausche für eine Runde den Platz mit deinem Nachbarn.",
-        "Singe die erste Zeile deines Lieblingssongs.",
-        "Lass dich von der Gruppe für 30 Sekunden fotografieren, egal wie du aussiehst.",
-        "Tanze 15 Sekunden ohne Musik.",
-        "Rede die nächste Runde nur in Fragen.",
-      ],
-    },
-    party: {
-      truth: [
-        "Wer in dieser Runde wäre dein Match bei einem Dating-App-Swipe?",
-        "Was ist das Verrückteste, das du je auf einer Party gemacht hast?",
-        "Hattest du schon mal ein Techtelmechtel mit jemandem aus dieser Runde?",
-        "Was ist dein größtes Party-Bedauern?",
-        "Wen in dieser Runde würdest du am ehesten daten?",
-        "Was ist die peinlichste Nachricht, die du je verschickt hast?",
-        "Welche Person hier würdest du am ehesten in einem Escape Room mitnehmen – oder eher nicht?",
-        "Was war dein schlimmster Filmriss?",
-      ],
-      dare: [
-        "Lass dir von der Gruppe ein Kompliment machen – und bedanke dich übertrieben theatralisch.",
-        "Mach ein spontanes 10-Sekunden-Comedy-Set.",
-        "Ruf/schreib jemandem eine ehrliche Nachricht, die die Gruppe diktiert (harmlos!).",
-        "Tanze mit der Person rechts von dir 20 Sekunden.",
-        "Lass dir von der Gruppe eine peinliche Frisur machen für den Rest der Runde.",
-        "Mach 3 Runden lang jeden Trinkspruch mit Akzent.",
-        "Zeig dein letztes Selfie in der Runde.",
-        "Lass jemanden aus der Gruppe deinen Status auf dem Handy für eine Minute ändern.",
-      ],
-    },
-  };
+  // Fragen-/Aufgaben-Pools kommen aus prompts.json (liegt neben dieser
+  // Datei). Neue Frage/Aufgabe = einfach neuen String im passenden
+  // "truth"- oder "dare"-Array eintragen, kein Code-Wissen nötig.
+  const PROMPTS_URL = "/games/truth_dare/prompts.json";
+  let PROMPTS = { normal: { truth: [], dare: [] }, party: { truth: [], dare: [] } };
+
+  async function loadPrompts() {
+    try {
+      const response = await fetch(PROMPTS_URL, { cache: "no-store" });
+      const data = await response.json();
+      if (data && typeof data === "object") PROMPTS = data;
+    } catch (err) {
+      // PROMPTS bleibt beim leeren Fallback-Grundgerüst; pickPrompt()
+      // fängt das unten ab, damit die Buttons nicht kaputtgehen.
+    }
+  }
+  loadPrompts();
 
   const MIN_PLAYERS = 2;
   const MAX_PLAYERS = 12;
@@ -135,7 +102,8 @@
   }
 
   function pickPrompt(type) {
-    const pool = PROMPTS[mode][type];
+    const pool = (PROMPTS[mode] && PROMPTS[mode][type]) || [];
+    if (!pool.length) return "…";
     const available = pool.filter((_, idx) => !usedPrompts.has(`${mode}:${type}:${idx}`));
     let index;
     if (available.length > 0) {

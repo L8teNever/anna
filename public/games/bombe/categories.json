@@ -1,0 +1,128 @@
+[
+  {
+    "id": "automarken",
+    "label": "Automarken",
+    "icon": "🚗",
+    "desc": "Marken und Modelle von Autos.",
+    "words": ["BMW", "Audi", "Mercedes", "Volkswagen", "Porsche", "Ferrari", "Toyota", "Honda", "Ford", "Opel", "Tesla", "Skoda", "Renault", "Fiat", "Mazda", "Volvo"]
+  },
+  {
+    "id": "tiere",
+    "label": "Tiere",
+    "icon": "🐾",
+    "desc": "Vom Haustier bis zum Wildtier.",
+    "words": ["Löwe", "Elefant", "Giraffe", "Pinguin", "Delfin", "Wolf", "Fuchs", "Bär", "Adler", "Zebra", "Känguru", "Koala", "Hai", "Schildkröte", "Papagei", "Eichhörnchen"]
+  },
+  {
+    "id": "laender",
+    "label": "Länder",
+    "icon": "🌍",
+    "desc": "Staaten rund um die Welt.",
+    "words": ["Deutschland", "Frankreich", "Italien", "Spanien", "Griechenland", "Japan", "Brasilien", "Kanada", "Ägypten", "Indien", "Australien", "Norwegen", "Portugal", "Mexiko", "Thailand", "Marokko"]
+  },
+  {
+    "id": "staedte",
+    "label": "Städte",
+    "icon": "🏙️",
+    "desc": "Groß- und Kleinstädte weltweit.",
+    "words": ["Berlin", "Paris", "London", "Rom", "Barcelona", "New York", "Tokio", "Wien", "Amsterdam", "Prag", "Istanbul", "Dubai", "Sydney", "Hamburg", "München", "Venedig"]
+  },
+  {
+    "id": "sportarten",
+    "label": "Sportarten",
+    "icon": "⚽",
+    "desc": "Disziplinen und Ballsportarten.",
+    "words": ["Fußball", "Basketball", "Tennis", "Volleyball", "Schwimmen", "Handball", "Boxen", "Golf", "Skifahren", "Leichtathletik", "Radfahren", "Klettern", "Turnen", "Eishockey", "Rudern", "Surfen"]
+  },
+  {
+    "id": "essen",
+    "label": "Essen & Trinken",
+    "icon": "🍕",
+    "desc": "Gerichte, Snacks und Getränke.",
+    "words": ["Pizza", "Pasta", "Sushi", "Döner", "Currywurst", "Schnitzel", "Burger", "Pommes", "Salat", "Pfannkuchen", "Lasagne", "Tacos", "Gulasch", "Ramen", "Croissant", "Falafel"]
+  },
+  {
+    "id": "filme",
+    "label": "Filmtitel",
+    "icon": "🎬",
+    "desc": "Bekannte Filme aller Genres.",
+    "words": ["Titanic", "Avatar", "Inception", "Gladiator", "Matrix", "Jurassic Park", "Star Wars", "Der Pate", "Forrest Gump", "Fluch der Karibik", "Herr der Ringe", "Joker", "Rocky", "Frozen", "Shrek"]
+  },
+  {
+    "id": "serien",
+    "label": "Serien",
+    "icon": "📺",
+    "desc": "TV- und Streaming-Serien.",
+    "words": ["Breaking Bad", "Friends", "Stranger Things", "The Office", "Game of Thrones", "Dark", "How I Met Your Mother", "The Crown", "Money Heist", "Squid Game", "Sherlock", "Die Simpsons", "Vikings", "Peaky Blinders", "Better Call Saul"]
+  },
+  {
+    "id": "musiker",
+    "label": "Musiker & Bands",
+    "icon": "🎵",
+    "desc": "Interpreten und Bands.",
+    "words": ["Beyoncé", "Ed Sheeran", "Adele", "Taylor Swift", "Rihanna", "Eminem", "Coldplay", "Queen", "ABBA", "Metallica", "Helene Fischer", "Rammstein", "Madonna", "Elvis Presley", "The Beatles"]
+  },
+  {
+    "id": "instrumente",
+    "label": "Musikinstrumente",
+    "icon": "🎸",
+    "desc": "Von Gitarre bis Triangel.",
+    "words": ["Gitarre", "Klavier", "Schlagzeug", "Violine", "Trompete", "Flöte", "Saxophon", "Cello", "Harfe", "Ukulele", "Klarinette", "Akkordeon", "Triangel", "Bassgitarre", "Mundharmonika"]
+  },
+  {
+    "id": "berufe",
+    "label": "Berufe",
+    "icon": "💼",
+    "desc": "Jobs und Tätigkeiten.",
+    "words": ["Arzt", "Lehrer", "Polizist", "Feuerwehrmann", "Bäcker", "Friseur", "Ingenieur", "Anwalt", "Koch", "Pilot", "Elektriker", "Krankenschwester", "Landwirt", "Zahnarzt", "Journalist", "Tierarzt"]
+  },
+  {
+    "id": "videospiele",
+    "label": "Videospiele",
+    "icon": "🎮",
+    "desc": "Games aller Plattformen.",
+    "words": ["Minecraft", "Fortnite", "FIFA", "Zelda", "Mario Kart", "Call of Duty", "GTA", "Among Us", "Tetris", "Pac-Man", "Die Sims", "Pokémon", "Overwatch", "League of Legends", "Animal Crossing"]
+  },
+  {
+    "id": "suesswaren",
+    "label": "Süßigkeiten",
+    "icon": "🍬",
+    "desc": "Naschereien und Süßkram.",
+    "words": ["Schokolade", "Gummibärchen", "Lakritz", "Bonbon", "Marshmallow", "Karamell", "Keks", "Lolli", "Kaugummi", "Nougat", "Milka", "Haribo", "Praline", "Zuckerwatte", "Toffee"]
+  },
+  {
+    "id": "urlaubsziele",
+    "label": "Urlaubsziele",
+    "icon": "🏖️",
+    "desc": "Beliebte Reiseziele.",
+    "words": ["Mallorca", "Malediven", "Kreta", "Bali", "Kanaren", "Ägypten", "Toskana", "Karibik", "Ibiza", "Türkei", "Portugal", "Hawaii", "Seychellen", "Kroatien", "Thailand"]
+  },
+  {
+    "id": "superstars",
+    "label": "Prominente",
+    "icon": "⭐",
+    "desc": "Bekannte Persönlichkeiten.",
+    "words": ["Leonardo DiCaprio", "Cristiano Ronaldo", "Lionel Messi", "Angelina Jolie", "Tom Hanks", "Serena Williams", "Dwayne Johnson", "Emma Watson", "Will Smith", "Jennifer Lawrence", "Roger Federer", "Rihanna", "Brad Pitt", "Zendaya", "Keanu Reeves"]
+  },
+  {
+    "id": "pflanzungen",
+    "label": "Pflanzen & Blumen",
+    "icon": "🌺",
+    "desc": "Gewächse und Blüten.",
+    "words": ["Rose", "Tulpe", "Sonnenblume", "Kaktus", "Orchidee", "Lavendel", "Gänseblümchen", "Efeu", "Bambus", "Farn", "Löwenzahn", "Nelke", "Bonsai", "Veilchen", "Mohn"]
+  },
+  {
+    "id": "marken",
+    "label": "Marken & Firmen",
+    "icon": "🏷️",
+    "desc": "Bekannte Unternehmen.",
+    "words": ["Nike", "Adidas", "Apple", "Samsung", "Coca-Cola", "McDonald's", "IKEA", "Amazon", "Google", "Puma", "Lego", "Rolex", "Chanel", "Netflix", "Spotify"]
+  },
+  {
+    "id": "farben",
+    "label": "Dinge einer Farbe",
+    "icon": "🎨",
+    "desc": "Alles rund um Farben.",
+    "words": ["Feuerwehrauto", "Banane", "Himmel", "Gras", "Schneemann", "Sonnenblume", "Blut", "Kohle", "Flamingo", "Zitrone", "Meer", "Erdbeere", "Veilchen", "Karotte", "Milch"]
+  }
+]

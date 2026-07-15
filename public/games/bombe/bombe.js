@@ -14,28 +14,13 @@
   const MAX_PLAYERS  = 8;
 
   /* ------------------------------------------------------------------ */
-  /* Kategorien-Datenbank (nur Namen, keine Aufgaben)                    */
+  /* Kategorien-Datenbank: kommt aus categories.json (liegt neben dieser
+   * Datei). Neue Kategorie = neues Objekt in der JSON-Liste anhängen.
+   * Mehr Begriffe = einfach weitere Strings ins "words"-Array der
+   * jeweiligen Kategorie eintragen. Kein Code-Wissen nötig.               */
   /* ------------------------------------------------------------------ */
-  const ALL_CATEGORIES = [
-    { id: "automarken",   label: "Automarken",          icon: "🚗", desc: "Marken und Modelle von Autos." },
-    { id: "tiere",        label: "Tiere",               icon: "🐾", desc: "Vom Haustier bis zum Wildtier." },
-    { id: "laender",      label: "Länder",              icon: "🌍", desc: "Staaten rund um die Welt." },
-    { id: "staedte",      label: "Städte",              icon: "🏙️", desc: "Groß- und Kleinstädte weltweit." },
-    { id: "sportarten",   label: "Sportarten",          icon: "⚽", desc: "Disziplinen und Ballsportarten." },
-    { id: "essen",        label: "Essen & Trinken",     icon: "🍕", desc: "Gerichte, Snacks und Getränke." },
-    { id: "filme",        label: "Filmtitel",           icon: "🎬", desc: "Bekannte Filme aller Genres." },
-    { id: "serien",       label: "Serien",              icon: "📺", desc: "TV- und Streaming-Serien." },
-    { id: "musiker",      label: "Musiker & Bands",     icon: "🎵", desc: "Interpreten und Bands." },
-    { id: "instrumente",  label: "Musikinstrumente",    icon: "🎸", desc: "Von Gitarre bis Triangel." },
-    { id: "berufe",       label: "Berufe",              icon: "💼", desc: "Jobs und Tätigkeiten." },
-    { id: "videospiele",  label: "Videospiele",         icon: "🎮", desc: "Games aller Plattformen." },
-    { id: "suesswaren",   label: "Süßigkeiten",         icon: "🍬", desc: "Naschereien und Süßkram." },
-    { id: "urlaubsziele", label: "Urlaubsziele",        icon: "🏖️", desc: "Beliebte Reiseziele." },
-    { id: "superstars",   label: "Prominente",          icon: "⭐", desc: "Bekannte Persönlichkeiten." },
-    { id: "pflanzungen",  label: "Pflanzen & Blumen",   icon: "🌺", desc: "Gewächse und Blüten." },
-    { id: "marken",       label: "Marken & Firmen",     icon: "🏷️", desc: "Bekannte Unternehmen." },
-    { id: "farben",       label: "Dinge einer Farbe",   icon: "🎨", desc: "Alles rund um Farben." },
-  ];
+  const CATEGORIES_URL = "/games/bombe/categories.json";
+  let ALL_CATEGORIES = [];
 
   /* ------------------------------------------------------------------ */
   /* DOM-Referenzen                                                        */
@@ -77,6 +62,7 @@
   // Aktive Kategorieanzeige im Spielfeld
   const activeCatBadge  = document.getElementById("active-cat-badge");
   const activeCatText   = document.getElementById("active-cat-text");
+  const activeCatExample = document.getElementById("active-cat-example");
 
   const playerPicker = PlayerPicker.create("bombe");
   let tickTimeoutId  = null;
@@ -102,7 +88,7 @@
   function saveSelectedCats(set) { localStorage.setItem(CATS_KEY, JSON.stringify([...set])); }
 
   const fuseSettings = loadFuseSettings();
-  let selectedCats   = loadSelectedCats();
+  let selectedCats   = new Set();
 
   minSecondsInput.value = fuseSettings.min;
   maxSecondsInput.value = fuseSettings.max;
@@ -112,7 +98,9 @@
   /* ------------------------------------------------------------------ */
   function updateCategorySummary() {
     if (!categorySummary) return;
-    if (selectedCats.size === ALL_CATEGORIES.length) {
+    if (!ALL_CATEGORIES.length) {
+      categorySummary.textContent = "Kategorien werden geladen…";
+    } else if (selectedCats.size === ALL_CATEGORIES.length) {
       categorySummary.textContent = "Alle Kategorien aktiv";
     } else if (selectedCats.size === 0) {
       categorySummary.textContent = "Keine Kategorie aktiv";
@@ -122,18 +110,21 @@
   }
 
   function renderCategoriesPool() {
-    categoriesPool.innerHTML = ALL_CATEGORIES.map((cat) => `
+    categoriesPool.innerHTML = ALL_CATEGORIES.map((cat) => {
+      const wordCount = Array.isArray(cat.words) ? cat.words.length : 0;
+      return `
       <div class="category-row" data-id="${cat.id}">
         <div class="category-row__text">
           <span class="category-row__title">${cat.icon} ${cat.label}</span>
-          <span class="category-row__desc">${cat.desc}</span>
+          <span class="category-row__desc">${cat.desc} · ${wordCount} Begriffe</span>
         </div>
         <label class="m3-switch">
           <input type="checkbox" class="category-row__checkbox" ${selectedCats.has(cat.id) ? "checked" : ""} />
           <span class="m3-switch__track"></span>
         </label>
       </div>
-    `).join("");
+    `;
+    }).join("");
     updateCategorySummary();
   }
 
@@ -159,7 +150,19 @@
     renderCategoriesPool();
   });
 
-  renderCategoriesPool();
+  async function initCategories() {
+    try {
+      const response = await fetch(CATEGORIES_URL, { cache: "no-store" });
+      const data = await response.json();
+      if (Array.isArray(data)) ALL_CATEGORIES = data;
+    } catch (err) {
+      ALL_CATEGORIES = [];
+    }
+    selectedCats = loadSelectedCats();
+    renderCategoriesPool();
+  }
+
+  initCategories();
 
   /* ------------------------------------------------------------------ */
   /* Ansichten wechseln                                                    */
@@ -201,7 +204,10 @@
   function pickCategory() {
     const active = ALL_CATEGORIES.filter((c) => selectedCats.has(c.id));
     if (!active.length) return null;
-    return active[Math.floor(Math.random() * active.length)];
+    const cat = active[Math.floor(Math.random() * active.length)];
+    const words = Array.isArray(cat.words) ? cat.words : [];
+    const word = words.length ? words[Math.floor(Math.random() * words.length)] : null;
+    return { ...cat, word };
   }
 
   /* ------------------------------------------------------------------ */
@@ -256,6 +262,10 @@
     const cat = pickCategory();
     if (cat && activeCatBadge) {
       activeCatText.textContent = `${cat.icon}  ${cat.label}`;
+      if (activeCatExample) {
+        activeCatExample.hidden = !cat.word;
+        if (cat.word) activeCatExample.textContent = `z.B. ${cat.word}`;
+      }
       activeCatBadge.hidden = false;
       // Slide-in Animation neu starten
       activeCatBadge.classList.remove("active-cat--in");

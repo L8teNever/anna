@@ -9,7 +9,10 @@
       "Bash(node --check js/view-nav.js)",
       "Bash(node --check sw.js)",
       "Bash(git rev-list *)",
-      "PowerShell(docker --version 2>&1)"
+      "PowerShell(docker --version 2>&1)",
+      "Bash(node -e \"const d=require\\('./public/games/bombe/categories.json'\\); console.log\\('categories:', d.length\\); d.forEach\\(c => { if\\(!c.id||!c.label||!Array.isArray\\(c.words\\)||!c.words.length\\) console.log\\('BAD', c.id\\); }\\); console.log\\('OK'\\);\")",
+      "Bash(node --check games/bombe/bombe.js)",
+      "Bash(node -e \"JSON.parse\\(require\\('fs'\\).readFileSync\\('games/bombe/categories.json','utf8'\\)\\); console.log\\('OK-json'\\)\")"
     ]
   }
 }

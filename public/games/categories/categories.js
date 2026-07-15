@@ -5,12 +5,23 @@
 (function () {
   const SETTINGS_KEY = "anna:categories:settings";
 
-  const CATEGORY_POOL = [
-    "Stadt", "Land", "Fluss", "Tier", "Beruf", "Filmtitel", "Automarke",
-    "Farbe", "Getränk", "Essen", "Sportart", "Promi", "Marke", "Musikband",
-    "Superheld", "Vorname", "Möbelstück", "Comicfigur", "App", "Instrument",
-  ];
+  // Kategorienliste kommt aus categories.json (liegt neben dieser Datei).
+  // Neue Kategorie = einfach neuen String in die JSON-Liste eintragen,
+  // kein Code-Wissen nötig – wird beim nächsten Laden automatisch benutzt.
+  const CATEGORIES_URL = "/games/categories/categories.json";
+  let CATEGORY_POOL = [];
   const LETTER_POOL = "ABCDEFGHIJKLMNOPRSTW".split("");
+
+  async function loadCategoryPool() {
+    try {
+      const response = await fetch(CATEGORIES_URL, { cache: "no-store" });
+      const data = await response.json();
+      if (Array.isArray(data) && data.length) CATEGORY_POOL = data;
+    } catch (err) {
+      CATEGORY_POOL = [];
+    }
+  }
+  loadCategoryPool();
 
   const MIN_PLAYERS = 1;
 
@@ -119,7 +130,9 @@
     remainingSeconds = totalSeconds;
     totalDuration = totalSeconds;
 
-    catName.textContent = CATEGORY_POOL[Math.floor(Math.random() * CATEGORY_POOL.length)];
+    catName.textContent = CATEGORY_POOL.length
+      ? CATEGORY_POOL[Math.floor(Math.random() * CATEGORY_POOL.length)]
+      : "…";
     catLetter.textContent = LETTER_POOL[Math.floor(Math.random() * LETTER_POOL.length)];
     catTimer.textContent = String(remainingSeconds);
     catTimer.dataset.urgent = "false";
