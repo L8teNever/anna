@@ -266,8 +266,7 @@
     if (currentRevealIndex < roundPlayers.length) {
       showRevealForCurrentPlayer();
     } else {
-      revealView.hidden = true;
-      playView.hidden = false;
+      ViewNav.transition(revealView, playView);
     }
   });
 
@@ -282,9 +281,7 @@
     impostorIndices = new Set(shuffledIdx.slice(0, impostorTotal));
 
     currentRevealIndex = 0;
-    setupView.hidden = true;
-    playView.hidden = true;
-    revealView.hidden = false;
+    ViewNav.transition(null, revealView);
     showRevealForCurrentPlayer();
   }
 
@@ -298,20 +295,10 @@
   exitButton.addEventListener("click", () => { window.location.href = "/"; });
 
   backButton.addEventListener("click", () => {
-    if (!playView.hidden && setupView.hidden) {
-      setupView.hidden = false;
-      playView.hidden = true;
-      return;
+    if (window.location.hash) {
+      history.back();
+    } else {
+      window.location.href = "/";
     }
-    if (!revealView.hidden && setupView.hidden) {
-      revealView.hidden = true;
-      setupView.hidden = false;
-      return;
-    }
-    if (!categorySelectView.hidden || !playerSelectView.hidden) {
-      ViewNav.transition(categorySelectView.hidden ? playerSelectView : categorySelectView, setupView);
-      return;
-    }
-    window.location.href = "/";
   });
 })();

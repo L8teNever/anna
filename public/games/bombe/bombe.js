@@ -152,8 +152,7 @@
     const totalMs = (min + Math.random() * (max - min)) * 1000;
 
     roundActive = true;
-    setupView.hidden = true;
-    playView.hidden  = false;
+    ViewNav.transition(setupView, playView);
     playActions.hidden = true;
 
     bombRing.classList.remove("bomb-ring--exploded");
@@ -233,17 +232,12 @@
   restartButton.addEventListener("click", startRound);
   exitButton.addEventListener("click", () => { stopRound(); window.location.href = "/"; });
   backButton.addEventListener("click", () => {
-    stopRound();
-    if (!playView.hidden && setupView.hidden) {
-      setupView.hidden = false;
-      playView.hidden  = true;
-      return;
+    if (window.location.hash) {
+      history.back();
+    } else {
+      window.location.href = "/";
     }
-    if (!categorySelectView.hidden || !playerSelectView.hidden) {
-      ViewNav.transition(categorySelectView.hidden ? playerSelectView : categorySelectView, setupView);
-      return;
-    }
-    window.location.href = "/";
   });
+  playView.addEventListener("viewhide", stopRound);
   window.addEventListener("beforeunload", stopRound);
 })();
