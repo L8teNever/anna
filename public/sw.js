@@ -15,7 +15,7 @@
  *     komplett offline mit dem neuen Stand.
  */
 
-const APP_VERSION = "2.1.3";
+const APP_VERSION = "2.1.4";
 const CACHE_NAME = `anna-cache-${APP_VERSION}`;
 
 importScripts("/js/game-registry.js");
@@ -59,8 +59,17 @@ async function precacheAll(cache, urls) {
   await Promise.all(
     urls.map(async (url) => {
       try {
-        const response = await fetch(url, { cache: "no-store" });
-        if (response.ok) await cache.put(url, response);
+        // Cache-Busting über Version: zwingt CDN/Cloudflare, die Datei neu vom Server zu holen
+        const separator = url.includes("?") ? "&" : "?";
+        const cleanUrl = url.split("#")[0];
+        const cacheBustUrl = `${cleanUrl}${separator}cb=${APP_VERSION}`;
+
+        const response = await fetch(cacheBustUrl, { cache: "no-store" });
+        if (response.ok) {
+          // Wir speichern das Asset unter dem Original-URL-Pfad (ohne query param),
+          // damit der Cache-Match bei normalen Seitenzugriffen wie gewohnt funktioniert.
+          await cache.put(url, response);
+        }
       } catch (err) {
         // Einzelner Asset-Fehler darf das Update nicht blockieren; der
         // Fetch-Handler unten holt fehlende Dateien bei Bedarf nach.
