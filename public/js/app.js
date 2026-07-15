@@ -46,11 +46,10 @@
     grid.innerHTML = "";
     matches.forEach((game) => {
       const isFav = favorites.includes(game.id);
-      const card = document.createElement("article");
+      const card = document.createElement("a");
       card.className = "m3-card m3-card--interactive game-card";
       card.dataset.color = game.color;
-      card.setAttribute("role", "button");
-      card.setAttribute("tabindex", "0");
+      card.href = `/${game.id}`;
       card.setAttribute("aria-label", `${game.name} öffnen`);
       card.innerHTML = `
         <div class="game-card__top">
@@ -69,15 +68,18 @@
           <span class="game-card__sub">${game.minPlayers}–${game.maxPlayers} Spieler</span>
         </div>
       `;
-      card.addEventListener("click", () => {
-        window.location.href = `/${game.id}`;
+
+      // View Transition für flüssigen App-like Übergang (Chrome 111+, Fallback: normale Navigation)
+      card.addEventListener("click", (event) => {
+        const fav = event.target.closest(".game-card__fav");
+        if (fav) return; // Favoriten-Klick nicht abfangen
+        if (!document.startViewTransition) return; // Kein Support → normaler Link-Klick
+        event.preventDefault();
+        document.startViewTransition(() => {
+          window.location.href = card.href;
+        });
       });
-      card.addEventListener("keydown", (event) => {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          window.location.href = `/${game.id}`;
-        }
-      });
+
       grid.appendChild(card);
     });
 
@@ -177,6 +179,7 @@
     const favButton = event.target.closest("[data-fav-id]");
     if (!favButton) return;
     event.stopPropagation();
+    event.preventDefault(); // Verhindert Navigation über den <a>-Eltern-Link
     const favorites = Storage.toggleFavorite(favButton.dataset.favId);
     const isFav = favorites.includes(favButton.dataset.favId);
     favButton.setAttribute("aria-pressed", String(isFav));

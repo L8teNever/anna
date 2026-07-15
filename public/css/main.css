@@ -198,6 +198,8 @@
   justify-content: space-between;
   height: 224px;
   border-radius: var(--m3-shape-xl);
+  text-decoration: none;
+  color: inherit;
 }
 
 .game-card__top {
