@@ -246,3 +246,25 @@ button {
   font-weight: 600;
   letter-spacing: 0.02em;
 }
+
+/* ─── Unterdrückt den vom Cloudflare-Worker injizierten globalen Loader ───────
+   Der Worker fügt auf jeder Seite einen Vollbild-Lader (#l8-page-loader) und
+   dynamische Element-Lader (.l8-element-loader / .l8-dynamic-wrapper) ein.
+   Anna lädt aus dem Service-Worker-Cache sofort – der globale Lader wird nie
+   benötigt und die Mini-Lader verursachen einen hängenden Spinner unten links.
+   ─────────────────────────────────────────────────────────────────────────── */
+#l8-page-loader {
+  display: none !important;
+}
+
+.l8-element-loader {
+  display: none !important;
+}
+
+.l8-dynamic-wrapper {
+  display: contents !important;
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+}
