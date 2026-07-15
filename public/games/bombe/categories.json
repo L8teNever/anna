@@ -1,608 +1,274 @@
 [
   {
-    "id": "pizza_zutaten",
-    "label": "Dinge auf einer Pizza",
+    "id": "fressen_saufen",
+    "label": "Fressen & Saufen",
     "icon": "🍕",
-    "desc": "Klassiker, geht immer."
+    "words": [
+      "Dinge auf einer Pizza",
+      "Pizza-Sünden",
+      "Fast-Food-Gerichte",
+      "Was man grillen kann",
+      "Sachen im Kühlschrank",
+      "Süßigkeiten der Kindheit",
+      "Was man zum Frühstück isst",
+      "Getränke zum Betrinken",
+      "Alkoholfreie Getränke",
+      "Essen bei einem Kater"
+    ]
   },
   {
-    "id": "pizza_suenden",
-    "label": "Pizza-Sünden",
-    "icon": "🍍",
-    "desc": "Zutaten, die illegal sein sollten."
-  },
-  {
-    "id": "fast_food",
-    "label": "Fast-Food-Gerichte",
-    "icon": "🍔",
-    "desc": "Döner, Burger, Pommes und Co."
-  },
-  {
-    "id": "grillen",
-    "label": "Was man grillen kann",
-    "icon": "🔥",
-    "desc": "Fleisch, Käse, Gemüse, Stockbrot..."
-  },
-  {
-    "id": "kuehlschrank",
-    "label": "Sachen im Kühlschrank",
-    "icon": "🥛",
-    "desc": "Senf, Milch, Abgelaufenes..."
-  },
-  {
-    "id": "kindheit_suessigkeiten",
-    "label": "Süßigkeiten der Kindheit",
-    "icon": "🍬",
-    "desc": "Saure Zungen, Schokobons, Knister-Kaugummi..."
-  },
-  {
-    "id": "fruehstueck",
-    "label": "Was man zum Frühstück isst",
-    "icon": "☕",
-    "desc": "Nutellabrot, Müsli, Rührei..."
-  },
-  {
-    "id": "alkohol",
-    "label": "Getränke zum Betrinken",
-    "icon": "🍺",
-    "desc": "Bier, Wodka, Korn, Tequila..."
-  },
-  {
-    "id": "alkoholfrei",
-    "label": "Alkoholfreie Getränke",
-    "icon": "🥤",
-    "desc": "Cola, Fanta, Saft, Wasser..."
-  },
-  {
-    "id": "kater_essen",
-    "label": "Essen bei einem Kater",
-    "icon": "🤢",
-    "desc": "Konterbier, Döner, fettige Pizza..."
-  },
-  {
-    "id": "zuspatekommen_ausreden",
-    "label": "Ausreden fürs Zuspätkommen",
+    "id": "alltagspanik",
+    "label": "Alltagspanik & Peinlichkeiten",
     "icon": "⏰",
-    "desc": "Bahn verpasst, Wecker nicht gehört..."
+    "words": [
+      "Ausreden fürs Zuspätkommen",
+      "Dinge, die extrem stinken",
+      "Gründe für schlechte Laune",
+      "Dinge, die man im Bett verliert",
+      "Sachen, die man im Hotel klaut",
+      "WLAN weg – Was tun?",
+      "Sachen, die man ständig verliert",
+      "Warum man die Tür nicht aufmacht",
+      "Warum man nicht ans Handy geht",
+      "Heimliches Tun, wenn man allein ist"
+    ]
   },
   {
-    "id": "stinkende_dinge",
-    "label": "Dinge, die extrem stinken",
-    "icon": "🦨",
-    "desc": "Müll, nasse Hunde, Pups, alter Käse..."
-  },
-  {
-    "id": "schlechte_laune",
-    "label": "Gründe für schlechte Laune",
-    "icon": "😠",
-    "desc": "Zu wenig Schlaf, Hunger, Montag, Regen..."
-  },
-  {
-    "id": "bett_verlieren",
-    "label": "Dinge, die man im Bett verliert",
-    "icon": "🛏️",
-    "desc": "Handy, Socke, Fernbedienung..."
-  },
-  {
-    "id": "hotel_klauen",
-    "label": "Sachen, die man im Hotel klaut",
-    "icon": "🎒",
-    "desc": "Shampoo, Handtücher, Schlappen..."
-  },
-  {
-    "id": "wlan_weg",
-    "label": "WLAN weg – Was tun?",
-    "icon": "📶",
-    "desc": "Router neu starten, rausgehen, weinen..."
-  },
-  {
-    "id": "staendig_verlieren",
-    "label": "Sachen, die man ständig verliert",
-    "icon": "🔍",
-    "desc": "Schlüssel, Geldbeutel, Vape..."
-  },
-  {
-    "id": "haustuer_nicht_aufmachen",
-    "label": "Warum man die Tür nicht aufmacht",
-    "icon": "🚪",
-    "desc": "Kein Bock auf Menschen, nackt..."
-  },
-  {
-    "id": "handy_nicht_drangehen",
-    "label": "Warum man nicht ans Handy geht",
-    "icon": "📴",
-    "desc": "Akku leer, lautlos, geschlafen..."
-  },
-  {
-    "id": "alleine_tun",
-    "label": "Heimliches Tun, wenn man allein ist",
-    "icon": "🤫",
-    "desc": "Nase bohren, peinlich tanzen..."
-  },
-  {
-    "id": "date_nogos",
-    "label": "No-Gos beim ersten Date",
+    "id": "dating",
+    "label": "Peinliches Dating & Herzensschmerz",
     "icon": "❌",
-    "desc": "Über den Ex reden, schmatzen..."
+    "words": [
+      "No-Gos beim ersten Date",
+      "Orte für ein furchtbares Date",
+      "Sätze zum Schlussmachen",
+      "Peinliche Kosenamen",
+      "Lügen im Dating-Profil",
+      "Billige Anmachsprüche",
+      "Red Flags im Chat",
+      "Gründe zum sofortigen Blockieren",
+      "Peinliche Date-Geschenke",
+      "Ausreden, um vor einem Date zu flüchten"
+    ]
   },
   {
-    "id": "furchtbare_date_orte",
-    "label": "Orte für ein furchtbares Date",
-    "icon": "🏚️",
-    "desc": "McDonalds, Friedhof, Puff..."
-  },
-  {
-    "id": "schlussmachen_saetze",
-    "label": "Sätze zum Schlussmachen",
-    "icon": "💔",
-    "desc": "Es liegt nicht an dir..."
-  },
-  {
-    "id": "peinliche_kosenamen",
-    "label": "Peinliche Kosenamen",
-    "icon": "🧸",
-    "desc": "Schnuckiputz, Bärchen, Schatzi..."
-  },
-  {
-    "id": "dating_profil_luegen",
-    "label": "Lügen im Dating-Profil",
-    "icon": "🤥",
-    "desc": "Größe, Hobbys, Alter, alte Fotos..."
-  },
-  {
-    "id": "anmachsprueche",
-    "label": "Billige Anmachsprüche",
-    "icon": "😏",
-    "desc": "Deine Eltern müssen Diebe sein..."
-  },
-  {
-    "id": "chat_redflags",
-    "label": "Red Flags im Chat",
-    "icon": "🚩",
-    "desc": "Nur hey schreiben, Nacktfotos..."
-  },
-  {
-    "id": "blockieren_gruende",
-    "label": "Gründe zum sofortigen Blockieren",
-    "icon": "🚫",
-    "desc": "Stalking, Beleidigungen, Ex..."
-  },
-  {
-    "id": "federnaeppchen",
-    "label": "Dinge im Federmäppchen",
+    "id": "schule_arbeit",
+    "label": "Schule, Uni & Arbeits-Wahnsinn",
     "icon": "✏️",
-    "desc": "Stift, Lineal, Radiergummifußel..."
+    "words": [
+      "Dinge im Federmäppchen",
+      "Ausreden für fehlende Hausaufgaben",
+      "Typische Sprüche von Lehrern",
+      "Gute Spickzettel-Verstecke",
+      "Nervige Mitschüler oder Kollegen",
+      "Heimliches im Homeoffice / Unterricht",
+      "Typisches Studenten-Essen",
+      "Sportarten im Schulsport, die man hasst",
+      "Gründe für eine Krankmeldung",
+      "Sachen, die man im Büro klaut"
+    ]
   },
   {
-    "id": "fehlende_hausaufgaben",
-    "label": "Ausreden für fehlende Hausaufgaben",
-    "icon": "📓",
-    "desc": "Hund hat sie gefressen, vergessen..."
-  },
-  {
-    "id": "lehrersprueche",
-    "label": "Typische Sprüche von Lehrern",
-    "icon": "👨‍🏫",
-    "desc": "Ich beende den Unterricht..."
-  },
-  {
-    "id": "spickzettel_verstecke",
-    "label": "Gute Spickzettel-Verstecke",
-    "icon": "🕵️",
-    "desc": "Mäppchen, Handgelenk, unter Arbeit..."
-  },
-  {
-    "id": "nervige_mitschueler",
-    "label": "Nervige Kollegen oder Mitschüler",
-    "icon": "🙄",
-    "desc": "Der Schleimer, Besserwisser..."
-  },
-  {
-    "id": "homeoffice_heimlich",
-    "label": "Heimliches im Homeoffice / Unterricht",
-    "icon": "💻",
-    "desc": "Zocken, schlafen, YouTube schauen..."
-  },
-  {
-    "id": "studenten_essen",
-    "label": "Typisches Studenten-Essen",
-    "icon": "🍜",
-    "desc": "Instant-Nudeln, Toasts..."
-  },
-  {
-    "id": "schulsport_hass",
-    "label": "Sportarten im Schulsport, die man hasst",
-    "icon": "🤸",
-    "desc": "Völkerball, Turnen, Ausdauerlauf..."
-  },
-  {
-    "id": "kumpel_woerter",
-    "label": "Wörter für Kumpel / Bruder",
-    "icon": "🤝",
-    "desc": "Bro, Digga, Atze, Habibi..."
-  },
-  {
-    "id": "geld_woerter",
-    "label": "Wörter für Geld",
-    "icon": "💵",
-    "desc": "Moneten, Cash, Para, Kies..."
-  },
-  {
-    "id": "peinlich_woerter",
-    "label": "Wörter für peinlich / unangenehm",
-    "icon": "🤦",
-    "desc": "Cringe, lost, gottlos..."
-  },
-  {
-    "id": "betrunken_woerter",
-    "label": "Wörter für betrunken sein",
-    "icon": "🥴",
-    "desc": "Dicht, weggescheppert, blau..."
-  },
-  {
-    "id": "chat_abkuerzungen",
-    "label": "Typische Chat-Abkürzungen",
+    "id": "jugendsprache",
+    "label": "Jugendsprache & Internet",
     "icon": "💬",
-    "desc": "lol, omg, btw, wtf, tbh..."
+    "words": [
+      "Wörter für Kumpel / Bruder",
+      "Wörter für Geld",
+      "Wörter für peinlich / unangenehm",
+      "Wörter für betrunken sein",
+      "Typische Chat-Abkürzungen",
+      "Beliebte Social-Media-Apps",
+      "Gaming-Begriffe im Reallife",
+      "Wörter für cool / gut",
+      "Typische YouTuber-Phrasen",
+      "Red Flags in einer Instagram-Bio"
+    ]
   },
   {
-    "id": "social_media",
-    "label": "Beliebte Social-Media-Apps",
-    "icon": "📱",
-    "desc": "TikTok, Instagram, Snapchat..."
+    "id": "bettgefluester",
+    "label": "Spicy: Bettgeflüster & Pannen (ab 18)",
+    "icon": "🔞",
+    "words": [
+      "Kosenamen im Bett",
+      "Ausreden gegen Sex",
+      "Orte im Haus für Sex",
+      "Lustkiller-Kosenamen",
+      "Lustige Namen fürs beste Stück",
+      "Peinliche Pannen im Bett",
+      "Sätze direkt nach dem Sex",
+      "Sätze zum Dirty Talk",
+      "Sätze, die man im Bett nicht hören will",
+      "Ausreden am Morgen danach"
+    ]
   },
   {
-    "id": "gaming_im_reallife",
-    "label": "Gaming-Begriffe im Reallife",
-    "icon": "🎮",
-    "desc": "NPC, Noob, Lag, Lost..."
-  },
-  {
-    "id": "cool_woerter",
-    "label": "Wörter für cool / gut",
-    "icon": "😎",
-    "desc": "Wild, stabil, macher, smash..."
-  },
-  {
-    "id": "bett_kosenamen",
-    "label": "Kosenamen im Bett",
-    "icon": "💋",
-    "desc": "Babe, Sexy, Daddy, Süße..."
-  },
-  {
-    "id": "sex_ausreden",
-    "label": "Ausreden gegen Sex",
-    "icon": "🛌",
-    "desc": "Kopfschmerzen, müde, Tage..."
-  },
-  {
-    "id": "sex_orte",
-    "label": "Orte im Haus für Sex",
-    "icon": "🏠",
-    "desc": "Sofa, Küchentisch, Dusche..."
-  },
-  {
-    "id": "lustkiller_kosenamen",
-    "label": "Lustkiller-Kosenamen",
-    "icon": "🤢",
-    "desc": "Mutti, Hengst, Spatz, Prinzessin..."
-  },
-  {
-    "id": "bestes_stueck",
-    "label": "Lustige Namen fürs beste Stück",
-    "icon": "🍆",
-    "desc": "Gurke, Lümmel, Mumu, Rüssel..."
-  },
-  {
-    "id": "bett_pannen",
-    "label": "Peinliche Pannen im Bett",
-    "icon": "🤦",
-    "desc": "Falscher Name, pupsen, Krampf..."
-  },
-  {
-    "id": "nach_sex_saetze",
-    "label": "Sätze direkt nach dem Sex",
-    "icon": "🚬",
-    "desc": "Das war gut, ich muss aufs Klo..."
-  },
-  {
-    "id": "dirty_talk",
-    "label": "Sätze zum Dirty Talk",
-    "icon": "💬",
-    "desc": "Du bist so geil, mach fester..."
-  },
-  {
-    "id": "bett_no_gos",
-    "label": "Sätze, die man im Bett nicht hören will",
-    "icon": "🙉",
-    "desc": "Bist du schon drin?, Ist es bald vorbei?..."
-  },
-  {
-    "id": "koffer_vergessen",
-    "label": "Sachen, die man im Koffer vergisst",
+    "id": "urlaub_party",
+    "label": "Urlaub, Mallorca & Party-Chaos",
     "icon": "🧳",
-    "desc": "Zahnbürste, Ladekabel, Sonnencreme..."
+    "words": [
+      "Sachen, die man im Koffer vergisst",
+      "Was man am Hotelbuffet macht",
+      "Typische Urlaubsfotos",
+      "Was man verliert beim Feiern",
+      "Dinge gegen einen Kater",
+      "Typische Partyspiele",
+      "Betrunken nachts um 3 Uhr",
+      "Warum man nicht in den Club kommt",
+      "Sachen, die man am Strand tut",
+      "Typische Malle-Schlager-Themen"
+    ]
   },
   {
-    "id": "hotelbuffet",
-    "label": "Was man am Hotelbuffet macht",
-    "icon": "🍽",
-    "desc": "Teller überladen, heimlich einpacken..."
+    "id": "familie_verwandte",
+    "label": "Familie & Verwandtschafts-Wahnsinn",
+    "icon": "🗣️",
+    "words": [
+      "Typische Sprüche von Eltern",
+      "Fragen von Oma beim Familienfest",
+      "Geschenke zum direkt Wegwerfen",
+      "Gründe für Streit an Weihnachten",
+      "Eltern-Fehler auf WhatsApp",
+      "Sachen, die Mutter sofort findet",
+      "Typische Sprüche von Onkel Uwe",
+      "Peinliche Aktionen von Eltern vor Freunden",
+      "Was man beim Familientreffen heimlich tut",
+      "Gründe, warum Eltern wütend werden"
+    ]
   },
   {
-    "id": "urlaubsfotos",
-    "label": "Typische Urlaubsfotos",
-    "icon": "📸",
-    "desc": "Füße am Strand, Sonnenuntergang..."
-  },
-  {
-    "id": "feiern_verlieren",
-    "label": "Was man verliert beim Feiern",
+    "id": "geld_flexing",
+    "label": "Geld, Flexing & Pleite sein",
     "icon": "💸",
-    "desc": "Vape, Handy, Jacke, Verstand..."
+    "words": [
+      "Was man tut, wenn man pleite ist",
+      "Dinge, um reich auszusehen",
+      "Wofür man zu viel Geld ausgibt",
+      "Was man tut bei Lottogewinn",
+      "Sachen auf eBay Kleinanzeigen",
+      "Typische Sätze von Krypto-Bros",
+      "Sachen, die man gebraucht kauft",
+      "Dinge, die man sich nicht leisten kann",
+      "Wo man zu Hause Kleingeld sammelt",
+      "Ausgefallene Spar-Methoden"
+    ]
   },
   {
-    "id": "kater_mittel",
-    "label": "Dinge gegen einen Kater",
-    "icon": "🤕",
-    "desc": "Konterbier, dicker Döner, Aspirin..."
-  },
-  {
-    "id": "partyspiele",
-    "label": "Typische Partyspiele",
-    "icon": "🎯",
-    "desc": "Beer Pong, Flunkyball, Loopings..."
-  },
-  {
-    "id": "nachts_3uhr",
-    "label": "Betrunken nachts um 3 Uhr",
-    "icon": "🌙",
-    "desc": "Döner essen, Ex anrufen, schlafen..."
-  },
-  {
-    "id": "tuersteher_abweisung",
-    "label": "Warum man nicht in den Club kommt",
-    "icon": "🚪",
-    "desc": "Zu betrunken, falsche Schuhe, aggro..."
-  },
-  {
-    "id": "elternsprueche",
-    "label": "Typische Sprüche von Eltern",
-    "icon": "🗣",
-    "desc": "Solange du deine Füße unter meinen Tisch stellst..."
-  },
-  {
-    "id": "oma_fragen",
-    "label": "Fragen von Oma beim Familienfest",
-    "icon": "👵",
-    "desc": "Hast du schon einen Freund?, was macht Schule?..."
-  },
-  {
-    "id": "verwandten_geschenke",
-    "label": "Geschenke zum direkt Wegwerfen",
-    "icon": "🎁",
-    "desc": "Hässliche Socken, Staubfänger..."
-  },
-  {
-    "id": "weihnachtsstreit",
-    "label": "Gründe für Streit an Weihnachten",
-    "icon": "🎄",
-    "desc": "Politik, wer abspült, Geschenke..."
-  },
-  {
-    "id": "eltern_whatsapp",
-    "label": "Eltern-Fehler auf WhatsApp",
-    "icon": "📱",
-    "desc": "Nur Smileys, Sprachnachrichten ohne Ton..."
-  },
-  {
-    "id": "mutter_findet",
-    "label": "Sachen, die Mutter sofort findet",
-    "icon": "🔍",
-    "desc": "Schlüssel, Socken, Butter..."
-  },
-  {
-    "id": "pleite_sein",
-    "label": "Was man tut, wenn man pleite ist",
-    "icon": "💸",
-    "desc": "Naudeln mit Ketchup essen, Pfand weggeben..."
-  },
-  {
-    "id": "reich_aussehen",
-    "label": "Dinge, um reich auszusehen",
-    "icon": "💎",
-    "desc": "Fake-Gucci, Starbucks, teure Schuhe..."
-  },
-  {
-    "id": "geld_ausgeben",
-    "label": "Wofür man zu viel Geld ausgibt",
-    "icon": "🛍",
-    "desc": "Shisha, Vapes, Lieferservice..."
-  },
-  {
-    "id": "lottogewinn",
-    "label": "Was man tut bei Lottogewinn",
-    "icon": "💰",
-    "desc": "Auto kaufen, kündigen, Urlaub..."
-  },
-  {
-    "id": "kleinanzeigen",
-    "label": "Sachen auf eBay Kleinanzeigen",
-    "icon": "📦",
-    "desc": "Was letzte Preis?, 'ist noch da?'..."
-  },
-  {
-    "id": "beifahrer_nervig",
-    "label": "Nervige Sachen von Beifahrern",
+    "id": "autofahren",
+    "label": "Autofahren & Roadtrip-Chaos",
     "icon": "🚗",
-    "desc": "Am Radio spielen, beim Parken reinreden..."
-  },
-  {
-    "id": "polizei_ausreden",
-    "label": "Ausreden bei Polizeikontrolle",
-    "icon": "🚓",
-    "desc": "Schild nicht gesehen, dringend aufs Klo..."
-  },
-  {
-    "id": "autofahrt_zeitvertreib",
-    "label": "Was man bei langer Autofahrt tut",
-    "icon": "🛣",
-    "desc": "Mitsingen, schlafen, Schilder suchen..."
-  },
-  {
-    "id": "im_auto",
-    "label": "Dinge, die man im Auto aufbewahrt",
-    "icon": "🔑",
-    "desc": "Parkgroschen, Masken, Duftbaum..."
-  },
-  {
-    "id": "autofahren_rage",
-    "label": "Warum man beim Fahren ausrastet",
-    "icon": "🤬",
-    "desc": "Schleicher, kein Blinker, Drängler..."
+    "words": [
+      "Nervige Sachen von Beifahrern",
+      "Ausreden bei Polizeikontrolle",
+      "Was man bei langer Autofahrt tut",
+      "Dinge, die man im Auto aufbewahrt",
+      "Warum man beim Fahren ausrastet",
+      "Typische Spiele für die Autofahrt",
+      "Gründe für Stau auf der Autobahn",
+      "Sachen, die man an der Tankstelle kauft",
+      "Fehler, die bei der Fahrprüfung passieren",
+      "Hassmomente bei der Parkplatzsuche"
+    ]
   },
   {
     "id": "trash_tv",
-    "label": "Typische Trash-TV-Sendungen",
+    "label": "Trash-TV & Promi-Abfuck",
     "icon": "📺",
-    "desc": "Dschungelcamp, Temptation Island..."
+    "words": [
+      "Typische Trash-TV-Sendungen",
+      "Wie Promis Aufmerksamkeit suchen",
+      "Warum Influencer gecancelt werden",
+      "Essen im Dschungelcamp",
+      "Typische Reality-TV-Sätze",
+      "Gründe, warum jemand die Show verlässt",
+      "Peinliche Reality-TV-Challenges",
+      "Typische Rollen in Trash-TV-Shows",
+      "Dinge, über die man bei Influencern lästert",
+      "Ausgefallene Orte für ein Reality-Format"
+    ]
   },
   {
-    "id": "promi_aufmerksamkeit",
-    "label": "Wie Promis Aufmerksamkeit suchen",
-    "icon": "⭐",
-    "desc": "Trennung vortäuschen, Instagram-Beef..."
-  },
-  {
-    "id": "canceling",
-    "label": "Warum Influencer gecancelt werden",
-    "icon": "🚫",
-    "desc": "Scams, Lügen, peinliche Videos..."
-  },
-  {
-    "id": "dschungelcamp_essen",
-    "label": "Essen im Dschungelcamp",
-    "icon": "🐛",
-    "desc": "Känguru-Hoden, Maden, Augen..."
-  },
-  {
-    "id": "boesewichte",
-    "label": "Berühmte Film-Bösewichte",
-    "icon": "🦹",
-    "desc": "Voldemort, Darth Vader, Joker..."
-  },
-  {
-    "id": "zocken_ausreden",
-    "label": "Ausreden fürs Verlieren beim Zocken",
+    "id": "gaming_film",
+    "label": "Film, Serien & Gaming-Nerds",
     "icon": "🎮",
-    "desc": "Es laggt, Controller leer, Team scheiße..."
+    "words": [
+      "Berühmte Film-Bösewichte",
+      "Ausreden fürs Verlieren beim Zocken",
+      "Hassmomente beim Filmschauen",
+      "Legendäre Videospiele",
+      "Ausreden, um nicht mitspielen zu müssen",
+      "Typische Gamer-Snacks",
+      "Filme, die jeder gesehen haben muss",
+      "Dinge, die in Horrorfilmen dumm sind",
+      "Typische Superkräfte",
+      "Nervige Dinge in Videospielen"
+    ]
   },
   {
-    "id": "film_hass",
-    "label": "Hassmomente beim Filmschauen",
-    "icon": "🍿",
-    "desc": "Spoiler, Werbung, wenn jemand redet..."
-  },
-  {
-    "id": "videospiele_legendaer",
-    "label": "Legendäre Videospiele",
-    "icon": "🕹",
-    "desc": "GTA, Minecraft, FIFA, Mario Kart..."
-  },
-  {
-    "id": "haustier_nein",
-    "label": "Haustiere, die keiner will",
+    "id": "tiere",
+    "label": "Tiere & Dschungel-Basics",
     "icon": "🐍",
-    "desc": "Spinne, Schlange, Krokodil..."
+    "words": [
+      "Haustiere, die keiner will",
+      "Tiere, die extrem stinken",
+      "Tiere, die fliegen können",
+      "Insekten, die man im Sommer hasst",
+      "Tiere, vor denen Menschen Angst haben",
+      "Lustige Hunderassen",
+      "Tiere, die extrem langsam sind",
+      "Tiere, die man essen kann",
+      "Geräusche, die Haustiere machen",
+      "Tiere, die im Meer leben"
+    ]
   },
   {
-    "id": "stinkende_tiere",
-    "label": "Tiere, die extrem stinken",
-    "icon": "🐷",
-    "desc": "Schwein, nasser Hund, Skunk..."
-  },
-  {
-    "id": "fliegende_tiere",
-    "label": "Tiere, die fliegen können",
-    "icon": "🦅",
-    "desc": "Vogel, Fliege, Fledermaus..."
-  },
-  {
-    "id": "sommer_insekten",
-    "label": "Insekten, die man im Sommer hasst",
-    "icon": "🦟",
-    "desc": "Mücke, Wespe, Fliege, Hornisse..."
-  },
-  {
-    "id": "sex_oeffentlichkeit",
-    "label": "Sex in der Öffentlichkeit",
-    "icon": "🌲",
-    "desc": "Aufzug, Auto, Wald, Park, Kino..."
-  },
-  {
-    "id": "rollenspiele",
-    "label": "Bekannte Rollenspiele fürs Bett",
+    "id": "spicy_kinks",
+    "label": "Spicy: Kinks & Fetische (einfach gehalten)",
     "icon": "🎭",
-    "desc": "Lehrer/Schülerin, Arzt/Patientin..."
+    "words": [
+      "Sex in der Öffentlichkeit",
+      "Bekannte Rollenspiele fürs Bett",
+      "Bekannte Fetische",
+      "Zweckentfremdete Sex-Spielzeuge",
+      "Körperstellen, die man gerne küsst",
+      "Sachen, die man beim Fesseln benutzt",
+      "Spicy Kleidung und Outfits",
+      "Dinge, die man beim Vorspiel tut",
+      "Orte für ein geheimes Treffen",
+      "Dinge, die man mit Gleitgel machen kann"
+    ]
   },
   {
-    "id": "fetische",
-    "label": "Bekannte Fetische",
-    "icon": "⛓",
-    "desc": "Fußfetisch, fesseln, Lack/Leder..."
-  },
-  {
-    "id": "sex_spielzeug_ersatz",
-    "label": "Zweckentfremdete Sex-Spielzeuge",
-    "icon": "🍦",
-    "desc": "Gurke, Bürste, Eiswürfel..."
-  },
-  {
-    "id": "abturner",
-    "label": "Dinge, die einen sofort abturnen",
+    "id": "spicy_abturner",
+    "label": "Spicy: Abturner & Bett-No-Gos",
     "icon": "🤮",
-    "desc": "Mundgeruch, ungepflegte Nägel..."
+    "words": [
+      "Dinge, die einen sofort abturnen",
+      "Peinliche Sätze beim Sex",
+      "Unangenehme Geräusche beim Sex",
+      "Aufräumen nach dem Sex",
+      "Schlimmste Parfüms & Gerüche beim Date",
+      "Was man beim Sex aus Versehen tut",
+      "Peinliche Blicke beim Sex",
+      "Dinge im Zimmer, die beim Sex stören",
+      "Sachen, die man beim Sex anbehält",
+      "Abturner bei der Körperbehaarung"
+    ]
   },
   {
-    "id": "sex_no_gos_saetze",
-    "label": "Peinliche Sätze beim Sex",
-    "icon": "🤐",
-    "desc": "Bist du schon drin?, wie hieß du?..."
-  },
-  {
-    "id": "sex_geraeusche",
-    "label": "Unangenehme Geräusche beim Sex",
-    "icon": "🐷",
-    "desc": "Furzgeräusche, Quietschen, Stöhnen..."
-  },
-  {
-    "id": "nach_sex_aufrsuben",
-    "label": "Aufräumen nach dem Sex",
-    "icon": "🧼",
-    "desc": "Kondom knoten, Flecken, Handtuch..."
-  },
-  {
-    "id": "flirt_komplimente",
-    "label": "Billige Flirt-Komplimente",
+    "id": "spicy_flirten",
+    "label": "Spicy: Flirten & Anmachen",
     "icon": "💬",
-    "desc": "Schöne Augen, hast du abgenommen?..."
-  },
-  {
-    "id": "club_flirt",
-    "label": "Flirt-Tricks im Club",
-    "icon": "🥂",
-    "desc": "Drink spendieren, intensiv anschauen..."
-  },
-  {
-    "id": "betrunken_flirt_chat",
-    "label": "Betrunkene Chats nachts",
-    "icon": "📱",
-    "desc": "Bist du noch wach?, komm vorbei..."
-  },
-  {
-    "id": "flirt_no_go_orte",
-    "label": "Unpassende Orte zum Anflirten",
-    "icon": "⚰️",
-    "desc": "Beerdigung, U-Bahn nachts, beim WC..."
+    "words": [
+      "Billige Flirt-Komplimente",
+      "Flirt-Tricks im Club",
+      "Betrunkene Chats nachts",
+      "Unpassende Orte zum Anflirten",
+      "Ausreden, um einen Korb zu geben",
+      "Wie man jemanden nach der Nummer fragt",
+      "Flirt-Fehler, die jeder macht",
+      "Was man beim Flirten am Körper macht",
+      "Typische Blicke beim Flirten",
+      "Was man beim ersten Kuss denkt"
+    ]
   }
 ]

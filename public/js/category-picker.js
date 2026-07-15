@@ -139,7 +139,8 @@
           const checked = selectedIds.has(cat.id) ? "checked" : "";
           let descText = cat.desc ? escapeHtml(cat.desc) : "";
           if (wordCount > 0) {
-            descText = descText ? `${descText} · ${wordCount} Wörter` : `${wordCount} Wörter`;
+            const unit = gameId === "bombe" ? "Themen" : "Wörter";
+            descText = descText ? `${descText} · ${wordCount} ${unit}` : `${wordCount} ${unit}`;
           }
           const customBadge = cat.custom ? '<span class="category-row__custom-tag">eigene</span>' : "";
           const customActions = cat.custom
@@ -153,11 +154,13 @@
             `
             : "";
 
+          const descHtml = descText ? `<span class="category-row__desc">${descText}</span>` : "";
+
           return `
             <div class="category-row" data-id="${cat.id}">
               <div class="category-row__text">
                 <span class="category-row__title">${cat.icon || "⭐"} ${escapeHtml(cat.label)}${customBadge}</span>
-                <span class="category-row__desc">${descText}</span>
+                ${descHtml}
               </div>
               <div class="category-row__actions">
                 ${customActions}

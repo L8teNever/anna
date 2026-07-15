@@ -163,10 +163,11 @@
     // Kategorie ziehen und anzeigen
     const cat = pickCategory();
     if (cat && activeCatBadge) {
-      activeCatText.textContent = `${cat.icon}  ${cat.label}`;
+      const promptText = cat.word || cat.label;
+      activeCatText.textContent = `${cat.icon}  ${promptText}`;
       if (activeCatExample) {
         activeCatExample.hidden = !cat.word;
-        if (cat.word) activeCatExample.textContent = `z.B. ${cat.word}`;
+        if (cat.word) activeCatExample.textContent = `Kategorie: ${cat.label}`;
       }
       activeCatBadge.hidden = false;
       // Slide-in Animation neu starten
