@@ -120,11 +120,12 @@
 
 .active-cat__label {
   font-family: var(--m3-font-display);
-  font-size: 2rem;
+  font-size: clamp(1.4rem, 5vw, 2rem);
   font-weight: 800;
-  line-height: 1.15;
+  line-height: 1.2;
   color: var(--m3-on-surface);
   margin-bottom: 10px;
+  word-wrap: break-word;
 }
 
 .active-cat__rule {
