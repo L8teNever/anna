@@ -26,7 +26,7 @@
 <body>
   <script src="/js/icons.js"></script>
   <div class="game-shell">
-    <header class="game-topbar">
+    <header class="game-topbar" id="game-topbar">
       <button class="m3-icon-button" id="back-button" aria-label="Zurück" title="Zurück">
         <svg class="m3-icon"><use href="#icon-arrow-back"></use></svg>
       </button>
@@ -97,7 +97,7 @@
     </section>
 
     <!-- ---------- Kategorie-Auswahl (Vollbild) ---------- -->
-    <section class="game-view app-view" id="view-category-select" hidden>
+    <section class="game-view app-view" id="view-category-select" data-hide-topbar hidden>
       <header class="picker-view-header">
         <div class="picker-view-header__left">
           <button type="button" class="m3-icon-button" id="category-select-back-button" aria-label="Zurück">
@@ -122,7 +122,7 @@
     </section>
 
     <!-- ---------- Mitspieler-Auswahl (Vollbild) ---------- -->
-    <section class="game-view app-view" id="view-player-select" hidden>
+    <section class="game-view app-view" id="view-player-select" data-hide-topbar hidden>
       <header class="picker-view-header">
         <div class="picker-view-header__left">
           <button type="button" class="m3-icon-button" id="player-select-back-button" aria-label="Zurück">

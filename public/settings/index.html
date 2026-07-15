@@ -11,79 +11,94 @@
     })();
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#6750a4" />
+  <meta name="theme-color" content="#0f1014" />
   <title>Einstellungen – Anna</title>
   <link rel="manifest" href="/manifest.json" />
   <link rel="icon" href="/assets/icons/icon-192.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/css/material.css" />
   <link rel="stylesheet" href="/css/components.css" />
   <link rel="stylesheet" href="/css/main.css" />
 </head>
 <body>
   <script src="/js/icons.js"></script>
-  <header class="app-topbar">
-    <button class="m3-icon-button" id="back-button" aria-label="Zurück" title="Zurück">
-      <svg class="m3-icon"><use href="#icon-arrow-back"></use></svg>
-    </button>
-    <h1 class="game-topbar__title">Einstellungen</h1>
-  </header>
+  <div class="game-shell">
+    <header class="game-topbar">
+      <button class="m3-icon-button" id="back-button" aria-label="Zurück" title="Zurück">
+        <svg class="m3-icon"><use href="#icon-arrow-back"></use></svg>
+      </button>
+      <h1 class="game-topbar__title">
+        <svg class="m3-icon" style="vertical-align: -5px"><use href="#icon-settings"></use></svg>
+        Einstellungen
+      </h1>
+    </header>
 
-  <main class="app-content">
-    <section class="settings-section">
-      <h2 class="m3-title">Darstellung</h2>
-      <div class="settings-row">
-        <div class="settings-row__label">
-          <span class="settings-row__title">Design</span>
-          <span class="settings-row__hint">Hell, dunkel oder wie im Systemmodus</span>
+    <section class="game-view app-view" id="setup-view">
+      <section class="settings-section" style="margin-top: 0">
+        <h2 class="m3-title">Darstellung</h2>
+        <div class="settings-row">
+          <div class="settings-row__label">
+            <span class="settings-row__title">Design</span>
+            <span class="settings-row__hint">Hell, dunkel oder wie im Systemmodus</span>
+          </div>
+          <div class="m3-segmented" id="theme-segmented" role="group" aria-label="Design wählen">
+            <button type="button" class="m3-segmented__option" data-value="system">Auto</button>
+            <button type="button" class="m3-segmented__option" data-value="light">Hell</button>
+            <button type="button" class="m3-segmented__option" data-value="dark">Dunkel</button>
+          </div>
         </div>
-        <div class="m3-segmented" id="theme-segmented" role="group" aria-label="Design wählen">
-          <button type="button" class="m3-segmented__option" data-value="system">Auto</button>
-          <button type="button" class="m3-segmented__option" data-value="light">Hell</button>
-          <button type="button" class="m3-segmented__option" data-value="dark">Dunkel</button>
-        </div>
-      </div>
-    </section>
+      </section>
 
-    <section class="settings-section">
-      <h2 class="m3-title">Spiele</h2>
-      <div class="settings-row">
-        <div class="settings-row__label">
-          <span class="settings-row__title">Sound</span>
-          <span class="settings-row__hint">Ton-Effekte in den Spielen (z.B. Ticken)</span>
+      <section class="settings-section">
+        <h2 class="m3-title">Spiele</h2>
+        <div class="settings-row">
+          <div class="settings-row__label">
+            <span class="settings-row__title">Sound</span>
+            <span class="settings-row__hint">Ton-Effekte in den Spielen (z.B. Ticken)</span>
+          </div>
+          <label class="m3-switch">
+            <input type="checkbox" id="sound-toggle" />
+            <span class="m3-switch__track"></span>
+          </label>
         </div>
-        <label class="m3-switch">
-          <input type="checkbox" id="sound-toggle" />
-          <span class="m3-switch__track"></span>
-        </label>
-      </div>
-      <div class="settings-row">
-        <div class="settings-row__label">
-          <span class="settings-row__title">Vibration</span>
-          <span class="settings-row__hint">Vibriert z.B. wenn die Bombe hochgeht</span>
+        <div class="settings-row">
+          <div class="settings-row__label">
+            <span class="settings-row__title">Vibration</span>
+            <span class="settings-row__hint">Vibriert z.B. wenn die Bombe hochgeht</span>
+          </div>
+          <label class="m3-switch">
+            <input type="checkbox" id="vibration-toggle" />
+            <span class="m3-switch__track"></span>
+          </label>
         </div>
-        <label class="m3-switch">
-          <input type="checkbox" id="vibration-toggle" />
-          <span class="m3-switch__track"></span>
-        </label>
-      </div>
-    </section>
+      </section>
 
-    <section class="settings-section">
-      <h2 class="m3-title">App</h2>
-      <div class="settings-row">
-        <div class="settings-row__label">
-          <span class="settings-row__title">Nach Updates suchen</span>
-          <span class="settings-row__hint">Prüft, ob eine neue Version verfügbar ist</span>
+      <section class="settings-section">
+        <h2 class="m3-title">App</h2>
+        <div class="settings-row">
+          <div class="settings-row__label">
+            <span class="settings-row__title">Nach Updates suchen</span>
+            <span class="settings-row__hint">Prüft, ob eine neue Version verfügbar ist</span>
+          </div>
+          <button type="button" class="m3-button m3-button--tonal" id="update-check-button">Prüfen</button>
         </div>
-        <button class="m3-button m3-button--tonal" id="update-check-button">Prüfen</button>
-      </div>
+        <div class="settings-row">
+          <div class="settings-row__label">
+            <span class="settings-row__title">App-Cache</span>
+            <span class="settings-row__hint">Löscht alle offline gespeicherten Dateien und lädt alles neu vom Server</span>
+          </div>
+          <button type="button" class="m3-button m3-button--danger" id="clear-cache-button">Cache löschen</button>
+        </div>
+      </section>
     </section>
-  </main>
+  </div>
 
   <script src="/js/storage.js"></script>
+  <script src="/js/toast.js"></script>
+  <script src="/js/ripple.js"></script>
+  <script src="/js/cache-tools.js"></script>
   <script src="/js/settings.js"></script>
   <script src="/js/pwa-helper.js"></script>
 </body>

@@ -359,6 +359,10 @@
   width: 100%;
 }
 
+.game-topbar[hidden] {
+  display: none;
+}
+
 .game-topbar__title {
   font-family: var(--m3-font-display);
   font-size: 1.3rem;
@@ -381,6 +385,12 @@
 
 .game-view[hidden] {
   display: none;
+}
+
+/* Ohne den äußeren #game-topbar (siehe [data-hide-topbar] in view-nav.js)
+   fehlt sonst jeglicher Abstand nach oben. */
+.game-view[data-hide-topbar] {
+  padding-top: 16px;
 }
 
 /* ---------- Setup: Detailkarte ---------- */
