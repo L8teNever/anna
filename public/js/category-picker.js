@@ -137,7 +137,10 @@
         .map((cat) => {
           const wordCount = Array.isArray(cat.words) ? cat.words.length : 0;
           const checked = selectedIds.has(cat.id) ? "checked" : "";
-          const descText = cat.desc ? `${escapeHtml(cat.desc)} · ` : "";
+          let descText = cat.desc ? escapeHtml(cat.desc) : "";
+          if (wordCount > 0) {
+            descText = descText ? `${descText} · ${wordCount} Wörter` : `${wordCount} Wörter`;
+          }
           const customBadge = cat.custom ? '<span class="category-row__custom-tag">eigene</span>' : "";
           const customActions = cat.custom
             ? `
@@ -154,12 +157,12 @@
             <div class="category-row" data-id="${cat.id}">
               <div class="category-row__text">
                 <span class="category-row__title">${cat.icon || "⭐"} ${escapeHtml(cat.label)}${customBadge}</span>
-                <span class="category-row__desc">${descText}${wordCount} Wörter</span>
+                <span class="category-row__desc">${descText}</span>
               </div>
               <div class="category-row__actions">
                 ${customActions}
                 <label class="m3-switch">
-                  <input type="checkbox" class="category-row__checkbox" data-id="${cat.id}" ${checked} />
+                   <input type="checkbox" class="category-row__checkbox" data-id="${cat.id}" ${checked} />
                   <span class="m3-switch__track"></span>
                 </label>
               </div>

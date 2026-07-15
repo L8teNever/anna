@@ -1,128 +1,608 @@
 [
   {
-    "id": "automarken",
-    "label": "Automarken",
-    "icon": "🚗",
-    "desc": "Marken und Modelle von Autos.",
-    "words": ["BMW", "Audi", "Mercedes", "Volkswagen", "Porsche", "Ferrari", "Toyota", "Honda", "Ford", "Opel", "Tesla", "Skoda", "Renault", "Fiat", "Mazda", "Volvo"]
-  },
-  {
-    "id": "tiere",
-    "label": "Tiere",
-    "icon": "🐾",
-    "desc": "Vom Haustier bis zum Wildtier.",
-    "words": ["Löwe", "Elefant", "Giraffe", "Pinguin", "Delfin", "Wolf", "Fuchs", "Bär", "Adler", "Zebra", "Känguru", "Koala", "Hai", "Schildkröte", "Papagei", "Eichhörnchen"]
-  },
-  {
-    "id": "laender",
-    "label": "Länder",
-    "icon": "🌍",
-    "desc": "Staaten rund um die Welt.",
-    "words": ["Deutschland", "Frankreich", "Italien", "Spanien", "Griechenland", "Japan", "Brasilien", "Kanada", "Ägypten", "Indien", "Australien", "Norwegen", "Portugal", "Mexiko", "Thailand", "Marokko"]
-  },
-  {
-    "id": "staedte",
-    "label": "Städte",
-    "icon": "🏙️",
-    "desc": "Groß- und Kleinstädte weltweit.",
-    "words": ["Berlin", "Paris", "London", "Rom", "Barcelona", "New York", "Tokio", "Wien", "Amsterdam", "Prag", "Istanbul", "Dubai", "Sydney", "Hamburg", "München", "Venedig"]
-  },
-  {
-    "id": "fussballspieler",
-    "label": "Fußballspieler",
-    "icon": "⚽",
-    "desc": "Aktuelle und legendäre Profis.",
-    "words": ["Messi", "Ronaldo", "Neymar", "Mbappé", "Haaland", "Kroos", "Müller", "Modric", "Salah", "Kane", "Lewandowski", "Bellingham", "Rodri", "De Bruyne", "Vinicius Jr", "Musiala"]
-  },
-  {
-    "id": "essen",
-    "label": "Essen & Trinken",
+    "id": "pizza_zutaten",
+    "label": "Dinge auf einer Pizza",
     "icon": "🍕",
-    "desc": "Gerichte, Snacks und Getränke.",
-    "words": ["Pizza", "Pasta", "Sushi", "Döner", "Currywurst", "Schnitzel", "Burger", "Pommes", "Salat", "Pfannkuchen", "Lasagne", "Tacos", "Gulasch", "Ramen", "Croissant", "Falafel"]
+    "desc": "Klassiker, geht immer."
   },
   {
-    "id": "filme",
-    "label": "Filmtitel",
-    "icon": "🎬",
-    "desc": "Bekannte Filme aller Genres.",
-    "words": ["Titanic", "Avatar", "Inception", "Gladiator", "Matrix", "Jurassic Park", "Star Wars", "Der Pate", "Forrest Gump", "Fluch der Karibik", "Herr der Ringe", "Joker", "Rocky", "Frozen", "Shrek"]
+    "id": "pizza_suenden",
+    "label": "Pizza-Sünden",
+    "icon": "🍍",
+    "desc": "Zutaten, die illegal sein sollten."
   },
   {
-    "id": "serien",
-    "label": "Serien",
-    "icon": "📺",
-    "desc": "TV- und Streaming-Serien.",
-    "words": ["Breaking Bad", "Friends", "Stranger Things", "The Office", "Game of Thrones", "Dark", "How I Met Your Mother", "The Crown", "Money Heist", "Squid Game", "Sherlock", "Die Simpsons", "Vikings", "Peaky Blinders", "Better Call Saul"]
+    "id": "fast_food",
+    "label": "Fast-Food-Gerichte",
+    "icon": "🍔",
+    "desc": "Döner, Burger, Pommes und Co."
   },
   {
-    "id": "musiker",
-    "label": "Musiker & Bands",
-    "icon": "🎵",
-    "desc": "Interpreten und Bands.",
-    "words": ["Beyoncé", "Ed Sheeran", "Adele", "Taylor Swift", "Rihanna", "Eminem", "Coldplay", "Queen", "ABBA", "Metallica", "Helene Fischer", "Rammstein", "Madonna", "Elvis Presley", "The Beatles"]
+    "id": "grillen",
+    "label": "Was man grillen kann",
+    "icon": "🔥",
+    "desc": "Fleisch, Käse, Gemüse, Stockbrot..."
   },
   {
-    "id": "vornamen",
-    "label": "Vornamen",
-    "icon": "🧑",
-    "desc": "Klassiker und moderne Vornamen.",
-    "words": ["Anna", "Max", "Lea", "Paul", "Mia", "Ben", "Emma", "Finn", "Laura", "Jonas", "Lena", "Felix", "Sarah", "Lukas", "Marie", "Tim"]
+    "id": "kuehlschrank",
+    "label": "Sachen im Kühlschrank",
+    "icon": "🥛",
+    "desc": "Senf, Milch, Abgelaufenes..."
   },
   {
-    "id": "berufe",
-    "label": "Berufe",
-    "icon": "💼",
-    "desc": "Jobs und Tätigkeiten.",
-    "words": ["Arzt", "Lehrer", "Polizist", "Feuerwehrmann", "Bäcker", "Friseur", "Ingenieur", "Anwalt", "Koch", "Pilot", "Elektriker", "Krankenschwester", "Landwirt", "Zahnarzt", "Journalist", "Tierarzt"]
-  },
-  {
-    "id": "videospiele",
-    "label": "Videospiele",
-    "icon": "🎮",
-    "desc": "Games aller Plattformen.",
-    "words": ["Minecraft", "Fortnite", "FIFA", "Zelda", "Mario Kart", "Call of Duty", "GTA", "Among Us", "Tetris", "Pac-Man", "Die Sims", "Pokémon", "Overwatch", "League of Legends", "Animal Crossing"]
-  },
-  {
-    "id": "suesswaren",
-    "label": "Süßigkeiten",
+    "id": "kindheit_suessigkeiten",
+    "label": "Süßigkeiten der Kindheit",
     "icon": "🍬",
-    "desc": "Naschereien und Süßkram.",
-    "words": ["Schokolade", "Gummibärchen", "Lakritz", "Bonbon", "Marshmallow", "Karamell", "Keks", "Lolli", "Kaugummi", "Nougat", "Milka", "Haribo", "Praline", "Zuckerwatte", "Toffee"]
+    "desc": "Saure Zungen, Schokobons, Knister-Kaugummi..."
   },
   {
-    "id": "urlaubsziele",
-    "label": "Urlaubsziele",
-    "icon": "🏖️",
-    "desc": "Beliebte Reiseziele.",
-    "words": ["Mallorca", "Malediven", "Kreta", "Bali", "Kanaren", "Ägypten", "Toskana", "Karibik", "Ibiza", "Türkei", "Portugal", "Hawaii", "Seychellen", "Kroatien", "Thailand"]
+    "id": "fruehstueck",
+    "label": "Was man zum Frühstück isst",
+    "icon": "☕",
+    "desc": "Nutellabrot, Müsli, Rührei..."
   },
   {
-    "id": "superstars",
-    "label": "Prominente",
+    "id": "alkohol",
+    "label": "Getränke zum Betrinken",
+    "icon": "🍺",
+    "desc": "Bier, Wodka, Korn, Tequila..."
+  },
+  {
+    "id": "alkoholfrei",
+    "label": "Alkoholfreie Getränke",
+    "icon": "🥤",
+    "desc": "Cola, Fanta, Saft, Wasser..."
+  },
+  {
+    "id": "kater_essen",
+    "label": "Essen bei einem Kater",
+    "icon": "🤢",
+    "desc": "Konterbier, Döner, fettige Pizza..."
+  },
+  {
+    "id": "zuspatekommen_ausreden",
+    "label": "Ausreden fürs Zuspätkommen",
+    "icon": "⏰",
+    "desc": "Bahn verpasst, Wecker nicht gehört..."
+  },
+  {
+    "id": "stinkende_dinge",
+    "label": "Dinge, die extrem stinken",
+    "icon": "🦨",
+    "desc": "Müll, nasse Hunde, Pups, alter Käse..."
+  },
+  {
+    "id": "schlechte_laune",
+    "label": "Gründe für schlechte Laune",
+    "icon": "😠",
+    "desc": "Zu wenig Schlaf, Hunger, Montag, Regen..."
+  },
+  {
+    "id": "bett_verlieren",
+    "label": "Dinge, die man im Bett verliert",
+    "icon": "🛏️",
+    "desc": "Handy, Socke, Fernbedienung..."
+  },
+  {
+    "id": "hotel_klauen",
+    "label": "Sachen, die man im Hotel klaut",
+    "icon": "🎒",
+    "desc": "Shampoo, Handtücher, Schlappen..."
+  },
+  {
+    "id": "wlan_weg",
+    "label": "WLAN weg – Was tun?",
+    "icon": "📶",
+    "desc": "Router neu starten, rausgehen, weinen..."
+  },
+  {
+    "id": "staendig_verlieren",
+    "label": "Sachen, die man ständig verliert",
+    "icon": "🔍",
+    "desc": "Schlüssel, Geldbeutel, Vape..."
+  },
+  {
+    "id": "haustuer_nicht_aufmachen",
+    "label": "Warum man die Tür nicht aufmacht",
+    "icon": "🚪",
+    "desc": "Kein Bock auf Menschen, nackt..."
+  },
+  {
+    "id": "handy_nicht_drangehen",
+    "label": "Warum man nicht ans Handy geht",
+    "icon": "📴",
+    "desc": "Akku leer, lautlos, geschlafen..."
+  },
+  {
+    "id": "alleine_tun",
+    "label": "Heimliches Tun, wenn man allein ist",
+    "icon": "🤫",
+    "desc": "Nase bohren, peinlich tanzen..."
+  },
+  {
+    "id": "date_nogos",
+    "label": "No-Gos beim ersten Date",
+    "icon": "❌",
+    "desc": "Über den Ex reden, schmatzen..."
+  },
+  {
+    "id": "furchtbare_date_orte",
+    "label": "Orte für ein furchtbares Date",
+    "icon": "🏚️",
+    "desc": "McDonalds, Friedhof, Puff..."
+  },
+  {
+    "id": "schlussmachen_saetze",
+    "label": "Sätze zum Schlussmachen",
+    "icon": "💔",
+    "desc": "Es liegt nicht an dir..."
+  },
+  {
+    "id": "peinliche_kosenamen",
+    "label": "Peinliche Kosenamen",
+    "icon": "🧸",
+    "desc": "Schnuckiputz, Bärchen, Schatzi..."
+  },
+  {
+    "id": "dating_profil_luegen",
+    "label": "Lügen im Dating-Profil",
+    "icon": "🤥",
+    "desc": "Größe, Hobbys, Alter, alte Fotos..."
+  },
+  {
+    "id": "anmachsprueche",
+    "label": "Billige Anmachsprüche",
+    "icon": "😏",
+    "desc": "Deine Eltern müssen Diebe sein..."
+  },
+  {
+    "id": "chat_redflags",
+    "label": "Red Flags im Chat",
+    "icon": "🚩",
+    "desc": "Nur hey schreiben, Nacktfotos..."
+  },
+  {
+    "id": "blockieren_gruende",
+    "label": "Gründe zum sofortigen Blockieren",
+    "icon": "🚫",
+    "desc": "Stalking, Beleidigungen, Ex..."
+  },
+  {
+    "id": "federnaeppchen",
+    "label": "Dinge im Federmäppchen",
+    "icon": "✏️",
+    "desc": "Stift, Lineal, Radiergummifußel..."
+  },
+  {
+    "id": "fehlende_hausaufgaben",
+    "label": "Ausreden für fehlende Hausaufgaben",
+    "icon": "📓",
+    "desc": "Hund hat sie gefressen, vergessen..."
+  },
+  {
+    "id": "lehrersprueche",
+    "label": "Typische Sprüche von Lehrern",
+    "icon": "👨‍🏫",
+    "desc": "Ich beende den Unterricht..."
+  },
+  {
+    "id": "spickzettel_verstecke",
+    "label": "Gute Spickzettel-Verstecke",
+    "icon": "🕵️",
+    "desc": "Mäppchen, Handgelenk, unter Arbeit..."
+  },
+  {
+    "id": "nervige_mitschueler",
+    "label": "Nervige Kollegen oder Mitschüler",
+    "icon": "🙄",
+    "desc": "Der Schleimer, Besserwisser..."
+  },
+  {
+    "id": "homeoffice_heimlich",
+    "label": "Heimliches im Homeoffice / Unterricht",
+    "icon": "💻",
+    "desc": "Zocken, schlafen, YouTube schauen..."
+  },
+  {
+    "id": "studenten_essen",
+    "label": "Typisches Studenten-Essen",
+    "icon": "🍜",
+    "desc": "Instant-Nudeln, Toasts..."
+  },
+  {
+    "id": "schulsport_hass",
+    "label": "Sportarten im Schulsport, die man hasst",
+    "icon": "🤸",
+    "desc": "Völkerball, Turnen, Ausdauerlauf..."
+  },
+  {
+    "id": "kumpel_woerter",
+    "label": "Wörter für Kumpel / Bruder",
+    "icon": "🤝",
+    "desc": "Bro, Digga, Atze, Habibi..."
+  },
+  {
+    "id": "geld_woerter",
+    "label": "Wörter für Geld",
+    "icon": "💵",
+    "desc": "Moneten, Cash, Para, Kies..."
+  },
+  {
+    "id": "peinlich_woerter",
+    "label": "Wörter für peinlich / unangenehm",
+    "icon": "🤦",
+    "desc": "Cringe, lost, gottlos..."
+  },
+  {
+    "id": "betrunken_woerter",
+    "label": "Wörter für betrunken sein",
+    "icon": "🥴",
+    "desc": "Dicht, weggescheppert, blau..."
+  },
+  {
+    "id": "chat_abkuerzungen",
+    "label": "Typische Chat-Abkürzungen",
+    "icon": "💬",
+    "desc": "lol, omg, btw, wtf, tbh..."
+  },
+  {
+    "id": "social_media",
+    "label": "Beliebte Social-Media-Apps",
+    "icon": "📱",
+    "desc": "TikTok, Instagram, Snapchat..."
+  },
+  {
+    "id": "gaming_im_reallife",
+    "label": "Gaming-Begriffe im Reallife",
+    "icon": "🎮",
+    "desc": "NPC, Noob, Lag, Lost..."
+  },
+  {
+    "id": "cool_woerter",
+    "label": "Wörter für cool / gut",
+    "icon": "😎",
+    "desc": "Wild, stabil, macher, smash..."
+  },
+  {
+    "id": "bett_kosenamen",
+    "label": "Kosenamen im Bett",
+    "icon": "💋",
+    "desc": "Babe, Sexy, Daddy, Süße..."
+  },
+  {
+    "id": "sex_ausreden",
+    "label": "Ausreden gegen Sex",
+    "icon": "🛌",
+    "desc": "Kopfschmerzen, müde, Tage..."
+  },
+  {
+    "id": "sex_orte",
+    "label": "Orte im Haus für Sex",
+    "icon": "🏠",
+    "desc": "Sofa, Küchentisch, Dusche..."
+  },
+  {
+    "id": "lustkiller_kosenamen",
+    "label": "Lustkiller-Kosenamen",
+    "icon": "🤢",
+    "desc": "Mutti, Hengst, Spatz, Prinzessin..."
+  },
+  {
+    "id": "bestes_stueck",
+    "label": "Lustige Namen fürs beste Stück",
+    "icon": "🍆",
+    "desc": "Gurke, Lümmel, Mumu, Rüssel..."
+  },
+  {
+    "id": "bett_pannen",
+    "label": "Peinliche Pannen im Bett",
+    "icon": "🤦",
+    "desc": "Falscher Name, pupsen, Krampf..."
+  },
+  {
+    "id": "nach_sex_saetze",
+    "label": "Sätze direkt nach dem Sex",
+    "icon": "🚬",
+    "desc": "Das war gut, ich muss aufs Klo..."
+  },
+  {
+    "id": "dirty_talk",
+    "label": "Sätze zum Dirty Talk",
+    "icon": "💬",
+    "desc": "Du bist so geil, mach fester..."
+  },
+  {
+    "id": "bett_no_gos",
+    "label": "Sätze, die man im Bett nicht hören will",
+    "icon": "🙉",
+    "desc": "Bist du schon drin?, Ist es bald vorbei?..."
+  },
+  {
+    "id": "koffer_vergessen",
+    "label": "Sachen, die man im Koffer vergisst",
+    "icon": "🧳",
+    "desc": "Zahnbürste, Ladekabel, Sonnencreme..."
+  },
+  {
+    "id": "hotelbuffet",
+    "label": "Was man am Hotelbuffet macht",
+    "icon": "🍽",
+    "desc": "Teller überladen, heimlich einpacken..."
+  },
+  {
+    "id": "urlaubsfotos",
+    "label": "Typische Urlaubsfotos",
+    "icon": "📸",
+    "desc": "Füße am Strand, Sonnenuntergang..."
+  },
+  {
+    "id": "feiern_verlieren",
+    "label": "Was man verliert beim Feiern",
+    "icon": "💸",
+    "desc": "Vape, Handy, Jacke, Verstand..."
+  },
+  {
+    "id": "kater_mittel",
+    "label": "Dinge gegen einen Kater",
+    "icon": "🤕",
+    "desc": "Konterbier, dicker Döner, Aspirin..."
+  },
+  {
+    "id": "partyspiele",
+    "label": "Typische Partyspiele",
+    "icon": "🎯",
+    "desc": "Beer Pong, Flunkyball, Loopings..."
+  },
+  {
+    "id": "nachts_3uhr",
+    "label": "Betrunken nachts um 3 Uhr",
+    "icon": "🌙",
+    "desc": "Döner essen, Ex anrufen, schlafen..."
+  },
+  {
+    "id": "tuersteher_abweisung",
+    "label": "Warum man nicht in den Club kommt",
+    "icon": "🚪",
+    "desc": "Zu betrunken, falsche Schuhe, aggro..."
+  },
+  {
+    "id": "elternsprueche",
+    "label": "Typische Sprüche von Eltern",
+    "icon": "🗣",
+    "desc": "Solange du deine Füße unter meinen Tisch stellst..."
+  },
+  {
+    "id": "oma_fragen",
+    "label": "Fragen von Oma beim Familienfest",
+    "icon": "👵",
+    "desc": "Hast du schon einen Freund?, was macht Schule?..."
+  },
+  {
+    "id": "verwandten_geschenke",
+    "label": "Geschenke zum direkt Wegwerfen",
+    "icon": "🎁",
+    "desc": "Hässliche Socken, Staubfänger..."
+  },
+  {
+    "id": "weihnachtsstreit",
+    "label": "Gründe für Streit an Weihnachten",
+    "icon": "🎄",
+    "desc": "Politik, wer abspült, Geschenke..."
+  },
+  {
+    "id": "eltern_whatsapp",
+    "label": "Eltern-Fehler auf WhatsApp",
+    "icon": "📱",
+    "desc": "Nur Smileys, Sprachnachrichten ohne Ton..."
+  },
+  {
+    "id": "mutter_findet",
+    "label": "Sachen, die Mutter sofort findet",
+    "icon": "🔍",
+    "desc": "Schlüssel, Socken, Butter..."
+  },
+  {
+    "id": "pleite_sein",
+    "label": "Was man tut, wenn man pleite ist",
+    "icon": "💸",
+    "desc": "Naudeln mit Ketchup essen, Pfand weggeben..."
+  },
+  {
+    "id": "reich_aussehen",
+    "label": "Dinge, um reich auszusehen",
+    "icon": "💎",
+    "desc": "Fake-Gucci, Starbucks, teure Schuhe..."
+  },
+  {
+    "id": "geld_ausgeben",
+    "label": "Wofür man zu viel Geld ausgibt",
+    "icon": "🛍",
+    "desc": "Shisha, Vapes, Lieferservice..."
+  },
+  {
+    "id": "lottogewinn",
+    "label": "Was man tut bei Lottogewinn",
+    "icon": "💰",
+    "desc": "Auto kaufen, kündigen, Urlaub..."
+  },
+  {
+    "id": "kleinanzeigen",
+    "label": "Sachen auf eBay Kleinanzeigen",
+    "icon": "📦",
+    "desc": "Was letzte Preis?, 'ist noch da?'..."
+  },
+  {
+    "id": "beifahrer_nervig",
+    "label": "Nervige Sachen von Beifahrern",
+    "icon": "🚗",
+    "desc": "Am Radio spielen, beim Parken reinreden..."
+  },
+  {
+    "id": "polizei_ausreden",
+    "label": "Ausreden bei Polizeikontrolle",
+    "icon": "🚓",
+    "desc": "Schild nicht gesehen, dringend aufs Klo..."
+  },
+  {
+    "id": "autofahrt_zeitvertreib",
+    "label": "Was man bei langer Autofahrt tut",
+    "icon": "🛣",
+    "desc": "Mitsingen, schlafen, Schilder suchen..."
+  },
+  {
+    "id": "im_auto",
+    "label": "Dinge, die man im Auto aufbewahrt",
+    "icon": "🔑",
+    "desc": "Parkgroschen, Masken, Duftbaum..."
+  },
+  {
+    "id": "autofahren_rage",
+    "label": "Warum man beim Fahren ausrastet",
+    "icon": "🤬",
+    "desc": "Schleicher, kein Blinker, Drängler..."
+  },
+  {
+    "id": "trash_tv",
+    "label": "Typische Trash-TV-Sendungen",
+    "icon": "📺",
+    "desc": "Dschungelcamp, Temptation Island..."
+  },
+  {
+    "id": "promi_aufmerksamkeit",
+    "label": "Wie Promis Aufmerksamkeit suchen",
     "icon": "⭐",
-    "desc": "Bekannte Persönlichkeiten.",
-    "words": ["Leonardo DiCaprio", "Cristiano Ronaldo", "Lionel Messi", "Angelina Jolie", "Tom Hanks", "Serena Williams", "Dwayne Johnson", "Emma Watson", "Will Smith", "Jennifer Lawrence", "Roger Federer", "Rihanna", "Brad Pitt", "Zendaya", "Keanu Reeves"]
+    "desc": "Trennung vortäuschen, Instagram-Beef..."
   },
   {
-    "id": "pflanzungen",
-    "label": "Pflanzen & Blumen",
-    "icon": "🌺",
-    "desc": "Gewächse und Blüten.",
-    "words": ["Rose", "Tulpe", "Sonnenblume", "Kaktus", "Orchidee", "Lavendel", "Gänseblümchen", "Efeu", "Bambus", "Farn", "Löwenzahn", "Nelke", "Bonsai", "Veilchen", "Mohn"]
+    "id": "canceling",
+    "label": "Warum Influencer gecancelt werden",
+    "icon": "🚫",
+    "desc": "Scams, Lügen, peinliche Videos..."
   },
   {
-    "id": "marken",
-    "label": "Marken & Firmen",
-    "icon": "🏷️",
-    "desc": "Bekannte Unternehmen.",
-    "words": ["Nike", "Adidas", "Apple", "Samsung", "Coca-Cola", "McDonald's", "IKEA", "Amazon", "Google", "Puma", "Lego", "Rolex", "Chanel", "Netflix", "Spotify"]
+    "id": "dschungelcamp_essen",
+    "label": "Essen im Dschungelcamp",
+    "icon": "🐛",
+    "desc": "Känguru-Hoden, Maden, Augen..."
   },
   {
-    "id": "farben",
-    "label": "Dinge einer Farbe",
-    "icon": "🎨",
-    "desc": "Alles rund um Farben.",
-    "words": ["Feuerwehrauto", "Banane", "Himmel", "Gras", "Schneemann", "Sonnenblume", "Blut", "Kohle", "Flamingo", "Zitrone", "Meer", "Erdbeere", "Veilchen", "Karotte", "Milch"]
+    "id": "boesewichte",
+    "label": "Berühmte Film-Bösewichte",
+    "icon": "🦹",
+    "desc": "Voldemort, Darth Vader, Joker..."
+  },
+  {
+    "id": "zocken_ausreden",
+    "label": "Ausreden fürs Verlieren beim Zocken",
+    "icon": "🎮",
+    "desc": "Es laggt, Controller leer, Team scheiße..."
+  },
+  {
+    "id": "film_hass",
+    "label": "Hassmomente beim Filmschauen",
+    "icon": "🍿",
+    "desc": "Spoiler, Werbung, wenn jemand redet..."
+  },
+  {
+    "id": "videospiele_legendaer",
+    "label": "Legendäre Videospiele",
+    "icon": "🕹",
+    "desc": "GTA, Minecraft, FIFA, Mario Kart..."
+  },
+  {
+    "id": "haustier_nein",
+    "label": "Haustiere, die keiner will",
+    "icon": "🐍",
+    "desc": "Spinne, Schlange, Krokodil..."
+  },
+  {
+    "id": "stinkende_tiere",
+    "label": "Tiere, die extrem stinken",
+    "icon": "🐷",
+    "desc": "Schwein, nasser Hund, Skunk..."
+  },
+  {
+    "id": "fliegende_tiere",
+    "label": "Tiere, die fliegen können",
+    "icon": "🦅",
+    "desc": "Vogel, Fliege, Fledermaus..."
+  },
+  {
+    "id": "sommer_insekten",
+    "label": "Insekten, die man im Sommer hasst",
+    "icon": "🦟",
+    "desc": "Mücke, Wespe, Fliege, Hornisse..."
+  },
+  {
+    "id": "sex_oeffentlichkeit",
+    "label": "Sex in der Öffentlichkeit",
+    "icon": "🌲",
+    "desc": "Aufzug, Auto, Wald, Park, Kino..."
+  },
+  {
+    "id": "rollenspiele",
+    "label": "Bekannte Rollenspiele fürs Bett",
+    "icon": "🎭",
+    "desc": "Lehrer/Schülerin, Arzt/Patientin..."
+  },
+  {
+    "id": "fetische",
+    "label": "Bekannte Fetische",
+    "icon": "⛓",
+    "desc": "Fußfetisch, fesseln, Lack/Leder..."
+  },
+  {
+    "id": "sex_spielzeug_ersatz",
+    "label": "Zweckentfremdete Sex-Spielzeuge",
+    "icon": "🍦",
+    "desc": "Gurke, Bürste, Eiswürfel..."
+  },
+  {
+    "id": "abturner",
+    "label": "Dinge, die einen sofort abturnen",
+    "icon": "🤮",
+    "desc": "Mundgeruch, ungepflegte Nägel..."
+  },
+  {
+    "id": "sex_no_gos_saetze",
+    "label": "Peinliche Sätze beim Sex",
+    "icon": "🤐",
+    "desc": "Bist du schon drin?, wie hieß du?..."
+  },
+  {
+    "id": "sex_geraeusche",
+    "label": "Unangenehme Geräusche beim Sex",
+    "icon": "🐷",
+    "desc": "Furzgeräusche, Quietschen, Stöhnen..."
+  },
+  {
+    "id": "nach_sex_aufrsuben",
+    "label": "Aufräumen nach dem Sex",
+    "icon": "🧼",
+    "desc": "Kondom knoten, Flecken, Handtuch..."
+  },
+  {
+    "id": "flirt_komplimente",
+    "label": "Billige Flirt-Komplimente",
+    "icon": "💬",
+    "desc": "Schöne Augen, hast du abgenommen?..."
+  },
+  {
+    "id": "club_flirt",
+    "label": "Flirt-Tricks im Club",
+    "icon": "🥂",
+    "desc": "Drink spendieren, intensiv anschauen..."
+  },
+  {
+    "id": "betrunken_flirt_chat",
+    "label": "Betrunkene Chats nachts",
+    "icon": "📱",
+    "desc": "Bist du noch wach?, komm vorbei..."
+  },
+  {
+    "id": "flirt_no_go_orte",
+    "label": "Unpassende Orte zum Anflirten",
+    "icon": "⚰️",
+    "desc": "Beerdigung, U-Bahn nachts, beim WC..."
   }
 ]
