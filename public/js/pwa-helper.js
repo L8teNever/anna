@@ -122,11 +122,22 @@
       // Aktiv nachfragen statt nur auf die (seltenen) automatischen
       // Browser-Checks zu warten: sobald die Seite wieder sichtbar wird
       // (App aus dem Hintergrund geholt) und danach regelmäßig, solange
-      // sie offen bleibt.
+      // sie offen bleibt. Cooldown: max. 1× alle 10 Minuten beim
+      // Sichtbarkeits-Wechsel, damit kein dauerhafter Browser-Ladeindikator
+      // am Bildschirmrand erscheint.
+      let lastUpdateCheck = 0;
+      const UPDATE_COOLDOWN_MS = 10 * 60 * 1000;
       document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "visible") registration.update().catch(() => {});
+        if (document.visibilityState !== "visible") return;
+        const now = Date.now();
+        if (now - lastUpdateCheck < UPDATE_COOLDOWN_MS) return;
+        lastUpdateCheck = now;
+        registration.update().catch(() => {});
       });
-      setInterval(() => registration.update().catch(() => {}), UPDATE_CHECK_INTERVAL_MS);
+      setInterval(() => {
+        lastUpdateCheck = Date.now();
+        registration.update().catch(() => {});
+      }, UPDATE_CHECK_INTERVAL_MS);
     }).catch((err) => {
       console.warn("[anna] Service-Worker-Registrierung fehlgeschlagen:", err);
     });
