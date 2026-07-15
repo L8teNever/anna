@@ -7,7 +7,9 @@
       "Bash(python3 -)",
       "Bash(powershell -NoProfile -Command 'Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like '\\\\''*server.py*'\\\\'' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }')",
       "Bash(node --check js/view-nav.js)",
-      "Bash(node --check sw.js)"
+      "Bash(node --check sw.js)",
+      "Bash(git rev-list *)",
+      "PowerShell(docker --version 2>&1)"
     ]
   }
 }
