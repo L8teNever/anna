@@ -43,6 +43,11 @@ jobs:
             type=raw,value=latest
             type=sha,format=short
 
+      # Automatisches Setzen der Service-Worker-Version mit dem Commit-SHA
+      - name: Inject Commit SHA as Service Worker Version
+        run: |
+          sed -i 's/const APP_VERSION = "[^"]*";/const APP_VERSION = "${{ github.sha }}";/g' public/sw.js
+
       # Build and push Docker image with Buildx
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
