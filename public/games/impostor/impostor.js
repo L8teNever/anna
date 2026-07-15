@@ -295,7 +295,9 @@
   exitButton.addEventListener("click", () => { window.location.href = "/"; });
 
   backButton.addEventListener("click", () => {
-    if (window.location.hash) {
+    // Sub-Pfad vorhanden (z.B. /impostor/spieler)? → Browser-Zurück
+    const parts = window.location.pathname.split("/").filter(Boolean);
+    if (parts.length > 1) {
       history.back();
     } else {
       window.location.href = "/";

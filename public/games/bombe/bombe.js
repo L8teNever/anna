@@ -232,7 +232,9 @@
   restartButton.addEventListener("click", startRound);
   exitButton.addEventListener("click", () => { stopRound(); window.location.href = "/"; });
   backButton.addEventListener("click", () => {
-    if (window.location.hash) {
+    // Sub-Pfad vorhanden (z.B. /bombe/kategorien)? → Browser-Zurück
+    const parts = window.location.pathname.split("/").filter(Boolean);
+    if (parts.length > 1) {
       history.back();
     } else {
       window.location.href = "/";

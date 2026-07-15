@@ -40,7 +40,7 @@ mimetypes.add_type("text/javascript", ".js")
 
 
 def resolve_route(raw_path: str) -> str | None:
-    """Bildet eine sauber Route (z.B. '/bombe') auf einen Dateipfad relativ
+    """Bildet eine sauber Route (z.B. '/bombe/kategorien') auf einen Dateipfad relativ
     zu PUBLIC_DIR ab. Gibt None zurück, wenn die Anfrage als normaler
     Static-File-Request behandelt werden soll."""
 
@@ -56,9 +56,14 @@ def resolve_route(raw_path: str) -> str | None:
     if "." in path.rsplit("/", 1)[-1]:
         return None
 
-    game_index = GAMES_DIR / path / "index.html"
+    # Game-Routing: /bombe  ODER  /bombe/kategorien → games/bombe/index.html
+    # Nur das erste Pfad-Segment bestimmt das Spiel; Unter-Segmente wie
+    # /kategorien, /spieler, /spiel werden clientseitig via history.pushState
+    # aufgelöst (view-nav.js).
+    game_id = path.split("/")[0]
+    game_index = GAMES_DIR / game_id / "index.html"
     if game_index.is_file():
-        return f"games/{path}/index.html"
+        return f"games/{game_id}/index.html"
 
     return None
 
