@@ -44,6 +44,10 @@
   width: 100%;
 }
 
+.td-choice-row[hidden] {
+  display: none;
+}
+
 .td-choice-row .m3-button {
   flex: 1;
 }
