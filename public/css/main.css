@@ -701,7 +701,7 @@
   font-weight: 700;
 }
 
-/* ---------- Kategorie-Reihen (Bombe) ---------- */
+/* ---------- Kategorie-Reihen (Bombe, Impostor, …) ---------- */
 .category-row {
   display: flex;
   align-items: center;
@@ -732,4 +732,30 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.category-row__actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.category-row__actions .m3-icon-button {
+  width: 36px;
+  height: 36px;
+}
+
+.category-row__custom-tag {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--m3-primary);
+  background: rgba(168, 199, 250, 0.14);
+  border-radius: var(--m3-shape-full);
+  padding: 2px 7px;
+  margin-left: 6px;
+  vertical-align: middle;
 }

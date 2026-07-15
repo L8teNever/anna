@@ -9,18 +9,8 @@
  */
 (function () {
   const SETTINGS_KEY = "anna:bombe:settings";
-  const CATS_KEY     = "anna:bombe:categories";
   const MIN_PLAYERS  = 2;
   const MAX_PLAYERS  = 8;
-
-  /* ------------------------------------------------------------------ */
-  /* Kategorien-Datenbank: kommt aus categories.json (liegt neben dieser
-   * Datei). Neue Kategorie = neues Objekt in der JSON-Liste anhängen.
-   * Mehr Begriffe = einfach weitere Strings ins "words"-Array der
-   * jeweiligen Kategorie eintragen. Kein Code-Wissen nötig.               */
-  /* ------------------------------------------------------------------ */
-  const CATEGORIES_URL = "/games/bombe/categories.json";
-  let ALL_CATEGORIES = [];
 
   /* ------------------------------------------------------------------ */
   /* DOM-Referenzen                                                        */
@@ -43,13 +33,9 @@
   const restartButton   = document.getElementById("restart-button");
   const exitButton      = document.getElementById("exit-button");
 
-  const categoriesPool       = document.getElementById("categories-pool");
-  const categorySummary      = document.getElementById("category-select-summary");
   const openCategorySelectBtn = document.getElementById("open-category-select-button");
   const categoryBackButton    = document.getElementById("category-select-back-button");
   const categoryConfirmButton = document.getElementById("category-select-confirm-button");
-  const categoryBulkAllBtn    = document.getElementById("category-bulk-all");
-  const categoryBulkNoneBtn   = document.getElementById("category-bulk-none");
 
   const playerSummary        = document.getElementById("player-select-summary");
   const openPlayerSelectBtn  = document.getElementById("open-player-select-button");
@@ -64,7 +50,8 @@
   const activeCatText   = document.getElementById("active-cat-text");
   const activeCatExample = document.getElementById("active-cat-example");
 
-  const playerPicker = PlayerPicker.create("bombe");
+  const playerPicker = PlayerPicker.create();
+  const categoryPicker = CategoryPicker.create("bombe", "/games/bombe/categories.json");
   let tickTimeoutId  = null;
   let roundActive    = false;
 
@@ -77,100 +64,15 @@
   }
   function saveFuseSettings(s) { localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); }
 
-  function loadSelectedCats() {
-    try {
-      const stored = JSON.parse(localStorage.getItem(CATS_KEY));
-      if (Array.isArray(stored) && stored.length) return new Set(stored);
-    } catch {}
-    // Standard: alle aktiv
-    return new Set(ALL_CATEGORIES.map((c) => c.id));
-  }
-  function saveSelectedCats(set) { localStorage.setItem(CATS_KEY, JSON.stringify([...set])); }
-
   const fuseSettings = loadFuseSettings();
-  let selectedCats   = new Set();
 
   minSecondsInput.value = fuseSettings.min;
   maxSecondsInput.value = fuseSettings.max;
 
   /* ------------------------------------------------------------------ */
-  /* Kategorie-Liste (Vollbild-Ansicht) aufbauen                          */
-  /* ------------------------------------------------------------------ */
-  function updateCategorySummary() {
-    if (!categorySummary) return;
-    if (!ALL_CATEGORIES.length) {
-      categorySummary.textContent = "Kategorien werden geladen…";
-    } else if (selectedCats.size === ALL_CATEGORIES.length) {
-      categorySummary.textContent = "Alle Kategorien aktiv";
-    } else if (selectedCats.size === 0) {
-      categorySummary.textContent = "Keine Kategorie aktiv";
-    } else {
-      categorySummary.textContent = `${selectedCats.size} von ${ALL_CATEGORIES.length} aktiv`;
-    }
-  }
-
-  function renderCategoriesPool() {
-    categoriesPool.innerHTML = ALL_CATEGORIES.map((cat) => {
-      const wordCount = Array.isArray(cat.words) ? cat.words.length : 0;
-      return `
-      <div class="category-row" data-id="${cat.id}">
-        <div class="category-row__text">
-          <span class="category-row__title">${cat.icon} ${cat.label}</span>
-          <span class="category-row__desc">${cat.desc} · ${wordCount} Begriffe</span>
-        </div>
-        <label class="m3-switch">
-          <input type="checkbox" class="category-row__checkbox" ${selectedCats.has(cat.id) ? "checked" : ""} />
-          <span class="m3-switch__track"></span>
-        </label>
-      </div>
-    `;
-    }).join("");
-    updateCategorySummary();
-  }
-
-  categoriesPool.addEventListener("change", (event) => {
-    const checkbox = event.target.closest(".category-row__checkbox");
-    if (!checkbox) return;
-    const id = checkbox.closest(".category-row").dataset.id;
-    if (checkbox.checked) selectedCats.add(id);
-    else selectedCats.delete(id);
-    saveSelectedCats(selectedCats);
-    updateCategorySummary();
-  });
-
-  categoryBulkAllBtn.addEventListener("click", () => {
-    selectedCats = new Set(ALL_CATEGORIES.map((c) => c.id));
-    saveSelectedCats(selectedCats);
-    renderCategoriesPool();
-  });
-
-  categoryBulkNoneBtn.addEventListener("click", () => {
-    selectedCats = new Set();
-    saveSelectedCats(selectedCats);
-    renderCategoriesPool();
-  });
-
-  async function initCategories() {
-    try {
-      const response = await fetch(CATEGORIES_URL, { cache: "no-store" });
-      const data = await response.json();
-      if (Array.isArray(data)) ALL_CATEGORIES = data;
-    } catch (err) {
-      ALL_CATEGORIES = [];
-    }
-    selectedCats = loadSelectedCats();
-    renderCategoriesPool();
-  }
-
-  initCategories();
-
-  /* ------------------------------------------------------------------ */
   /* Ansichten wechseln                                                    */
   /* ------------------------------------------------------------------ */
-  openCategorySelectBtn.addEventListener("click", () => {
-    renderCategoriesPool();
-    ViewNav.transition(setupView, categorySelectView);
-  });
+  openCategorySelectBtn.addEventListener("click", () => ViewNav.transition(setupView, categorySelectView));
   categoryBackButton.addEventListener("click", () => ViewNav.transition(categorySelectView, setupView));
   categoryConfirmButton.addEventListener("click", () => ViewNav.transition(categorySelectView, setupView));
 
@@ -202,7 +104,7 @@
   /* Zufällige Kategorie für diese Runde ziehen                          */
   /* ------------------------------------------------------------------ */
   function pickCategory() {
-    const active = ALL_CATEGORIES.filter((c) => selectedCats.has(c.id));
+    const active = categoryPicker.getSelectedCategories();
     if (!active.length) return null;
     const cat = active[Math.floor(Math.random() * active.length)];
     const words = Array.isArray(cat.words) ? cat.words : [];

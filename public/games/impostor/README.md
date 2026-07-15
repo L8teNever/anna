@@ -5,6 +5,21 @@ reinen Daten-Datei: [`categories.json`](categories.json) in diesem Ordner.
 Kein Code-Wissen nötig – die App liest die Datei beim Start ein und zeigt
 automatisch an, was darin steht.
 
+## Eigene Kategorien direkt in der App erstellen
+
+Für den schnellen Weg ohne Datei-Bearbeitung: In der Kategorie-Auswahl im
+Spiel selbst gibt es ganz unten den Button „Eigene Kategorie erstellen“.
+Damit angelegte Kategorien landen NICHT in `categories.json`, sondern separat
+im Browser-Speicher (localStorage) des Geräts – sie bleiben dort dauerhaft
+erhalten, auch nach einem App-Update über den „Aktualisieren“-Button oder
+„Cache löschen“ (beides betrifft nur den Datei-Cache, nie den lokalen
+Speicher). Eigene Kategorien lassen sich in der Auswahl über die Stift- bzw.
+X-Buttons direkt an der jeweiligen Zeile bearbeiten oder löschen.
+
+Der Rest dieser Anleitung bezieht sich auf den anderen Weg: Kategorien fest
+in `categories.json` eintragen, z.B. wenn sie für alle Geräte gleich
+vorinstalliert sein sollen.
+
 ## Aufbau der Datei
 
 ```json

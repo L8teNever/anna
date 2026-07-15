@@ -8,13 +8,8 @@
  */
 (function () {
   const SETTINGS_KEY = "anna:impostor:settings";
-  const CATS_KEY = "anna:impostor:categories";
-  const CATEGORIES_URL = "/games/impostor/categories.json";
   const MIN_PLAYERS = 3;
   const MAX_PLAYERS = 12;
-
-  let ALL_CATEGORIES = [];
-  let selectedCats = new Set();
 
   /* ------------------------------------------------------------------ */
   /* DOM-Referenzen                                                        */
@@ -32,13 +27,9 @@
   const hintWordToggle = document.getElementById("hint-word-toggle");
   const startButton = document.getElementById("start-button");
 
-  const categoriesPool = document.getElementById("categories-pool");
-  const categorySummary = document.getElementById("category-select-summary");
   const openCategorySelectBtn = document.getElementById("open-category-select-button");
   const categoryBackButton = document.getElementById("category-select-back-button");
   const categoryConfirmButton = document.getElementById("category-select-confirm-button");
-  const categoryBulkAllBtn = document.getElementById("category-bulk-all");
-  const categoryBulkNoneBtn = document.getElementById("category-bulk-none");
 
   const playerSummary = document.getElementById("player-select-summary");
   const openPlayerSelectBtn = document.getElementById("open-player-select-button");
@@ -60,7 +51,8 @@
   const restartButton = document.getElementById("restart-button");
   const exitButton = document.getElementById("exit-button");
 
-  const playerPicker = PlayerPicker.create("impostor");
+  const playerPicker = PlayerPicker.create();
+  const categoryPicker = CategoryPicker.create("impostor", "/games/impostor/categories.json");
 
   /* ------------------------------------------------------------------ */
   /* Einstellungen laden / speichern                                      */
@@ -79,88 +71,9 @@
   hintWordToggle.checked = settings.hintWordEnabled;
 
   /* ------------------------------------------------------------------ */
-  /* Kategorien laden                                                      */
+  /* Ansichten wechseln                                                    */
   /* ------------------------------------------------------------------ */
-  function loadSelectedCats() {
-    try {
-      const stored = JSON.parse(localStorage.getItem(CATS_KEY));
-      if (Array.isArray(stored) && stored.length) return new Set(stored);
-    } catch {}
-    return new Set(ALL_CATEGORIES.map((c) => c.id));
-  }
-  function saveSelectedCats(set) { localStorage.setItem(CATS_KEY, JSON.stringify([...set])); }
-
-  function updateCategorySummary() {
-    if (!categorySummary) return;
-    if (!ALL_CATEGORIES.length) {
-      categorySummary.textContent = "Kategorien werden geladen…";
-    } else if (selectedCats.size === ALL_CATEGORIES.length) {
-      categorySummary.textContent = "Alle Kategorien aktiv";
-    } else if (selectedCats.size === 0) {
-      categorySummary.textContent = "Keine Kategorie aktiv";
-    } else {
-      categorySummary.textContent = `${selectedCats.size} von ${ALL_CATEGORIES.length} aktiv`;
-    }
-  }
-
-  function renderCategoriesPool() {
-    categoriesPool.innerHTML = ALL_CATEGORIES.map((cat) => {
-      const wordCount = Array.isArray(cat.words) ? cat.words.length : 0;
-      return `
-      <div class="category-row" data-id="${cat.id}">
-        <div class="category-row__text">
-          <span class="category-row__title">${cat.icon} ${cat.label}</span>
-          <span class="category-row__desc">${cat.desc} · ${wordCount} Wörter</span>
-        </div>
-        <label class="m3-switch">
-          <input type="checkbox" class="category-row__checkbox" ${selectedCats.has(cat.id) ? "checked" : ""} />
-          <span class="m3-switch__track"></span>
-        </label>
-      </div>
-    `;
-    }).join("");
-    updateCategorySummary();
-  }
-
-  categoriesPool.addEventListener("change", (event) => {
-    const checkbox = event.target.closest(".category-row__checkbox");
-    if (!checkbox) return;
-    const id = checkbox.closest(".category-row").dataset.id;
-    if (checkbox.checked) selectedCats.add(id);
-    else selectedCats.delete(id);
-    saveSelectedCats(selectedCats);
-    updateCategorySummary();
-  });
-
-  categoryBulkAllBtn.addEventListener("click", () => {
-    selectedCats = new Set(ALL_CATEGORIES.map((c) => c.id));
-    saveSelectedCats(selectedCats);
-    renderCategoriesPool();
-  });
-
-  categoryBulkNoneBtn.addEventListener("click", () => {
-    selectedCats = new Set();
-    saveSelectedCats(selectedCats);
-    renderCategoriesPool();
-  });
-
-  async function initCategories() {
-    try {
-      const response = await fetch(CATEGORIES_URL, { cache: "no-store" });
-      const data = await response.json();
-      if (Array.isArray(data)) ALL_CATEGORIES = data;
-    } catch (err) {
-      ALL_CATEGORIES = [];
-    }
-    selectedCats = loadSelectedCats();
-    renderCategoriesPool();
-  }
-  initCategories();
-
-  openCategorySelectBtn.addEventListener("click", () => {
-    renderCategoriesPool();
-    ViewNav.transition(setupView, categorySelectView);
-  });
+  openCategorySelectBtn.addEventListener("click", () => ViewNav.transition(setupView, categorySelectView));
   categoryBackButton.addEventListener("click", () => ViewNav.transition(categorySelectView, setupView));
   categoryConfirmButton.addEventListener("click", () => ViewNav.transition(categorySelectView, setupView));
 
@@ -298,7 +211,7 @@
   }
 
   function pickRoundWord() {
-    const active = ALL_CATEGORIES.filter((c) => selectedCats.has(c.id) && Array.isArray(c.words) && c.words.length);
+    const active = categoryPicker.getSelectedCategories().filter((c) => Array.isArray(c.words) && c.words.length);
     if (!active.length) return { word: null, hint: null };
     const category = active[Math.floor(Math.random() * active.length)];
     const words = category.words;

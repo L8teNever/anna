@@ -46,16 +46,18 @@
       write("roster", names);
     },
 
-    // Welche Roster-Namen sind für ein bestimmtes Spiel angehakt (spielen
-    // mit)? Wird gegen das aktuelle Roster gefiltert, damit gelöschte
-    // Namen nirgends mehr auftauchen.
-    getSelectedPlayers(gameId) {
+    // Welche Roster-Namen sind gerade angehakt (spielen mit)? Bewusst EIN
+    // gemeinsamer Zustand über alle Spiele hinweg (nicht pro Spiel), damit
+    // man beim Wechsel zwischen Spielen nicht jedes Mal neu anhaken muss.
+    // Wird gegen das aktuelle Roster gefiltert, damit gelöschte Namen
+    // nirgends mehr auftauchen.
+    getSelectedPlayers() {
       const roster = this.getRoster();
-      const selected = read(`selected:${gameId}`, []);
+      const selected = read("selected", []);
       return selected.filter((name) => roster.includes(name));
     },
-    setSelectedPlayers(gameId, names) {
-      write(`selected:${gameId}`, names);
+    setSelectedPlayers(names) {
+      write("selected", names);
     },
 
     // Als Favorit markierte Spiele (Startseiten-Filter "Nur Favoriten").

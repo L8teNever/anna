@@ -1,16 +1,16 @@
 /**
  * Gemeinsame Spieler-Auswahl für alle Spiele. Verwaltet EIN globales
- * Roster (siehe storage.js: Storage.getRoster/setRoster), das über alle
- * Spiele hinweg erhalten bleibt, bis ein Name umbenannt oder gelöscht
- * wird. Jedes Spiel hakt daraus nur an, wer diese Runde mitspielt
- * (gespeichert pro gameId).
+ * Roster UND eine gemeinsame Auswahl, wer gerade mitspielt (siehe
+ * storage.js: Storage.getRoster/setRoster/getSelectedPlayers/
+ * setSelectedPlayers) – bewusst NICHT pro Spiel getrennt, damit man beim
+ * Wechsel zwischen Spielen dieselben Mitspieler nicht neu anhaken muss.
  *
  * Rendert in die feste Vollbild-Ansicht "Mitspieler auswählen" jeder
  * Spielseite (IDs: select-players-scroll, player-active-counter,
  * combined-player-input, create-player-inline-btn, player-bulk-all/none).
  * Das Umbenennen-Dialogfenster wird bei Bedarf selbst ins <body> injiziert.
  *
- * Nutzung: const picker = PlayerPicker.create("bombe");
+ * Nutzung: const picker = PlayerPicker.create();
  *          picker.getSelectedNames() // -> string[]
  */
 (function (root) {
@@ -50,9 +50,9 @@
     return modal;
   }
 
-  function create(gameId) {
+  function create() {
     let roster = Storage.getRoster();
-    let selected = new Set(Storage.getSelectedPlayers(gameId));
+    let selected = new Set(Storage.getSelectedPlayers());
     let searchQuery = "";
     let renamingName = null;
     let changeCallback = null;
@@ -72,7 +72,7 @@
     }
 
     function persistSelection() {
-      Storage.setSelectedPlayers(gameId, Array.from(selected));
+      Storage.setSelectedPlayers(Array.from(selected));
       updateCounter();
       if (changeCallback) changeCallback(getSelectedNames());
     }

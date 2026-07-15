@@ -15,7 +15,7 @@
  *     komplett offline mit dem neuen Stand.
  */
 
-const APP_VERSION = "2.4.0";
+const APP_VERSION = "2.5.0";
 const CACHE_NAME = `anna-cache-${APP_VERSION}`;
 
 importScripts("/js/game-registry.js");
@@ -30,6 +30,7 @@ const CORE_ASSETS = [
   "/js/storage.js",
   "/js/icons.js",
   "/js/player-picker.js",
+  "/js/category-picker.js",
   "/js/game-registry.js",
   "/js/app.js",
   "/js/settings.js",
