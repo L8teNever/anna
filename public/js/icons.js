@@ -83,6 +83,12 @@
       <circle cx="12" cy="12" r="10"/><line x1="12" y1="11" x2="12" y2="16"/>
       <circle cx="12" cy="7.5" r="1" fill="currentColor" stroke="none"/>
     </symbol>
+    <symbol id="icon-chevron-up" viewBox="0 0 24 24">
+      <path d="M6 15l6-6 6 6"/>
+    </symbol>
+    <symbol id="icon-minus" viewBox="0 0 24 24">
+      <line x1="5" y1="12" x2="19" y2="12"/>
+    </symbol>
   `;
   document.body.prepend(sprite);
 })();

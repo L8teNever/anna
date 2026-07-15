@@ -1,0 +1,148 @@
+/**
+ * Visuals, die ausschließlich zum Impostor-Spiel gehören. Layout/Grundgerüst
+ * kommt aus main.css (.game-shell, .game-view, .picker-* ...), hier nur die
+ * Wisch-Karte und den Stepper für die Impostor-Anzahl.
+ */
+
+/* ---------- Stepper (Impostor-Anzahl) ---------- */
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--m3-surface-container-high);
+  border-radius: var(--m3-shape-full);
+  padding: 2px;
+}
+
+.stepper__btn {
+  width: 36px;
+  height: 36px;
+}
+
+.stepper__value {
+  min-width: 28px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--m3-on-surface);
+}
+
+/* ---------- Wisch-nach-oben-Bühne ---------- */
+.reveal-stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  max-width: 420px;
+  margin: 0 auto;
+  width: 100%;
+  text-align: center;
+}
+
+.reveal-stage__label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--m3-on-surface-variant);
+}
+
+.reveal-stage__name {
+  font-family: var(--m3-font-display);
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: var(--m3-on-surface);
+}
+
+.reveal-stage__progress {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--m3-on-surface-variant);
+  margin-bottom: 12px;
+}
+
+/* ---------- Wisch-Karte ---------- */
+.reveal-card {
+  position: relative;
+  width: 100%;
+  height: 260px;
+  border-radius: var(--m3-shape-xxl);
+  background: var(--m3-surface-container);
+  border: 1px solid var(--m3-outline-variant);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  overflow: hidden;
+  transition: transform 0.25s var(--m3-easing-emphasized), background-color 0.2s, border-color 0.2s;
+}
+
+.reveal-card--dragging {
+  transition: none;
+  cursor: grabbing;
+}
+
+.reveal-card--revealed {
+  background: var(--m3-primary-container);
+  border-color: var(--m3-primary);
+  cursor: default;
+}
+
+.reveal-card--revealed.reveal-card--impostor {
+  background: rgba(242, 184, 181, 0.16);
+  border-color: var(--m3-error);
+}
+
+.reveal-card__face {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  width: 100%;
+}
+
+.reveal-card__chevron {
+  width: 32px;
+  height: 32px;
+  color: var(--m3-primary);
+  animation: reveal-chevron-bounce 1.4s ease-in-out infinite;
+}
+
+@keyframes reveal-chevron-bounce {
+  0%, 100% { transform: translateY(0); opacity: 0.6; }
+  50% { transform: translateY(-10px); opacity: 1; }
+}
+
+.reveal-card__hint {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--m3-on-surface-variant);
+  line-height: 1.4;
+}
+
+.reveal-card__role {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--m3-primary);
+}
+
+.reveal-card__role--impostor {
+  color: var(--m3-error);
+}
+
+.reveal-card__word {
+  font-family: var(--m3-font-display);
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: var(--m3-on-surface);
+  line-height: 1.2;
+}

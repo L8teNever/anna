@@ -22,6 +22,18 @@
       maxPlayers: 8,
       assets: ["/games/bombe/bombe.js", "/games/bombe/bombe.css", "/games/bombe/categories.json"],
     },
+    {
+      id: "impostor",
+      name: "Impostor",
+      tag: "Bluff",
+      description: "Alle außer dem Impostor kennen das Geheimwort.",
+      detail: "Alle außer dem Impostor sehen ein geheimes Wort. Reihum beschreibt ihr es, ohne es zu sagen – der Impostor muss mitreden, ohne aufzufliegen.",
+      icon: "masks",
+      color: "purple",
+      minPlayers: 3,
+      maxPlayers: 12,
+      assets: ["/games/impostor/impostor.js", "/games/impostor/impostor.css", "/games/impostor/categories.json"],
+    },
   ];
 
   root.GAMES = GAMES;

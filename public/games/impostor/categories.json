@@ -1,0 +1,86 @@
+[
+  {
+    "id": "tiere",
+    "label": "Tiere",
+    "icon": "🐾",
+    "desc": "Haustiere und Wildtiere.",
+    "words": ["Hund", "Katze", "Elefant", "Löwe", "Pinguin", "Delfin", "Adler", "Schlange", "Bär", "Fuchs", "Hase", "Eule"]
+  },
+  {
+    "id": "essen",
+    "label": "Essen & Trinken",
+    "icon": "🍕",
+    "desc": "Gerichte, Snacks und Getränke.",
+    "words": ["Pizza", "Sushi", "Döner", "Schnitzel", "Eis", "Kaffee", "Limonade", "Pfannkuchen", "Salat", "Burger", "Kuchen", "Popcorn"]
+  },
+  {
+    "id": "orte",
+    "label": "Orte",
+    "icon": "📍",
+    "desc": "Plätze, an denen man sich aufhält.",
+    "words": ["Strand", "Schule", "Krankenhaus", "Flughafen", "Bibliothek", "Supermarkt", "Zoo", "Kino", "Friseur", "Baustelle", "Bahnhof", "Gym"]
+  },
+  {
+    "id": "berufe",
+    "label": "Berufe",
+    "icon": "💼",
+    "desc": "Jobs und Tätigkeiten.",
+    "words": ["Arzt", "Lehrer", "Feuerwehrmann", "Pilot", "Koch", "Friseur", "Polizist", "Bäcker", "Anwalt", "Gärtner", "Elektriker", "Tierarzt"]
+  },
+  {
+    "id": "sportarten",
+    "label": "Sportarten",
+    "icon": "⚽",
+    "desc": "Disziplinen und Ballsportarten.",
+    "words": ["Fußball", "Tennis", "Schwimmen", "Boxen", "Skifahren", "Klettern", "Basketball", "Golf", "Reiten", "Surfen", "Yoga", "Tanzen"]
+  },
+  {
+    "id": "haushalt",
+    "label": "Zuhause",
+    "icon": "🏠",
+    "desc": "Dinge aus dem Alltag zuhause.",
+    "words": ["Staubsauger", "Kühlschrank", "Sofa", "Wecker", "Dusche", "Waschmaschine", "Fernseher", "Bett", "Spiegel", "Teppich", "Regal", "Lampe"]
+  },
+  {
+    "id": "filme",
+    "label": "Filme & Serien",
+    "icon": "🎬",
+    "desc": "Bekannte Titel aus Kino und Streaming.",
+    "words": ["Titanic", "Matrix", "Star Wars", "Frozen", "Joker", "Shrek", "Avatar", "Rocky", "Gladiator", "Herr der Ringe", "Jurassic Park", "Squid Game"]
+  },
+  {
+    "id": "feiertage",
+    "label": "Feste & Feiertage",
+    "icon": "🎉",
+    "desc": "Anlässe zum Feiern.",
+    "words": ["Weihnachten", "Geburtstag", "Silvester", "Ostern", "Hochzeit", "Halloween", "Karneval", "Muttertag", "Einschulung", "Jubiläum", "Abschlussfeier", "Valentinstag"]
+  },
+  {
+    "id": "wetter",
+    "label": "Wetter & Jahreszeiten",
+    "icon": "🌦️",
+    "desc": "Alles rund ums Wetter.",
+    "words": ["Regenbogen", "Gewitter", "Schnee", "Sonnenschein", "Nebel", "Hitzewelle", "Herbst", "Frühling", "Sturm", "Hagel", "Regenschirm", "Eiszapfen"]
+  },
+  {
+    "id": "schule",
+    "label": "Schule & Uni",
+    "icon": "🎒",
+    "desc": "Fächer und Dinge aus dem Schulalltag.",
+    "words": ["Mathe", "Klassenarbeit", "Pausenhof", "Hausaufgaben", "Lehrer", "Stundenplan", "Zeugnis", "Tafel", "Schulranzen", "Kantine", "Prüfung", "Ferien"]
+  },
+  {
+    "id": "urlaub",
+    "label": "Reise & Urlaub",
+    "icon": "✈️",
+    "desc": "Alles rund ums Verreisen.",
+    "words": ["Koffer", "Strand", "Reisepass", "Hotel", "Zelt", "Sonnencreme", "Berghütte", "Kreuzfahrt", "Roadtrip", "Souvenir", "Wanderweg", "Flugzeug"]
+  },
+  {
+    "id": "technik",
+    "label": "Technik",
+    "icon": "📱",
+    "desc": "Geräte, die wir täglich benutzen.",
+    "words": ["Smartphone", "Laptop", "Kopfhörer", "Fernbedienung", "Drucker", "Kamera", "Router", "Powerbank", "Smartwatch", "Konsole", "Ladekabel", "Kühlschrank"]
+  }
+]
