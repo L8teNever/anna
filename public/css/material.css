@@ -191,6 +191,11 @@ body {
   padding: 0;
   max-width: 100%;
   overflow-x: hidden;
+  /* Kein Markieren/Auswählen auf dem gesamten Dokument (App-Feeling) */
+  -webkit-user-select: none;
+  user-select: none;
+  /* Kein Callout-Menü bei langem Drücken auf iOS */
+  -webkit-touch-callout: none;
 }
 
 body {
@@ -203,6 +208,15 @@ body {
     color var(--m3-duration-medium) var(--m3-easing-standard);
 }
 
+/* Eingabefelder dürfen Text markieren und haben normales Callout */
+input,
+textarea,
+[contenteditable] {
+  -webkit-user-select: text;
+  user-select: text;
+  -webkit-touch-callout: default;
+}
+
 h1,
 h2,
 h3,
@@ -212,6 +226,8 @@ p {
 
 button {
   font-family: inherit;
+  /* Kein Callout auf Buttons bei langem Drücken */
+  -webkit-touch-callout: none;
 }
 
 .m3-display {
