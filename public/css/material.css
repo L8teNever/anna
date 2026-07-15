@@ -284,3 +284,15 @@ button {
   height: auto !important;
   min-height: 0 !important;
 }
+
+/* ─── Unterdrückt den vom Cloudflare-Worker injizierten "Rechtliches"-Button ──
+   Wir fügen diesen manuell passend ins UI ein, damit er nicht unten herumhängt.
+   ─────────────────────────────────────────────────────────────────────────── */
+#l8-legal-wrapper,
+.l8-legal-wrapper,
+#l8-legal-badge,
+.l8-legal-badge,
+#l8-legal-container,
+.l8-legal-container {
+  display: none !important;
+}
