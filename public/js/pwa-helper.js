@@ -1,9 +1,18 @@
 /**
  * Globales PWA-Helper-Script, das auf JEDER Seite eingebunden wird.
- * Registriert den Service Worker und zeigt bei einer neuen Version ein
- * Material-Update-Banner oben an. Das Update wird NUR nach Klick auf
- * "Aktualisieren" angewendet (nicht automatisch) – erst dann übernimmt der
- * neue Service Worker und die Seite lädt neu.
+ * Registriert den Service Worker (das muss immer passieren, sonst bieten
+ * Chrome/Edge die App gar nicht erst zum Installieren an – siehe sw.js)
+ * und zeigt bei einer neuen Version ein Material-Update-Banner oben an.
+ * Das Update wird NUR nach Klick auf "Aktualisieren" angewendet (nicht
+ * automatisch) – erst dann übernimmt der neue Service Worker und die
+ * Seite lädt neu.
+ *
+ * Offline-Caching selbst ist NUR für die installierte PWA gedacht: läuft
+ * die Seite gerade im Standalone-Fenster (App vom Startbildschirm/Desktop
+ * geöffnet, nicht im normalen Browser-Tab), schicken wir dem Worker einmal
+ * "ENABLE_OFFLINE_CACHE" – ab dann cacht er dauerhaft (auch über künftige
+ * Updates hinweg automatisch, siehe sw.js). Ein normaler Browser-Tab
+ * schickt diese Nachricht nie und bleibt dadurch bewusst online-only.
  */
 (function () {
   if (!("serviceWorker" in navigator)) return;
@@ -13,6 +22,21 @@
   // durchgereicht – ohne das würde ein Update erst beim nächsten kompletten
   // Neustart der App erkannt.
   const UPDATE_CHECK_INTERVAL_MS = 20 * 60 * 1000;
+
+  // display-mode "standalone" deckt Android/Desktop-Installationen ab,
+  // "fullscreen"/"minimal-ui" sind seltenere aber gültige Install-Varianten.
+  // navigator.standalone ist die ältere iOS-Safari-spezifische Variante
+  // ("Zum Home-Bildschirm hinzufügen") – auf anderen Browsern schlicht
+  // undefined, daher gefahrlos immer abfragbar.
+  function isInstalledPwa() {
+    if (window.navigator.standalone === true) return true;
+    if (!window.matchMedia) return false;
+    return (
+      window.matchMedia("(display-mode: standalone)").matches ||
+      window.matchMedia("(display-mode: fullscreen)").matches ||
+      window.matchMedia("(display-mode: minimal-ui)").matches
+    );
+  }
 
   function showUpdateBanner(onConfirm) {
     if (document.querySelector(".update-banner")) return;
@@ -61,6 +85,19 @@
 
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("/sw.js").then((registration) => {
+      // Nur in der installierten PWA den dauerhaften Offline-Modus im
+      // Worker anschalten (siehe sw.js) – ein normaler Browser-Tab lässt
+      // das bewusst aus und bleibt online-only. navigator.serviceWorker.ready
+      // wartet zuverlässig, bis es einen aktiven Worker gibt (auch bei der
+      // allerersten Installation, die noch kurz "installing" sein kann).
+      if (isInstalledPwa()) {
+        navigator.serviceWorker.ready.then((readyRegistration) => {
+          if (readyRegistration.active) {
+            readyRegistration.active.postMessage({ type: "ENABLE_OFFLINE_CACHE" });
+          }
+        });
+      }
+
       // Fall 1: Es gibt bereits einen wartenden Worker (Update wurde auf
       // einer anderen Seite/Tab entdeckt, Nutzer hat aber noch nicht bestätigt).
       if (registration.waiting && navigator.serviceWorker.controller) {
