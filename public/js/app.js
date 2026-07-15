@@ -82,6 +82,7 @@
     });
 
     emptyState.hidden = matches.length > 0;
+    emptyState.style.display = matches.length > 0 ? "none" : "";
   }
 
   function currentQuery() {
@@ -106,6 +107,24 @@
     renderGames("");
   }
 
+  function resetAllFilters() {
+    searchActive = false;
+    topbar.dataset.searchActive = "false";
+    searchInput.value = "";
+    clearSearchButton.hidden = true;
+
+    showOnlyFavorites = false;
+    favFilterToggle.checked = false;
+
+    activePlayerFilter = "all";
+    playerChipsContainer.querySelectorAll(".m3-chip").forEach((el) => {
+      el.setAttribute("aria-pressed", String(el.dataset.value === "all"));
+    });
+
+    filterPanel.dataset.open = "false";
+    renderGames("");
+  }
+
   searchTriggerButton.addEventListener("click", () => {
     if (searchActive) closeSearch();
     else openSearch();
@@ -123,7 +142,7 @@
     renderGames("");
   });
 
-  resetSearchButton.addEventListener("click", closeSearch);
+  resetSearchButton.addEventListener("click", resetAllFilters);
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && searchActive) closeSearch();
