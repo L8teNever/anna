@@ -26,3 +26,19 @@ In allen HTML-Dateien der Anwendung muss sich im `<head>`-Bereich folgender Meta
 
 3. **Garantierte Ausfallsicherheit:**
    Indem der Tag in **allen** HTML-Dateien (`index.html`, `/settings/index.html`, `/games/*/index.html`, `404.html`) integriert ist, wird der Marker bei jedem Seitenaufruf – egal über welchen Pfad der Nutzer einsteigt – zuverlässig gesetzt und verlängert.
+
+### Cloudflare Worker Injektionen komplett deaktivieren
+
+Die App ist für die Ausführung als eigenständige PWA optimiert und besitzt bereits eigene native UI-Elemente (z.B. flüssige Animationen, eigene "Rechtliches"-Links in der Topbar). 
+
+Um **alle** automatischen Injektionen und Eingriffe des Cloudflare Workers auf dieser Domain **komplett abzuschalten**, muss sich in **ausnahmslos allen HTML-Dateien** im `<head>`-Bereich zusätzlich folgender Meta-Tag befinden:
+
+```html
+<meta name="cf-worker-bypass" content="true" />
+```
+
+Durch diesen Tag ignoriert der Cloudflare Worker die Seite komplett und injiziert nichts mehr. Dies schaltet folgende Funktionen des Workers ab:
+- Kein Ladeanimations-Overlay (wird hier nicht benötigt, da Cache-geladen)
+- Kein "Rechtliches"-Button unten links
+- Kein Favicon-Fallback-Script
+- Keine eigenen 404/403/500/503-Fehlerseiten (Origin-Fehler kommen unverändert durch)
