@@ -61,7 +61,7 @@
  * angerührt.
  */
 
-const APP_VERSION = "3.1.0";
+const APP_VERSION = "3.2.0";
 const CACHE_NAME = `anna-cache-${APP_VERSION}`;
 
 // Versionsunabhängige Marker: NICHT umbenennen und NICHT in CACHE_NAME
@@ -100,6 +100,8 @@ const CORE_ASSETS = [
   "/js/toast.js",
   "/js/view-nav.js",
   "/js/cache-tools.js",
+  "/js/confirm-dialog.js",
+  "/js/touch-fixes.js",
   "/assets/icons/icon-192.png",
   "/assets/icons/icon-192-maskable.png",
   "/assets/icons/icon-512.png",

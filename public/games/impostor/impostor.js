@@ -312,14 +312,38 @@
   exitButton.addEventListener("click", () => { window.location.href = "/"; });
 
   backButton.addEventListener("click", () => {
-    // Sub-Pfad vorhanden (z.B. /impostor/spieler)? → Browser-Zurück
-    const parts = window.location.pathname.split("/").filter(Boolean);
-    if (parts.length > 1) {
-      history.back();
-    } else {
-      window.location.href = "/";
+    if (!revealView.hidden && setupView.hidden) {
+      // Wortvergabe läuft gerade -> erst bestätigen lassen.
+      ConfirmDialog.show({
+        title: "Spiel verlassen?",
+        message: "Die Wortvergabe wird abgebrochen.",
+        confirmLabel: "Verlassen",
+        onConfirm: () => ViewNav.transition(revealView, setupView),
+      });
+      return;
     }
-  window.confirmGameExit = function() {
+    if (!playView.hidden && setupView.hidden) {
+      // Diskussionsrunde läuft -> erst bestätigen lassen.
+      ConfirmDialog.show({
+        title: "Spiel verlassen?",
+        message: "Die laufende Runde wird abgebrochen.",
+        confirmLabel: "Verlassen",
+        onConfirm: () => ViewNav.transition(playView, setupView),
+      });
+      return;
+    }
+    if (!categorySelectView.hidden || !playerSelectView.hidden) {
+      ViewNav.transition(categorySelectView.hidden ? playerSelectView : categorySelectView, setupView);
+      return;
+    }
+    window.location.href = "/";
+  });
+
+  // Bestätigung beim System-Zurück (Android/iOS-Zurück-Geste, siehe
+  // view-nav.js) – die lässt sich nur synchron per window.confirm()
+  // abfangen, ein eigenes Dialogfenster kann die Browser-Navigation nicht
+  // rechtzeitig aufhalten.
+  window.confirmGameExit = function () {
     const currentActive = document.querySelector(".app-view:not([hidden])");
     if (currentActive && (currentActive.id === "view-reveal" || currentActive.id === "play-view")) {
       return confirm("Möchtest du das laufende Spiel wirklich beenden?");

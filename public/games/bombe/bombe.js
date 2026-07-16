@@ -231,16 +231,31 @@
   startButton.addEventListener("click", startRound);
   restartButton.addEventListener("click", startRound);
   exitButton.addEventListener("click", () => { stopRound(); window.location.href = "/"; });
+
   backButton.addEventListener("click", () => {
-    // Sub-Pfad vorhanden (z.B. /bombe/kategorien)? → Browser-Zurück
-    const parts = window.location.pathname.split("/").filter(Boolean);
-    if (parts.length > 1) {
-      history.back();
-    } else {
-      window.location.href = "/";
+    if (!playView.hidden && setupView.hidden) {
+      // Runde läuft (oder ist gerade explodiert) -> erst bestätigen lassen,
+      // bevor es zurück zur Spiel-Vorbereitung geht.
+      ConfirmDialog.show({
+        title: "Spiel verlassen?",
+        message: "Die laufende Runde wird abgebrochen.",
+        confirmLabel: "Verlassen",
+        onConfirm: () => ViewNav.transition(playView, setupView),
+      });
+      return;
     }
+    if (!categorySelectView.hidden || !playerSelectView.hidden) {
+      ViewNav.transition(categorySelectView.hidden ? playerSelectView : categorySelectView, setupView);
+      return;
+    }
+    window.location.href = "/";
   });
-  window.confirmGameExit = function() {
+
+  // Bestätigung beim System-Zurück (Android/iOS-Zurück-Geste, siehe
+  // view-nav.js) – die lässt sich nur synchron per window.confirm()
+  // abfangen, ein eigenes Dialogfenster kann die Browser-Navigation nicht
+  // rechtzeitig aufhalten.
+  window.confirmGameExit = function () {
     if (roundActive) {
       return confirm("Möchtest du das laufende Spiel wirklich beenden?");
     }
