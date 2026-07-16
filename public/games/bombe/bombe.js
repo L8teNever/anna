@@ -240,6 +240,13 @@
       window.location.href = "/";
     }
   });
+  window.confirmGameExit = function() {
+    if (roundActive) {
+      return confirm("Möchtest du das laufende Spiel wirklich beenden?");
+    }
+    return true;
+  };
+
   playView.addEventListener("viewhide", stopRound);
   window.addEventListener("beforeunload", stopRound);
 })();

@@ -319,5 +319,11 @@
     } else {
       window.location.href = "/";
     }
-  });
+  window.confirmGameExit = function() {
+    const currentActive = document.querySelector(".app-view:not([hidden])");
+    if (currentActive && (currentActive.id === "view-reveal" || currentActive.id === "play-view")) {
+      return confirm("Möchtest du das laufende Spiel wirklich beenden?");
+    }
+    return true;
+  };
 })();

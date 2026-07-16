@@ -95,12 +95,29 @@
     }
   }
 
+  let blockPopState = false;
+
   // Reagiert auf Browser-Zurück/-Vorwärts-Button (System-Back auf Android)
   window.addEventListener("popstate", () => {
+    if (blockPopState) {
+      blockPopState = false;
+      return;
+    }
+
+    const currentActive = document.querySelector(".app-view:not([hidden])");
+
+    // Prüfen, ob das Spiel das Verlassen bestätigen möchte
+    if (currentActive && typeof window.confirmGameExit === "function") {
+      if (!window.confirmGameExit()) {
+        blockPopState = true;
+        history.go(1); // Wieder einen Schritt vorwärts springen, um das Zurückgehen abzubrechen
+        return;
+      }
+    }
+
     const sub = currentSub();
     const targetId = REVERSE_MAP[sub] || "setup-view";
     const targetEl = document.getElementById(targetId);
-    const currentActive = document.querySelector(".app-view:not([hidden])");
 
     if (targetEl && currentActive && targetEl !== currentActive) {
       performTransition(currentActive, targetEl);
