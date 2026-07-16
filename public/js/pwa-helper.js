@@ -75,9 +75,22 @@
     window.location.reload();
   }
 
+  // Nur wenn diese Seite VOR der Registrierung unten schon einen
+  // Controller hatte, ist ein späteres SW_ACTIVATED/controllerchange ein
+  // ECHTES Update (alter Worker -> neuer Worker) und rechtfertigt einen
+  // automatischen Reload. Beim allerersten Laden dieser Origin (oder
+  // direkt nach "Cache löschen", das den Worker komplett neu registriert,
+  // siehe cache-tools.js) gibt es hier noch KEINEN Controller: der erste
+  // clients.claim() im Worker "übernimmt" dann nur die bereits frisch
+  // geladene Seite – das ist kein Update und darf keinen ungefragten
+  // Reload auslösen (sonst reloadet die Seite z.B. beim allerersten
+  // Besuch von selbst, oder nach "Cache löschen" gleich zweimal).
+  const hadControllerAtLoad = Boolean(navigator.serviceWorker.controller);
+
   // Listen to messages from the Service Worker
   navigator.serviceWorker.addEventListener("message", (event) => {
     if (event.data && event.data.type === "SW_ACTIVATED") {
+      if (!hadControllerAtLoad) return; // erster Claim, kein echtes Update
       console.log("[anna] SW_ACTIVATED received. Clean reloading page.");
       reloadOnce();
     }
@@ -143,6 +156,7 @@
     });
 
     navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (!hadControllerAtLoad) return; // erster Claim, kein echtes Update
       // controllerchange ist der Standard-Trigger, wir lassen ihn als Fallback aktiv
       // falls der Worker die Aktivierungsnachricht nicht abschicken kann.
       setTimeout(reloadOnce, 1000);

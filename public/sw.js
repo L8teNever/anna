@@ -1,21 +1,39 @@
 /**
  * Service Worker: Offline-Caching gibt es NUR für die installierte PWA
  * (Startbildschirm/App-Fenster im "standalone"-Modus) – ein normaler
- * Browser-Tab bleibt bewusst online-only und cacht nichts. Der Worker
- * selbst wird trotzdem IMMER registriert (auch im Browser-Tab), weil
- * Chrome/Edge einen aktiven Service Worker mit fetch-Handler brauchen,
- * damit der native "App installieren"-Vorschlag überhaupt erscheint
- * (sonst wäre die App nie als PWA installierbar). Ob tatsächlich gecacht
- * wird, entscheidet dieser Worker selbst anhand eines dauerhaften, von
- * der Versionsnummer unabhängigen Flags (FLAG_CACHE) – siehe unten.
+ * Browser-Tab bleibt bewusst online-only. Der Worker selbst wird
+ * trotzdem IMMER registriert (auch im Browser-Tab), weil Chrome/Edge
+ * einen aktiven Service Worker mit fetch-Handler brauchen, damit der
+ * native "App installieren"-Vorschlag überhaupt erscheint (sonst wäre
+ * die App nie als PWA installierbar). Ob tatsächlich gecacht wird,
+ * entscheidet dieser Worker selbst anhand eines dauerhaften, von der
+ * Versionsnummer unabhängigen Flags (FLAG_CACHE) – siehe unten.
+ *
+ * WICHTIGER VORBEHALT (Web-Plattform-Grenze, kein Implementierungsfehler):
+ * Cache Storage ist pro ORIGIN gültig, nicht pro Fenster/Tab. Es gibt
+ * keine Browser-API, mit der ein Service Worker unterscheiden könnte,
+ * ob eine einzelne Anfrage aus dem installierten App-Fenster oder einem
+ * ganz normalen Browser-Tab kommt. Das bedeutet: sobald diese PWA auf
+ * einem Gerät EINMAL im Standalone-Modus geöffnet wurde, "weiß" der
+ * Worker das dauerhaft – öffnet danach jemand auf demselben Gerät
+ * zusätzlich einen normalen Browser-Tab, sieht auch der isOfflineEnabled()
+ * === true. Das lässt sich nicht sauber verhindern (ist keine Baustelle,
+ * sondern eine Grenze der Plattform). Der fetch-Handler unten fängt den
+ * SCHADEN daraus aber gezielt ab: er liefert IMMER zuerst das Netz (wer
+ * Internet hat, bekommt IMMER den frischen Serverstand, nie einen
+ * veralteten Cache-Stand vorgesetzt) und nutzt den Cache wirklich nur
+ * als Fallback, wenn das Netz gerade nicht erreichbar ist. Ein normaler
+ * Browser-Tab, der NIE auf einem Gerät mit aktivierter PWA lief, bleibt
+ * dagegen zu 100% cachefrei (siehe erster Zweig im fetch-Handler).
  *
  * Ablauf:
  *  1. pwa-helper.js erkennt beim Laden, ob die Seite im PWA-Standalone-
  *     Modus läuft (display-mode: standalone/fullscreen/minimal-ui bzw.
- *     iOS navigator.standalone) und schickt in diesem Fall EINMAL die
- *     Nachricht { type: "ENABLE_OFFLINE_CACHE" } an diesen Worker.
- *  2. enableOfflineMode() setzt daraufhin das Flag (bleibt über Neustarts
- *     des Workers UND über App-Updates hinweg erhalten, da es in einer
+ *     iOS navigator.standalone) und schickt in diesem Fall die Nachricht
+ *     { type: "ENABLE_OFFLINE_CACHE" } an diesen Worker.
+ *  2. enableOfflineMode() setzt daraufhin (einmalig – wiederholte Aufrufe
+ *     sind ein günstiger No-Op) das Flag (bleibt über Neustarts des
+ *     Workers UND über App-Updates hinweg erhalten, da es in einer
  *     eigenen, versionsunabhängigen Cache-Storage-"Datenbank" liegt) und
  *     lädt einmalig die komplette App in den Cache.
  *  3. Ab jetzt (und bei jedem künftigen install()) prüft dieser Worker das
@@ -31,7 +49,10 @@
  *     unangetastet). pwa-helper.js zeigt daraufhin das Update-Banner;
  *     erst nach Klick auf "Aktualisieren" schickt die Seite ein
  *     SKIP_WAITING an diesen Worker. activate() räumt danach alte
- *     Versions-Caches auf (das Flag bleibt erhalten) und übernimmt.
+ *     Versions-Caches auf (das Flag bleibt erhalten) und übernimmt – ein
+ *     automatischer Seiten-Reload passiert dabei NUR, wenn die Seite beim
+ *     Laden bereits von einem älteren Worker kontrolliert wurde (siehe
+ *     hadControllerAtLoad in pwa-helper.js), nie beim allerersten Install.
  *
  * Lokale Daten (Spieler-Roster, Favoriten, Einstellungen, eigene
  * Kategorien) laufen komplett über localStorage (siehe storage.js) und
@@ -40,15 +61,21 @@
  * angerührt.
  */
 
-const APP_VERSION = "3.0.0";
+const APP_VERSION = "3.1.0";
 const CACHE_NAME = `anna-cache-${APP_VERSION}`;
 
-// Versionsunabhängiger Marker: NICHT umbenennen und NICHT in CACHE_NAME
-// einbauen, sonst geht die "wurde diese PWA schon mal offline benutzt"-
-// Information bei jedem Update verloren und jede Version müsste den
-// Offline-Modus erneut manuell "aktivieren".
+// Versionsunabhängige Marker: NICHT umbenennen und NICHT in CACHE_NAME
+// einbauen, sonst gehen diese Informationen bei jedem Update verloren.
 const FLAG_CACHE = "anna-offline-flag";
+// "Wurde Offline-Modus (PWA) schon mal aktiviert?" – steuert Precaching/fetch-Strategie.
 const FLAG_KEY = "/__offline_enabled__";
+// "Ist auf diesem Gerät/Origin schon irgendwann ein anna-Worker fertig
+// installiert gewesen?" – unabhängig vom Offline-Status. Ersetzt die
+// frühere (fehlerhafte) Prüfung "existiert ein anna-cache-*", die bei
+// reinen Browser-Tab-Nutzern (die Offline-Modus nie aktivieren, siehe
+// isOfflineEnabled) permanent falsch auf "true" stand und dadurch bei
+// JEDEM Update erneut self.skipWaiting() ausgelöst hätte.
+const MIGRATION_FLAG_KEY = "/__anna_sw_installed__";
 
 importScripts("/js/game-registry.js");
 
@@ -119,9 +146,15 @@ async function precacheAll(cache, urls) {
 }
 
 // Wird von der Seite per postMessage ausgelöst, sobald sie im PWA-
-// Standalone-Modus läuft. Setzt das dauerhafte Flag und füllt den Cache.
-// Idempotent/gefahrlos mehrfach aufrufbar (z.B. bei jedem App-Start).
+// Standalone-Modus läuft. Setzt das dauerhafte Flag und füllt den Cache
+// EINMALIG – bei jedem weiteren Aufruf (z.B. bei jeder In-App-Navigation,
+// da diese App aus mehreren echten Seiten statt einer SPA besteht) ist
+// das Flag schon gesetzt und wir überspringen das erneute Vorcachen.
+// Künftige Versions-Updates cachen trotzdem automatisch neu (siehe
+// install()-Handler unten, der PRECACHE_URLS bei jedem Update erneut lädt).
 async function enableOfflineMode() {
+  if (await isOfflineEnabled()) return;
+
   const flagCache = await caches.open(FLAG_CACHE);
   await flagCache.put(FLAG_KEY, new Response("1"));
 
@@ -132,15 +165,15 @@ async function enableOfflineMode() {
 self.addEventListener("install", (event) => {
   event.waitUntil(
     (async () => {
-      const existingCacheNames = await caches.keys();
-      // Erkennt einen fremden/älteren Service Worker (z.B. von einer
-      // komplett anderen Vorgänger-Version dieser App unter derselben
-      // Origin), der sonst unbegrenzt weiter alte Dateien ausliefern
-      // würde, ohne dass eine Nutzer-Bestätigung möglich ist. Nur wenn
-      // NOCH KEIN "anna-cache-*" existiert, wird sofort übernommen
-      // (einmalige Migration). Ab dann greift wieder die normale
-      // Update-Bestätigung über das Banner (siehe Kommentar oben).
-      const isFirstAnnaInstall = !existingCacheNames.some((name) => name.startsWith("anna-cache-"));
+      const flagCache = await caches.open(FLAG_CACHE);
+
+      // Echte "einmalige Migration"-Erkennung: war dieser Worker auf
+      // diesem Gerät/Origin schon mal fertig installiert (offline aktiv
+      // oder nicht, spielt keine Rolle)? Nur beim GENUINEN allerersten
+      // Install wird sofort übernommen (skipWaiting) – ab dann greift
+      // immer die normale Update-Bestätigung über das Banner.
+      const previouslyInstalled = await flagCache.match(MIGRATION_FLAG_KEY);
+      const isFirstAnnaInstall = !previouslyInstalled;
 
       // Nur vorcachen, wenn dieses Gerät den Offline-Modus schon mal
       // aktiviert hat (also mindestens einmal als installierte PWA lief).
@@ -150,7 +183,10 @@ self.addEventListener("install", (event) => {
         await precacheAll(cache, PRECACHE_URLS);
       }
 
-      if (isFirstAnnaInstall) self.skipWaiting();
+      if (isFirstAnnaInstall) {
+        await flagCache.put(MIGRATION_FLAG_KEY, new Response("1"));
+        self.skipWaiting();
+      }
     })()
   );
 });
@@ -160,7 +196,8 @@ self.addEventListener("activate", (event) => {
     (async () => {
       const keys = await caches.keys();
       // FLAG_CACHE bewusst NICHT löschen – das ist kein Versions-Cache,
-      // sondern die dauerhafte "wurde als PWA benutzt"-Markierung.
+      // sondern enthält die dauerhaften "wurde als PWA benutzt" / "wurde
+      // hier schon mal installiert"-Markierungen.
       await Promise.all(
         keys.filter((key) => key !== CACHE_NAME && key !== FLAG_CACHE).map((key) => caches.delete(key))
       );
@@ -197,18 +234,23 @@ self.addEventListener("fetch", (event) => {
         return fetch(request);
       }
 
+      // Netzwerk-zuerst: wer Internet hat (App ODER ein Tab auf einem
+      // Gerät, auf dem die PWA mal aktiviert wurde), bekommt IMMER den
+      // frischen Serverstand – nie ungefragt eine veraltete Cache-Version.
+      // Der Cache ist nur der Fallback, wenn das Netz wirklich nicht
+      // erreichbar ist (= "richtiges" Offline-Spielen in der PWA).
       const cache = await caches.open(CACHE_NAME);
-      const cached = await cache.match(request);
-      const networkFetch = fetch(request)
-        .then((response) => {
-          if (response && response.ok) {
-            cache.put(request, response.clone());
-          }
-          return response;
-        })
-        .catch(() => cached);
-
-      return cached || networkFetch;
+      try {
+        const response = await fetch(request);
+        if (response && response.ok) {
+          await cache.put(request, response.clone());
+        }
+        return response;
+      } catch (err) {
+        const cached = await cache.match(request);
+        if (cached) return cached;
+        throw err;
+      }
     })()
   );
 });
