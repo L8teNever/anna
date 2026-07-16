@@ -140,6 +140,18 @@
       // am Bildschirmrand erscheint.
       let lastUpdateCheck = 0;
       const UPDATE_COOLDOWN_MS = 10 * 60 * 1000;
+
+      // WICHTIG: sofort bei jedem (Neu-)Start prüfen, nicht erst warten.
+      // "visibilitychange" feuert nur bei einem WECHSEL des Sichtbarkeits-
+      // Status – eine frisch geladene Seite ist von Anfang an sichtbar,
+      // es gibt also gar keinen Wechsel zum Reagieren. Ohne diesen Aufruf
+      // hier hätte ein Nutzer, der die App schließt und direkt wieder
+      // öffnet, erst nach dem 20-Minuten-Intervall überhaupt eine Chance,
+      // eine neue Version zu sehen (Browser selbst prüfen von sich aus nur
+      // gedrosselt, teils erst nach 24 Stunden).
+      lastUpdateCheck = Date.now();
+      registration.update().catch(() => {});
+
       document.addEventListener("visibilitychange", () => {
         if (document.visibilityState !== "visible") return;
         const now = Date.now();
