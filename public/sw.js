@@ -61,7 +61,7 @@
  * angerührt.
  */
 
-const APP_VERSION = "3.2.0";
+const APP_VERSION = "3.3.0";
 const CACHE_NAME = `anna-cache-${APP_VERSION}`;
 
 // Versionsunabhängige Marker: NICHT umbenennen und NICHT in CACHE_NAME

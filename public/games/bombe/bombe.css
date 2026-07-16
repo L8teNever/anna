@@ -6,8 +6,11 @@
 
 /* ---------- Bombe-Ring ---------- */
 .bomb-ring {
-  width: 220px;
-  height: 220px;
+  /* min() statt fixer Größe: schrumpft von selbst auf kurzen Bildschirmen/
+     PWA-Fenstern, ohne strikt auf die Media-Query-Schwelle unten angewiesen
+     zu sein. */
+  width: min(220px, 34dvh);
+  height: min(220px, 34dvh);
   border-radius: 50%;
   display: flex;
   align-items: center;

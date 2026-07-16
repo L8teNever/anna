@@ -380,6 +380,12 @@
 
 .game-view {
   flex: 1;
+  /* Ohne min-height:0 würde dieses Flex-Kind (in .game-shell) nie unter
+     die Höhe seines Inhalts schrumpfen -> der Inhalt würde die Ansicht
+     nach unten hinaus schieben statt intern zu scrollen, und Elemente
+     am unteren Rand (z.B. der Start-Button) könnten je nach Gerät/PWA-
+     Chrome teilweise über den Bildschirmrand hinausragen. */
+  min-height: 0;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -478,11 +484,15 @@
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
-  transition: background-color 0.2s var(--m3-easing-standard);
+  transition: background-color 0.2s var(--m3-easing-standard), transform 0.15s var(--m3-easing-standard);
 }
 
 .picker-launch-btn:hover {
   background: var(--m3-surface-container-high);
+}
+
+.picker-launch-btn:active {
+  transform: scale(0.98);
 }
 
 .picker-launch-btn__left {
@@ -575,6 +585,7 @@
 
 .game-play {
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -750,8 +761,10 @@
 }
 
 .category-row__actions .m3-icon-button {
-  width: 36px;
-  height: 36px;
+  /* 40px statt 36px: näher an der Mindest-Tippfläche (Apple 44pt/Google
+     48dp), damit Bearbeiten/Löschen auf dem Handy leicht zu treffen ist. */
+  width: 40px;
+  height: 40px;
 }
 
 .category-row__custom-tag {

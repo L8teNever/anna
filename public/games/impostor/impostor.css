@@ -15,8 +15,10 @@
 }
 
 .stepper__btn {
-  width: 36px;
-  height: 36px;
+  /* 40px statt 36px: näher an der Mindest-Tippfläche (Apple 44pt/Google
+     48dp), damit der Button auf dem Handy leicht zu treffen ist. */
+  width: 40px;
+  height: 40px;
 }
 
 .stepper__value {
@@ -30,6 +32,7 @@
 /* ---------- Wisch-nach-oben-Bühne ---------- */
 .reveal-stage {
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -67,7 +70,10 @@
 .reveal-card {
   position: relative;
   width: 100%;
-  height: 260px;
+  /* Deckelt sich selbst auf kurzen Bildschirmen (min() statt fixer Höhe),
+     damit auf kleinen/PWA-Fenstern nie Inhalt/Button unten abgeschnitten
+     wirkt, ohne auf die genaue Media-Query-Schwelle unten angewiesen zu sein. */
+  height: min(260px, 34dvh);
   border-radius: var(--m3-shape-xxl);
   background: var(--m3-surface-container);
   border: 1px solid var(--m3-outline-variant);
