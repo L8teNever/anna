@@ -142,26 +142,23 @@
   /* ------------------------------------------------------------------ */
   /* Wisch-nach-oben-Karte                                                 */
   /* ------------------------------------------------------------------ */
-  function setupSwipeReveal(cardEl, onReveal) {
+  function setupSwipeReveal(cardEl, onPeek, onRelease) {
     const THRESHOLD = 60;
     let dragging = false;
     let startY = 0;
     let deltaY = 0;
+    let revealed = false;
 
     function resetTransform() {
       cardEl.style.transform = "";
       cardEl.classList.remove("reveal-card--dragging");
     }
 
-    function isRevealed() {
-      return cardEl.classList.contains("reveal-card--revealed");
-    }
-
     cardEl.addEventListener("pointerdown", (event) => {
-      if (isRevealed()) return;
       dragging = true;
       startY = event.clientY;
       deltaY = 0;
+      revealed = false;
       cardEl.classList.add("reveal-card--dragging");
       cardEl.setPointerCapture(event.pointerId);
     });
@@ -170,26 +167,30 @@
       if (!dragging) return;
       deltaY = Math.min(0, event.clientY - startY);
       cardEl.style.transform = `translateY(${deltaY}px)`;
+
+      if (!revealed && Math.abs(deltaY) > THRESHOLD) {
+        revealed = true;
+        onPeek();
+      } else if (revealed && Math.abs(deltaY) <= THRESHOLD) {
+        revealed = false;
+        onRelease(false);
+      }
     });
 
     function endDrag() {
       if (!dragging) return;
       dragging = false;
-      if (Math.abs(deltaY) > THRESHOLD) {
-        onReveal();
-      } else {
-        resetTransform();
+      resetTransform();
+      if (revealed) {
+        revealed = false;
+        onRelease(true);
       }
       deltaY = 0;
     }
 
     cardEl.addEventListener("pointerup", endDrag);
     cardEl.addEventListener("pointercancel", endDrag);
-
-    // Tippen als barrierefreie Alternative zum Wischen.
-    cardEl.addEventListener("click", () => {
-      if (!isRevealed() && !dragging) onReveal();
-    });
+    cardEl.addEventListener("contextmenu", e => e.preventDefault());
   }
 
   /* ------------------------------------------------------------------ */
@@ -232,13 +233,13 @@
     revealCardFront.hidden = false;
     revealCardBack.hidden = true;
     revealNextButton.hidden = true;
+    delete revealCard.dataset.peeked;
+    const hint = revealCardFront.querySelector(".reveal-card__hint");
+    if (hint) hint.innerHTML = "Nach oben wischen und halten,<br/>um dein Wort zu sehen";
   }
 
-  function revealCurrentPlayer() {
-    if (revealCard.classList.contains("reveal-card--revealed")) return;
-    revealCard.classList.remove("reveal-card--dragging");
+  function peekCurrentPlayer() {
     revealCard.classList.add("reveal-card--revealed");
-    revealCard.style.transform = "";
     revealCardFront.hidden = true;
     revealCardBack.hidden = false;
 
@@ -253,13 +254,26 @@
       revealWord.textContent = secretWord;
     }
 
-    Sound.beep(720, 0.1);
-    if (Storage.getSettings().vibrationEnabled && navigator.vibrate) navigator.vibrate(30);
-
-    revealNextButton.hidden = false;
+    if (!revealCard.dataset.peeked) {
+      revealCard.dataset.peeked = "true";
+      Sound.beep(720, 0.1);
+      if (Storage.getSettings().vibrationEnabled && navigator.vibrate) navigator.vibrate(30);
+    }
   }
 
-  setupSwipeReveal(revealCard, revealCurrentPlayer);
+  function hideCurrentPlayer(finished) {
+    revealCard.classList.remove("reveal-card--revealed", "reveal-card--impostor");
+    revealCardFront.hidden = false;
+    revealCardBack.hidden = true;
+    
+    if (finished || revealCard.dataset.peeked) {
+      revealNextButton.hidden = false;
+      const hint = revealCardFront.querySelector(".reveal-card__hint");
+      if (hint) hint.innerHTML = "Erneut ansehen<br/>(Wischen & Halten)";
+    }
+  }
+
+  setupSwipeReveal(revealCard, peekCurrentPlayer, hideCurrentPlayer);
 
   revealNextButton.addEventListener("click", () => {
     currentRevealIndex += 1;
