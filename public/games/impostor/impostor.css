@@ -99,6 +99,8 @@
 }
 
 .reveal-card__face {
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -106,8 +108,19 @@
   gap: 12px;
   padding: 24px;
   width: 100%;
+  height: 100%;
 }
 
+.reveal-card__face--front {
+  background: var(--m3-surface-container);
+  z-index: 2;
+  transition: transform 0.25s var(--m3-easing-emphasized);
+}
+
+.reveal-card__face--back {
+  background: transparent;
+  z-index: 1;
+}
 .reveal-card__chevron {
   width: 32px;
   height: 32px;

@@ -142,7 +142,7 @@
   /* ------------------------------------------------------------------ */
   /* Wisch-nach-oben-Karte                                                 */
   /* ------------------------------------------------------------------ */
-  function setupSwipeReveal(cardEl, onPeek, onRelease) {
+  function setupSwipeReveal(cardEl, coverEl, onPeek, onRelease) {
     const THRESHOLD = 60;
     let dragging = false;
     let startY = 0;
@@ -150,7 +150,8 @@
     let revealed = false;
 
     function resetTransform() {
-      cardEl.style.transform = "";
+      coverEl.style.transform = "";
+      coverEl.style.transition = "transform 0.25s var(--m3-easing-emphasized)";
       cardEl.classList.remove("reveal-card--dragging");
     }
 
@@ -159,6 +160,7 @@
       startY = event.clientY;
       deltaY = 0;
       revealed = false;
+      coverEl.style.transition = "none";
       cardEl.classList.add("reveal-card--dragging");
       cardEl.setPointerCapture(event.pointerId);
     });
@@ -166,7 +168,10 @@
     cardEl.addEventListener("pointermove", (event) => {
       if (!dragging) return;
       deltaY = Math.min(0, event.clientY - startY);
-      cardEl.style.transform = `translateY(${deltaY}px)`;
+      
+      const maxDrag = -cardEl.offsetHeight + 40;
+      const moveY = Math.max(deltaY, maxDrag);
+      coverEl.style.transform = `translateY(${moveY}px)`;
 
       if (!revealed && Math.abs(deltaY) > THRESHOLD) {
         revealed = true;
@@ -229,9 +234,19 @@
     revealPlayerName.textContent = roundPlayers[currentRevealIndex];
     revealProgress.textContent = `${currentRevealIndex + 1} / ${roundPlayers.length}`;
     revealCard.classList.remove("reveal-card--revealed", "reveal-card--impostor");
-    revealCard.style.transform = "";
+    
+    const isImpostor = impostorIndices.has(currentRevealIndex);
+    revealRole.classList.toggle("reveal-card__role--impostor", isImpostor);
+    if (isImpostor) {
+      revealRole.textContent = "Du bist der Impostor!";
+      revealWord.textContent = hintWord ? `Hinweis: ${hintWord}` : "Kein Wort – hör gut zu und bluffe mit!";
+    } else {
+      revealRole.textContent = "Dein Wort:";
+      revealWord.textContent = secretWord;
+    }
+
+    revealCardBack.hidden = false;
     revealCardFront.hidden = false;
-    revealCardBack.hidden = true;
     revealNextButton.hidden = true;
     delete revealCard.dataset.peeked;
     const hint = revealCardFront.querySelector(".reveal-card__hint");
@@ -240,19 +255,9 @@
 
   function peekCurrentPlayer() {
     revealCard.classList.add("reveal-card--revealed");
-    revealCardFront.hidden = true;
-    revealCardBack.hidden = false;
-
+    
     const isImpostor = impostorIndices.has(currentRevealIndex);
-    revealRole.classList.toggle("reveal-card__role--impostor", isImpostor);
     revealCard.classList.toggle("reveal-card--impostor", isImpostor);
-    if (isImpostor) {
-      revealRole.textContent = "Du bist der Impostor!";
-      revealWord.textContent = hintWord ? `Hinweis: ${hintWord}` : "Kein Wort – hör gut zu und bluffe mit!";
-    } else {
-      revealRole.textContent = "Dein Wort:";
-      revealWord.textContent = secretWord;
-    }
 
     if (!revealCard.dataset.peeked) {
       revealCard.dataset.peeked = "true";
@@ -263,8 +268,6 @@
 
   function hideCurrentPlayer(finished) {
     revealCard.classList.remove("reveal-card--revealed", "reveal-card--impostor");
-    revealCardFront.hidden = false;
-    revealCardBack.hidden = true;
     
     if (finished || revealCard.dataset.peeked) {
       revealNextButton.hidden = false;
@@ -273,7 +276,7 @@
     }
   }
 
-  setupSwipeReveal(revealCard, peekCurrentPlayer, hideCurrentPlayer);
+  setupSwipeReveal(revealCard, revealCardFront, peekCurrentPlayer, hideCurrentPlayer);
 
   revealNextButton.addEventListener("click", () => {
     currentRevealIndex += 1;
