@@ -142,3 +142,31 @@
   color: var(--m3-on-surface-variant);
 }
 
+/* ---------- Grid-Zentrierung für Spielfeld ---------- */
+.game-play--bombe {
+  display: grid !important;
+  grid-template-rows: 1fr auto 1fr;
+  align-items: center;
+  justify-items: center;
+  height: 100%;
+  width: 100%;
+}
+
+.game-play--bombe .active-cat {
+  grid-row: 1;
+  align-self: end;
+  margin-bottom: 8px;
+}
+
+.game-play--bombe .bomb-ring {
+  grid-row: 2;
+  align-self: center;
+  justify-self: center;
+}
+
+.game-play--bombe #play-status {
+  grid-row: 3;
+  align-self: start;
+  margin-top: 16px;
+}
+
