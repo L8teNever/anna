@@ -70,6 +70,18 @@
       maxPlayers: 12,
       assets: ["/games/werbinich/werbinich.js", "/games/werbinich/werbinich.css", "/games/werbinich/categories.json"],
     },
+    {
+      id: "werwolf",
+      name: "Werwolf",
+      tag: "Party",
+      description: "Das Dorf schläft ein – wer sind die Werwölfe?",
+      detail: "Das Dorf schläft ein, die Werwölfe wählen ihr Opfer. Tagsüber diskutiert und stimmt das Dorf ab, wer verdächtig ist. Mit optionaler Seherin, Hexe, Amor und Jäger.",
+      icon: "moon",
+      color: "indigo",
+      minPlayers: 4,
+      maxPlayers: 20,
+      assets: ["/games/werwolf/werwolf.js", "/games/werwolf/werwolf.css"],
+    },
   ];
 
   root.GAMES = GAMES;

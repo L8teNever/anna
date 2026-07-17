@@ -1,0 +1,151 @@
+/**
+ * Visuals, die ausschließlich zu "Werwolf" gehören. Layout/Grundgerüst
+ * (.game-shell, .game-options-card, .reveal-stage, .reveal-card ...) kommt
+ * aus main.css, hier nur werwolf-spezifische Ergänzungen: Stepper (wie bei
+ * Impostor, aber dort nur lokal in impostor.css definiert -> hier dupliziert),
+ * Options-Hinweistext, die Rollenlisten-Wischkarte und die Nacht/Tag-Bühne.
+ */
+
+/* ---------- Stepper (Anzahl Werwölfe) ---------- */
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--m3-surface-container-high);
+  border-radius: var(--m3-shape-full);
+  padding: 2px;
+}
+
+.stepper__btn {
+  width: 40px;
+  height: 40px;
+}
+
+.stepper__value {
+  min-width: 28px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--m3-on-surface);
+}
+
+.game-option-row__hint {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--m3-on-surface-variant);
+}
+
+/* ---------- Rollen-Wischkarte (eigene Rolle ODER Werwolf-Rudel-Liste) ---------- */
+.reveal-card--list {
+  height: min(420px, 58dvh);
+}
+
+.reveal-card--list .reveal-card__face--back {
+  justify-content: flex-start;
+  padding-top: 28px;
+  overflow: hidden;
+}
+
+.identity-list {
+  width: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 4px;
+}
+
+.identity-list__item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--m3-surface-container-high);
+  border-radius: var(--m3-shape-lg);
+  text-align: left;
+}
+
+.identity-list__name {
+  font-weight: 700;
+  color: var(--m3-on-surface);
+  flex-shrink: 0;
+}
+
+.identity-list__value {
+  font-weight: 600;
+  color: var(--game-indigo);
+  text-align: right;
+}
+
+/* ---------- Nacht/Tag-Bühne ---------- */
+.werwolf-stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-width: 480px;
+  margin: 0 auto;
+  width: 100%;
+  overflow-y: auto;
+  text-align: center;
+}
+
+.werwolf-stage__icon {
+  width: 48px;
+  height: 48px;
+  color: var(--game-indigo);
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
+.werwolf-stage__status {
+  font-family: var(--m3-font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--m3-on-surface);
+}
+
+.werwolf-stage__body {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.werwolf-choice-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.werwolf-choice-list__btn[data-selected="true"] {
+  background: var(--m3-primary);
+  color: var(--m3-on-primary);
+}
+
+.werwolf-death-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.werwolf-death-list__item {
+  padding: 10px 14px;
+  background: var(--m3-surface-container-high);
+  border-radius: var(--m3-shape-lg);
+  font-weight: 600;
+}
+
+.werwolf-result-card {
+  padding: 20px;
+  border-radius: var(--m3-shape-xl);
+  background: var(--m3-surface-container);
+  border: 1px solid var(--m3-outline-variant);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}

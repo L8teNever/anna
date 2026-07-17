@@ -306,6 +306,11 @@
   color: var(--game-teal);
 }
 
+.game-card[data-color="indigo"] .m3-tag {
+  background: var(--game-indigo-container);
+  color: var(--game-indigo);
+}
+
 /* ---------- Einstellungsseite ---------- */
 .settings-section {
   margin-top: 24px;

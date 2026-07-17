@@ -115,6 +115,9 @@
       <path d="M9.5 9a2.5 2.5 0 1 1 4.2 1.8c-.9.8-1.7 1.3-1.7 2.7"/>
       <circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/>
     </symbol>
+    <symbol id="icon-moon" viewBox="0 0 24 24">
+      <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z"/>
+    </symbol>
   `;
   document.body.prepend(sprite);
 })();
