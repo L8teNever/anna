@@ -81,6 +81,43 @@
     window.location.reload();
   }
 
+  // Zweiter, vom Service-Worker-Lifecycle UNABHÄNGIGER Update-Check: holt
+  // /js/version.js roh vom Netz (cache: "no-store" + Zeitstempel-Query
+  // gegen jeglichen HTTP-/CDN-Zwischenspeicher) und vergleicht die darin
+  // stehende Versionsnummer mit der gerade laufenden. Grund: der normale
+  // SW-Update-Check (registration.update()) verlässt sich darauf, dass der
+  // Browser irgendwann einen Byte-Unterschied in sw.js selbst bemerkt –
+  // das kann in seltenen Fällen ausbleiben (z.B. wenn ein zwischengeschalteter
+  // CDN-Cache sw.js oder die importScripts()-Dateien darin ungewöhnlich
+  // lange vorhält, oder eine PWA tagelang im Hintergrund offen bleibt ohne
+  // dass der Browser von selbst nochmal nachfragt). Diese Prüfung hier
+  // umgeht das komplett: sie fragt direkt eine echte Datei ab und merkt so
+  // JEDEN Versionsunterschied, unabhängig davon, ob der SW-Mechanismus
+  // gerade mitspielt. Bei einem Fund gibt es KEINEN SKIP_WAITING-Handshake
+  // (es ist ja nicht sicher, dass überhaupt ein neuer Worker lokal bereitsteht)
+  // – stattdessen direkt der harte Reset über forceFreshReload().
+  let versionMismatchDetected = false;
+  async function checkVersionMismatch() {
+    if (versionMismatchDetected || hasReloaded || !window.APP_VERSION) return;
+    try {
+      const response = await fetch(`/js/version.js?t=${Date.now()}`, { cache: "no-store" });
+      if (!response.ok) return;
+      const text = await response.text();
+      const match = text.match(/APP_VERSION\s*=\s*["']([^"']+)["']/);
+      if (!match) return;
+      const liveVersion = match[1];
+      if (liveVersion !== window.APP_VERSION) {
+        versionMismatchDetected = true;
+        console.log(
+          `[anna] Versions-Mismatch erkannt (aktiv: ${window.APP_VERSION}, Server: ${liveVersion}).`
+        );
+        showUpdateBanner(forceFreshReload);
+      }
+    } catch (err) {
+      // Kein Netz o.ä. – der nächste reguläre Check greift ohnehin wieder.
+    }
+  }
+
   // Letzter Rettungsanker, falls der normale Update-Handshake (SKIP_WAITING
   // -> activate -> SW_ACTIVATED) aus irgendeinem Grund nicht durchläuft:
   // alles zurücksetzen statt nur zu hoffen, dass ein einfacher Reload hilft.
@@ -176,6 +213,7 @@
       // gedrosselt, teils erst nach 24 Stunden).
       lastUpdateCheck = Date.now();
       registration.update().catch(() => {});
+      checkVersionMismatch();
 
       document.addEventListener("visibilitychange", () => {
         if (document.visibilityState !== "visible") return;
@@ -183,10 +221,12 @@
         if (now - lastUpdateCheck < UPDATE_COOLDOWN_MS) return;
         lastUpdateCheck = now;
         registration.update().catch(() => {});
+        checkVersionMismatch();
       });
       setInterval(() => {
         lastUpdateCheck = Date.now();
         registration.update().catch(() => {});
+        checkVersionMismatch();
       }, UPDATE_CHECK_INTERVAL_MS);
     }).catch((err) => {
       console.warn("[anna] Service-Worker-Registrierung fehlgeschlagen:", err);

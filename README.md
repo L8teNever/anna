@@ -25,6 +25,16 @@ sich Design/Spiele/Code/Daten ändern – alles andere läuft automatisch:
 5. Zusätzlich prüft die Seite **sofort bei jedem Laden** aktiv auf Updates
    (nicht erst bei einem Sichtbarkeits-Wechsel oder nach 20 Minuten) – siehe
    Kommentare in `pwa-helper.js`.
+6. **Zweiter, unabhängiger Sicherheitsnetz-Check:** Neben dem normalen
+   Service-Worker-Update (Punkt 1) fragt die Seite bei jedem der obigen
+   Zeitpunkte zusätzlich `/js/version.js` roh vom Netz ab (`cache: "no-store"`
+   + Zeitstempel, umgeht damit jeden HTTP-/CDN-Zwischenspeicher) und
+   vergleicht die Versionsnummer darin mit der gerade laufenden. Das fängt
+   Fälle ab, in denen der normale SW-Byte-Vergleich aus irgendeinem Grund
+   nicht anschlägt (z.B. eine PWA, die tagelang im Hintergrund offen bleibt,
+   ohne dass der Browser von selbst nochmal nachfragt). Bei einem Fund geht
+   es direkt zu `forceFreshReload()` (kompletter Reset), ganz ohne auf den
+   normalen SKIP_WAITING-Handshake zu warten.
 
 Offline-Caching (das eigentliche Vorladen der ganzen App) passiert NUR für
 die installierte PWA (Standalone-Fenster), nie für einen normalen
@@ -34,6 +44,15 @@ Browser-Tab – Details dazu direkt in den Kommentaren von `sw.js`.
 Versionswechseln während der Entwicklung): Einstellungen → "Cache löschen"
 räumt manuell alles auf (`public/js/cache-tools.js`). Das sollte im
 Normalbetrieb aber dank Punkt 4 oben nicht mehr nötig sein.
+
+**Wichtig: Die installierte PWA "neu installieren" (Icon entfernen und neu
+hinzufügen) räumt NICHTS auf!** Service-Worker-Registrierung und Cache
+Storage gehören zum *Browser-Profil/Origin*, nicht zum App-Icon. Ent- und
+Wiederinstallieren entfernt nur die Verknüpfung, die zugrunde liegenden
+(evtl. veralteten) Daten bleiben exakt gleich bestehen. Der einzige Weg,
+wirklich alles zurückzusetzen, ist "Cache löschen" in den Einstellungen –
+und das funktioniert von **jedem** Fenster aus (normaler Tab reicht),
+weil beide sich dieselbe Origin-Speicherung teilen.
 
 **Bevor du hier einen echten Bug vermutest:** immer zuerst in einem
 privaten/Inkognito-Fenster testen. Das startet komplett ohne alten Cache/
