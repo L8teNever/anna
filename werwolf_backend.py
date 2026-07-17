@@ -81,6 +81,11 @@ class Player:
 class Room:
     token: str
     host_token: str
+    # Zusätzlicher 6-stelliger Code als bequeme Alternative zu QR-Code/Link
+    # (z.B. zum Vorlesen am Tisch). Bewusst schwächer als der 128-Bit-Token -
+    # deshalb nur gültig, solange die Runde noch in der Lobby ist, UND auf
+    # denselben Rate-Limiter wie /join beschränkt (siehe join_room_by_code).
+    short_code: str = ""
     created_at: float = field(default_factory=time.time)
     last_activity: float = field(default_factory=time.time)
     version: int = 0
@@ -146,6 +151,9 @@ class Room:
 LOCK = threading.Lock()
 ROOMS: dict[str, Room] = {}
 
+# 6-stelliger Code -> Raum-Token, für den bequemen Beitritt ohne QR/Link.
+_CODE_TO_TOKEN: dict[str, str] = {}
+
 # IP -> Liste von Timestamps (nur für rate-limited Endpunkte)
 _RATE_BUCKETS: dict[str, list[float]] = {}
 
@@ -164,11 +172,23 @@ def _cleanup_expired_locked():
     now = time.time()
     expired = [t for t, r in ROOMS.items() if now - r.last_activity > ROOM_TTL_SECONDS]
     for t in expired:
-        del ROOMS[t]
+        _forget_room_locked(t)
+
+
+def _forget_room_locked(token: str):
+    """Muss unter LOCK aufgerufen werden. Räumt einen Raum UND seinen
+    6-stelligen Code-Eintrag weg (sonst bliebe der Code auf ewig belegt)."""
+    room = ROOMS.pop(token, None)
+    if room and room.short_code:
+        _CODE_TO_TOKEN.pop(room.short_code, None)
 
 
 def _make_token() -> str:
     return secrets.token_urlsafe(16)
+
+
+def _make_short_code() -> str:
+    return f"{secrets.randbelow(1_000_000):06d}"
 
 
 def _shuffle(items: list):
@@ -361,7 +381,7 @@ def _get_room(token: str) -> Room:
     if room is None:
         raise ApiError(404, "Unbekannter oder abgelaufener Raum")
     if time.time() - room.last_activity > ROOM_TTL_SECONDS:
-        del ROOMS[token]
+        _forget_room_locked(token)
         raise ApiError(404, "Unbekannter oder abgelaufener Raum")
     return room
 
@@ -373,15 +393,20 @@ def create_room(body: dict, client_ip: str) -> dict:
         while token in ROOMS:
             token = _make_token()
         host_token = _make_token()
-        room = Room(token=token, host_token=host_token)
+        code = _make_short_code()
+        while code in _CODE_TO_TOKEN:
+            code = _make_short_code()
+        room = Room(token=token, host_token=host_token, short_code=code)
         host_name = str(body.get("hostName") or "Host").strip()[:30] or "Host"
         host = Player(player_id=str(uuid.uuid4()), player_token=_make_token(), name=host_name, is_host=True)
         room.players[host.player_id] = host
         room.touch()
         ROOMS[token] = room
+        _CODE_TO_TOKEN[code] = token
         return {
             "roomToken": room.token,
             "hostToken": room.host_token,
+            "shortCode": room.short_code,
             "playerId": host.player_id,
             "playerToken": host.player_token,
         }
@@ -405,7 +430,22 @@ def join_room(token: str, body: dict, client_ip: str) -> dict:
         player = Player(player_id=str(uuid.uuid4()), player_token=_make_token(), name=name)
         room.players[player.player_id] = player
         room.touch()
-        return {"playerId": player.player_id, "playerToken": player.player_token}
+        return {"playerId": player.player_id, "playerToken": player.player_token, "roomToken": room.token}
+
+
+def join_room_by_code(body: dict, client_ip: str) -> dict:
+    """Bequemer Beitritt über den 6-stelligen Code statt QR-Code/Link (z.B.
+    zum Vorlesen am Tisch). Sucht nur kurz den Raum-Token zum Code, die
+    eigentliche Beitritts-Logik (Rate-Limit, Namensprüfung, Lobby-Check
+    usw.) läuft komplett in join_room - kein doppelter LOCK-Erwerb, da hier
+    nur kurz gelockt und wieder freigegeben wird, bevor join_room selbst
+    seinen eigenen LOCK nimmt."""
+    code = str(body.get("code") or "").strip()
+    with LOCK:
+        token = _CODE_TO_TOKEN.get(code)
+    if not token:
+        raise ApiError(404, "Code nicht gefunden - bitte prüfen")
+    return join_room(token, body, client_ip)
 
 
 def rejoin_room(token: str, body: dict, client_ip: str) -> dict:
@@ -581,7 +621,7 @@ def end_room(token: str, body: dict, client_ip: str) -> dict:
     with LOCK:
         room = _get_room(token)
         _require_host(room, body)
-        del ROOMS[token]
+        _forget_room_locked(token)
         return {"ok": True}
 
 
@@ -602,6 +642,30 @@ def leave_room(token: str, body: dict, client_ip: str) -> dict:
             return {"ok": True}
         player.left = True
         player.connected = False
+        _recheck_after_leave(room)
+        room.touch()
+        return {"ok": True}
+
+
+def kick_player(token: str, body: dict, client_ip: str) -> dict:
+    """Host-Aktion: eine bestimmte Person aus der Runde werfen - technisch
+    dasselbe wie ein freiwilliges Verlassen (siehe leave_room), nur vom
+    Host für jemand anderen ausgelöst."""
+    with LOCK:
+        room = _get_room(token)
+        _require_host(room, body)
+        target_id = str(body.get("targetPlayerId") or "")
+        target = room.players.get(target_id)
+        if target is None:
+            raise ApiError(404, "Unbekannte Person")
+        if target.is_host:
+            raise ApiError(400, "Der Host kann sich nicht selbst rauswerfen")
+        if room.phase == "lobby":
+            del room.players[target_id]
+            room.touch()
+            return {"ok": True}
+        target.left = True
+        target.connected = False
         _recheck_after_leave(room)
         room.touch()
         return {"ok": True}
@@ -679,6 +743,7 @@ def snapshot_for(room: Room, player: Player) -> dict:
         "winner": room.winner,
         "readyGate": ready_gate,
         "announceAllDevices": room.announce_all_devices,
+        "shortCode": room.short_code if room.phase == "lobby" else None,
         "minPlayers": MIN_PLAYERS,
         "maxPlayers": MAX_PLAYERS,
     }
@@ -708,6 +773,7 @@ _POST_HANDLERS = {
     "force-advance": force_advance,
     "end": end_room,
     "leave": leave_room,
+    "kick": kick_player,
     "reset": reset_room,
 }
 
@@ -717,6 +783,8 @@ def handle_post(segments: list[str], body: dict, client_ip: str) -> dict:
     ['rooms', '<token>', 'join']."""
     if segments == ["rooms"]:
         return create_room(body, client_ip)
+    if segments == ["join-by-code"]:
+        return join_room_by_code(body, client_ip)
     if len(segments) == 3 and segments[0] == "rooms":
         token, action = segments[1], segments[2]
         handler = _POST_HANDLERS.get(action)

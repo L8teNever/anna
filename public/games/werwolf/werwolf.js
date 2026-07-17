@@ -96,6 +96,13 @@
   const werwolfQrWrap = document.getElementById("werwolf-qr-wrap");
   const werwolfJoinLinkInput = document.getElementById("werwolf-join-link-input");
   const werwolfCopyLinkButton = document.getElementById("werwolf-copy-link-button");
+  const werwolfShortCodeText = document.getElementById("werwolf-short-code-text");
+  const onlineJoinByCodeButton = document.getElementById("online-join-by-code-button");
+  const onlineCodeJoinForm = document.getElementById("online-code-join-form");
+  const onlineCodeInput = document.getElementById("online-code-input");
+  const onlineCodeNameInput = document.getElementById("online-code-name-input");
+  const onlineCodeJoinSubmitButton = document.getElementById("online-code-join-submit-button");
+  const onlineCodeJoinError = document.getElementById("online-code-join-error");
   const onlineStatusText = document.getElementById("online-status-text");
   const onlineBody = document.getElementById("online-body");
   const onlineActions = document.getElementById("online-actions");
@@ -193,6 +200,7 @@
     openPlayerSelectBtn.hidden = isOnline;
     onlineHostNameRow.hidden = !isOnline;
     onlineAnnounceRow.hidden = !isOnline;
+    onlineJoinByCodeButton.hidden = !isOnline;
     validationWarning.hidden = isOnline || validationWarning.hidden;
     startButton.innerHTML = isOnline
       ? `<svg class="m3-icon" style="width: 18px; height: 18px"><use href="#icon-users"></use></svg> Online-Runde erstellen`
@@ -751,6 +759,11 @@
   /* ------------------------------------------------------------------ */
   backButton.addEventListener("click", () => {
     if ((!onlineLobbyView.hidden || !onlinePlayView.hidden) && setupView.hidden) {
+      if (!onlineJoinForm.hidden || !onlineCodeJoinForm.hidden) {
+        resetOnlineState();
+        ViewNav.transition(onlineLobbyView, setupView);
+        return;
+      }
       ConfirmDialog.show({
         title: onlineIsHost ? "Runde für alle beenden?" : "Online-Runde verlassen?",
         message: onlineIsHost
@@ -795,6 +808,10 @@
     if (!currentActive) return true;
     if (currentActive.id === "view-reveal" && mode === "online") return true; // eigener Reveal, kein Gruppenzustand
     if (["view-reveal", "play-view", "view-online-lobby", "view-online-play"].includes(currentActive.id)) {
+      if (!onlineJoinForm.hidden || !onlineCodeJoinForm.hidden) {
+        resetOnlineState();
+        return true;
+      }
       const leaving = confirm("Möchtest du das laufende Spiel wirklich beenden?");
       if (leaving && ["view-online-lobby", "view-online-play"].includes(currentActive.id)) {
         leaveOrEndOnlineRoom();
@@ -882,6 +899,8 @@
     creatingOnlineRoom = true;
     startButton.disabled = true;
 
+    resetOnlineState();
+
     const hostName = onlineHostNameInput.value.trim() || "Host";
     let created;
     try {
@@ -949,6 +968,7 @@
 
   /* ---------------- Beitreten über Join-Link ---------------- */
   function enterAsJoiner(token) {
+    resetOnlineState();
     mode = "online";
     onlineRoomToken = token;
     showOnlineView(onlineLobbyView);
@@ -1007,6 +1027,66 @@
     }
   });
 
+  /* ---------------- Beitreten über 6-stelligen Code ---------------- */
+  onlineJoinByCodeButton.addEventListener("click", () => {
+    resetOnlineState();
+    showOnlineView(onlineLobbyView);
+    onlineHostPanel.hidden = true;
+    onlineJoinForm.hidden = true;
+    onlinePlayerListPanel.hidden = true;
+    onlineCodeJoinForm.hidden = false;
+    onlineCodeInput.focus();
+  });
+
+  onlineCodeInput.addEventListener("input", () => { onlineCodeJoinError.hidden = true; });
+  onlineCodeNameInput.addEventListener("input", () => { onlineCodeJoinError.hidden = true; });
+
+  onlineCodeJoinSubmitButton.addEventListener("click", async () => {
+    const code = onlineCodeInput.value.trim();
+    const name = onlineCodeNameInput.value.trim();
+    onlineCodeJoinError.hidden = true;
+    if (!/^\d{6}$/.test(code)) {
+      onlineCodeJoinError.textContent = "Bitte den 6-stelligen Code eingeben";
+      onlineCodeJoinError.hidden = false;
+      return;
+    }
+    if (!name) {
+      onlineCodeJoinError.textContent = "Bitte einen Namen eingeben";
+      onlineCodeJoinError.hidden = false;
+      return;
+    }
+    try {
+      const r = await apiPost("/join-by-code", { code, name });
+      onlineRoomToken = r.roomToken;
+      onlinePlayerToken = r.playerToken;
+      onlineIsHost = false;
+      saveSession(onlineRoomToken, { playerToken: onlinePlayerToken, isHost: false });
+      onlineCodeJoinForm.hidden = true;
+      onlinePlayerListPanel.hidden = false;
+      startOnlineStream();
+    } catch (err) {
+      onlineCodeJoinError.textContent = err.message;
+      onlineCodeJoinError.hidden = false;
+    }
+  });
+
+  function resetOnlineState() {
+    stopOnlineStream();
+    onlineRoomToken = null;
+    onlineHostToken = null;
+    onlinePlayerToken = null;
+    onlineIsHost = false;
+    onlineLatestSnapshot = null;
+    onlineRoleRevealShown = false;
+    onlineRoleAcked = false;
+    onlineLastNarrated = "";
+    onlinePrivateResultPending = false;
+    onlineJoinForm.hidden = true;
+    onlineCodeJoinForm.hidden = true;
+    onlinePlayerListPanel.hidden = true;
+    onlineHostPanel.hidden = true;
+  }
+
   /* ---------------- Live-Stream (SSE) ---------------- */
   function stopOnlineStream() {
     if (onlineEventSource) {
@@ -1036,6 +1116,15 @@
 
   /* ---------------- Lobby-Ansicht rendern ---------------- */
   function renderOnlineSnapshot(snapshot) {
+    const me = snapshot.players.find((p) => p.isYou);
+    if (me && me.left) {
+      Toast.show("Du wurdest aus der Runde geworfen", "alert-triangle");
+      clearSession(onlineRoomToken);
+      stopOnlineStream();
+      window.location.href = "/";
+      return;
+    }
+
     if (snapshot.phase === "lobby") {
       onlineRoleRevealShown = false;
       onlineRoleAcked = false;
@@ -1043,15 +1132,30 @@
       onlinePrivateResultPending = false;
       if (onlineLobbyView.hidden) {
         showOnlineView(onlineLobbyView);
-        onlineHostPanel.hidden = !snapshot.isHost;
-        onlineJoinForm.hidden = true;
-        onlinePlayerListPanel.hidden = false;
-        if (snapshot.isHost) renderQrAndLink(onlineRoomToken);
+      }
+      onlineHostPanel.hidden = !snapshot.isHost;
+      onlineJoinForm.hidden = true;
+      onlinePlayerListPanel.hidden = false;
+      if (snapshot.isHost) {
+        renderQrAndLink(onlineRoomToken);
+      }
+      if (snapshot.isHost && snapshot.shortCode) {
+        werwolfShortCodeText.textContent = snapshot.shortCode;
       }
       onlinePlayerCount.textContent = String(snapshot.players.length);
-      onlinePlayerList.innerHTML = snapshot.players.map((p) => `
-        <div class="werwolf-death-list__item">${escapeHtml(p.name)}${p.isYou ? " (du)" : ""}${p.isHost ? " · Host" : ""}</div>
-      `).join("");
+      onlinePlayerList.innerHTML = snapshot.players.map((p) => {
+        const kickBtn = (snapshot.isHost && !p.isHost)
+          ? `<button type="button" class="m3-icon-button identity-list__kick-button" data-kick-id="${p.playerId}" aria-label="${escapeHtml(p.name)} rauskicken" title="${escapeHtml(p.name)} rauskicken">
+               <svg class="m3-icon" style="width:16px; height:16px"><use href="#icon-close"></use></svg>
+             </button>`
+          : "";
+        return `
+          <div class="identity-list__item" style="align-items: center;">
+            <span class="identity-list__name">${escapeHtml(p.name)}${p.isYou ? " (du)" : ""}${p.isHost ? " · Host" : ""}</span>
+            ${kickBtn}
+          </div>
+        `;
+      }).join("");
       onlineWaitingText.hidden = snapshot.isHost;
       onlineLobbyActions.hidden = !snapshot.isHost;
       if (snapshot.isHost) {
@@ -1370,6 +1474,25 @@
     } catch (err) {
       Toast.show(err.message, "alert-triangle");
     }
+  });
+
+  onlinePlayerList.addEventListener("click", async (event) => {
+    const btn = event.target.closest("[data-kick-id]");
+    if (!btn) return;
+    const targetPlayerId = btn.dataset.kickId;
+    const targetName = onlineLatestSnapshot?.players?.find((p) => p.playerId === targetPlayerId)?.name || "Spieler";
+    ConfirmDialog.show({
+      title: "Spieler rauskicken?",
+      message: `Möchtest du ${targetName} wirklich aus der Runde werfen?`,
+      confirmLabel: "Rauswerfen",
+      onConfirm: async () => {
+        try {
+          await apiPost(`/rooms/${onlineRoomToken}/kick`, { hostToken: onlineHostToken, targetPlayerId });
+        } catch (err) {
+          Toast.show(err.message, "alert-triangle");
+        }
+      },
+    });
   });
 
   onlineRestartButton.addEventListener("click", async () => {

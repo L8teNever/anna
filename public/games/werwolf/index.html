@@ -140,6 +140,9 @@
         <button type="button" class="m3-button m3-button--filled" id="start-button">
           <svg class="m3-icon" style="width: 18px; height: 18px"><use href="#icon-play"></use></svg> Runde starten
         </button>
+        <button type="button" class="m3-button m3-button--text" id="online-join-by-code-button" hidden style="margin-top: 8px">
+          Mit Code beitreten
+        </button>
       </div>
     </section>
 
@@ -218,6 +221,8 @@
               <svg class="m3-icon"><use href="#icon-check"></use></svg>
             </button>
           </div>
+          <p class="m3-body" style="text-align: center; margin-top: 8px">oder Code zum Vorlesen:</p>
+          <p class="werwolf-short-code" id="werwolf-short-code-text">------</p>
         </div>
 
         <div id="online-join-form" hidden>
@@ -225,6 +230,14 @@
           <input type="text" id="online-join-name-input" class="m3-text-input" placeholder="Dein Name" maxlength="30" style="width: 100%" />
           <button type="button" class="m3-button m3-button--filled" id="online-join-submit-button" style="width: 100%; margin-top: 12px">Beitreten</button>
           <p class="m3-body" id="online-join-error" style="color: var(--m3-error); text-align: center" hidden></p>
+        </div>
+
+        <div id="online-code-join-form" hidden>
+          <p class="m3-title" style="text-align: center">Mit Code beitreten</p>
+          <input type="text" id="online-code-input" class="m3-text-input werwolf-code-input" placeholder="000000" maxlength="6" inputmode="numeric" pattern="[0-9]*" />
+          <input type="text" id="online-code-name-input" class="m3-text-input" placeholder="Dein Name" maxlength="30" style="width: 100%; margin-top: 8px" />
+          <button type="button" class="m3-button m3-button--filled" id="online-code-join-submit-button" style="width: 100%; margin-top: 12px">Beitreten</button>
+          <p class="m3-body" id="online-code-join-error" style="color: var(--m3-error); text-align: center" hidden></p>
         </div>
 
         <div id="online-player-list-panel" hidden>
