@@ -110,6 +110,11 @@
     <symbol id="icon-shape-star" viewBox="0 0 24 24">
       <path d="M12 2.5l2.6 6.4 6.9.5-5.3 4.4 1.8 6.7L12 16.9 5.9 20.5l1.8-6.7-5.3-4.4 6.9-.5Z"/>
     </symbol>
+    <symbol id="icon-question" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10"/>
+      <path d="M9.5 9a2.5 2.5 0 1 1 4.2 1.8c-.9.8-1.7 1.3-1.7 2.7"/>
+      <circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/>
+    </symbol>
   `;
   document.body.prepend(sprite);
 })();

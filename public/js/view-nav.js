@@ -4,11 +4,12 @@
  * des System-Zurück-Buttons auf Android und iOS.
  *
  * URL-Schema:
- *   /bombe                → setup-view     (Standard)
- *   /bombe/kategorien     → view-category-select
- *   /bombe/spieler        → view-player-select
- *   /bombe/spiel          → play-view
- *   /impostor/aufdecken   → view-reveal
+ *   /bombe                  → setup-view     (Standard)
+ *   /bombe/kategorien       → view-category-select
+ *   /bombe/spieler          → view-player-select
+ *   /bombe/spiel            → play-view
+ *   /impostor/aufdecken     → view-reveal
+ *   /werbinich/nachschlagen → view-lookup
  */
 (function (root) {
   // View-ID → URL-Segment
@@ -18,6 +19,7 @@
     "view-player-select":   "spieler",
     "play-view":            "spiel",
     "view-reveal":          "aufdecken",
+    "view-lookup":          "nachschlagen",
   };
 
   // URL-Segment → View-ID

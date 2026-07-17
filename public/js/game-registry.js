@@ -58,6 +58,18 @@
       maxPlayers: 20,
       assets: ["/games/shapes/shapes.js", "/games/shapes/shapes.css"],
     },
+    {
+      id: "werbinich",
+      name: "Wer bin ich?",
+      tag: "Rätsel",
+      description: "Jeder kennt deine Identität – nur du nicht. Errate sie!",
+      detail: "Jede Person bekommt eine geheime Identität – nur sieht sie NICHT die eigene, sondern die aller anderen. Stellt reihum Ja/Nein-Fragen und findet heraus, wer oder was ihr seid!",
+      icon: "question",
+      color: "teal",
+      minPlayers: 3,
+      maxPlayers: 12,
+      assets: ["/games/werbinich/werbinich.js", "/games/werbinich/werbinich.css", "/games/werbinich/categories.json"],
+    },
   ];
 
   root.GAMES = GAMES;

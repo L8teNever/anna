@@ -1,0 +1,93 @@
+[
+  {
+    "id": "figuren",
+    "label": "Promis & Figuren",
+    "icon": "🎭",
+    "words": [
+      "Albert Einstein",
+      "Sherlock Holmes",
+      "Cleopatra",
+      "Dracula",
+      "Batman",
+      "Wonder Woman",
+      "Harry Potter",
+      "Darth Vader",
+      "Pippi Langstrumpf",
+      "Robin Hood",
+      "Zorro",
+      "James Bond",
+      "Yoda",
+      "Homer Simpson",
+      "Shrek",
+      "Mickey Mouse",
+      "Julius Caesar",
+      "Aschenputtel",
+      "Frankensteins Monster",
+      "Superman"
+    ]
+  },
+  {
+    "id": "tiere",
+    "label": "Tiere",
+    "icon": "🐾",
+    "words": [
+      "Löwe",
+      "Elefant",
+      "Pinguin",
+      "Hai",
+      "Adler",
+      "Fuchs",
+      "Panda",
+      "Krake",
+      "Flamingo",
+      "Nashorn",
+      "Wolf",
+      "Eule",
+      "Faultier",
+      "Känguru",
+      "Delfin"
+    ]
+  },
+  {
+    "id": "gegenstaende",
+    "label": "Gegenstände",
+    "icon": "📦",
+    "words": [
+      "Staubsauger",
+      "Kühlschrank",
+      "Regenschirm",
+      "Zahnbürste",
+      "Wecker",
+      "Fahrrad",
+      "Kaffeemaschine",
+      "Handtasche",
+      "Kopfhörer",
+      "Toaster",
+      "Taschenlampe",
+      "Rucksack",
+      "Spiegel",
+      "Feuerzeug"
+    ]
+  },
+  {
+    "id": "berufe",
+    "label": "Berufe & Rollen",
+    "icon": "💼",
+    "words": [
+      "Feuerwehrmann",
+      "Astronautin",
+      "Pirat",
+      "Detektivin",
+      "Zauberer",
+      "Koch",
+      "Ritter",
+      "Cowboy",
+      "Superheldin",
+      "Clown",
+      "Zeitreisender",
+      "Geheimagentin",
+      "Lehrer",
+      "Königin"
+    ]
+  }
+]

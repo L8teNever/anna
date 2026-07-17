@@ -81,6 +81,8 @@
   --game-green-container: rgba(183, 236, 176, 0.16);
   --game-orange: #ffb787;
   --game-orange-container: rgba(255, 183, 135, 0.16);
+  --game-teal: #80d8d0;
+  --game-teal-container: rgba(128, 216, 208, 0.16);
 }
 
 :root[data-theme="light"] {
@@ -130,6 +132,8 @@
   --game-green-container: #d7f8c3;
   --game-orange: #9a4d0c;
   --game-orange-container: #ffdcc2;
+  --game-teal: #146c64;
+  --game-teal-container: #b6ece4;
 }
 
 @media (prefers-color-scheme: light) {

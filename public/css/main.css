@@ -301,6 +301,11 @@
   color: var(--game-orange);
 }
 
+.game-card[data-color="teal"] .m3-tag {
+  background: var(--game-teal-container);
+  color: var(--game-teal);
+}
+
 /* ---------- Einstellungsseite ---------- */
 .settings-section {
   margin-top: 24px;

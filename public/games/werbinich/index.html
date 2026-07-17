@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta name="cf-worker-bypass" content="true" />
+  <meta charset="utf-8" />
+  <meta name="cf-cache-bust" content="true" />
+  <script>
+    (function () {
+      try {
+        var s = JSON.parse(localStorage.getItem("anna:settings") || "{}");
+        if (s.theme === "light" || s.theme === "dark") document.documentElement.dataset.theme = s.theme;
+      } catch (e) {}
+    })();
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f1014" />
+  <title>Wer bin ich? – Anna</title>
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" href="/assets/icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/material.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/games/werbinich/werbinich.css" />
+</head>
+<body>
+  <script src="/js/icons.js"></script>
+  <div class="game-shell">
+    <header class="game-topbar" id="game-topbar">
+      <button class="m3-icon-button" id="back-button" aria-label="Zurück" title="Zurück">
+        <svg class="m3-icon"><use href="#icon-arrow-back"></use></svg>
+      </button>
+      <h1 class="game-topbar__title">
+        <svg class="m3-icon" style="vertical-align: -5px"><use href="#icon-question"></use></svg>
+        Wer bin ich?
+      </h1>
+      <a href="https://legal.kulbarts.com/" target="_blank" class="m3-label" style="text-decoration: none; color: var(--m3-on-surface-variant); margin-left: auto;">Rechtliches</a>
+    </header>
+
+    <!-- ---------- Setup-Ansicht ---------- -->
+    <section class="game-view app-view" id="setup-view">
+      <div class="game-detail-card">
+        <div class="game-detail-card__top">
+          <span class="m3-tag" style="background: var(--game-teal-container); color: var(--game-teal)">Rätsel</span>
+          <span class="game-detail-card__limit">3–12 Spieler</span>
+        </div>
+        <p class="m3-body">
+          Jede Person bekommt eine geheime Identität – nur sieht sie NICHT die eigene, sondern die aller
+          anderen. Stellt reihum Ja/Nein-Fragen und findet heraus, wer oder was ihr seid!
+        </p>
+      </div>
+
+      <button type="button" class="picker-launch-btn" id="open-category-select-button">
+        <div class="picker-launch-btn__left">
+          <div class="picker-launch-btn__icon"><svg class="m3-icon"><use href="#icon-grid"></use></svg></div>
+          <div>
+            <p class="picker-launch-btn__title">Identitäten-Kategorien</p>
+            <p class="picker-launch-btn__hint" id="category-select-summary">Alle Kategorien aktiv</p>
+          </div>
+        </div>
+        <svg class="m3-icon"><use href="#icon-chevron-right"></use></svg>
+      </button>
+
+      <button type="button" class="picker-launch-btn" id="open-player-select-button">
+        <div class="picker-launch-btn__left">
+          <div class="picker-launch-btn__icon"><svg class="m3-icon"><use href="#icon-users"></use></svg></div>
+          <div>
+            <p class="picker-launch-btn__title">Mitspieler auswählen</p>
+            <p class="picker-launch-btn__hint" id="player-select-summary">0 Spieler ausgewählt</p>
+          </div>
+        </div>
+        <svg class="m3-icon"><use href="#icon-chevron-right"></use></svg>
+      </button>
+
+      <div class="validation-warning" id="validation-warning" hidden>
+        <svg class="m3-icon" style="width: 16px; height: 16px"><use href="#icon-alert-triangle"></use></svg>
+        <span id="validation-warning-text">Für dieses Spiel werden 3–12 Mitspieler benötigt.</span>
+      </div>
+
+      <div class="game-bottom-bar">
+        <button type="button" class="m3-button m3-button--filled" id="start-button">
+          <svg class="m3-icon" style="width: 18px; height: 18px"><use href="#icon-play"></use></svg> Runde starten
+        </button>
+      </div>
+    </section>
+
+    <!-- ---------- Kategorie-Auswahl (Vollbild) ---------- -->
+    <section class="game-view app-view" id="view-category-select" data-hide-topbar hidden>
+      <header class="picker-view-header">
+        <div class="picker-view-header__left">
+          <button type="button" class="m3-icon-button" id="category-select-back-button" aria-label="Zurück">
+            <svg class="m3-icon"><use href="#icon-arrow-back"></use></svg>
+          </button>
+          <span class="picker-view-header__title">Identitäten-Kategorien</span>
+        </div>
+        <div class="picker-view-header__bulk">
+          <button type="button" class="picker-view-header__bulk-btn picker-view-header__bulk-btn--primary" id="category-bulk-all">Alle</button>
+          <div class="picker-view-header__divider"></div>
+          <button type="button" class="picker-view-header__bulk-btn" id="category-bulk-none">Keine</button>
+        </div>
+      </header>
+
+      <div id="categories-pool" style="display: flex; flex-direction: column; gap: 8px"></div>
+
+      <div class="game-bottom-bar">
+        <button type="button" class="m3-button m3-button--tonal" id="category-select-confirm-button">
+          <svg class="m3-icon"><use href="#icon-check"></use></svg> Auswahl bestätigen
+        </button>
+      </div>
+    </section>
+
+    <!-- ---------- Mitspieler-Auswahl (Vollbild) ---------- -->
+    <section class="game-view app-view" id="view-player-select" data-hide-topbar hidden>
+      <header class="picker-view-header">
+        <div class="picker-view-header__left">
+          <button type="button" class="m3-icon-button" id="player-select-back-button" aria-label="Zurück">
+            <svg class="m3-icon"><use href="#icon-arrow-back"></use></svg>
+          </button>
+          <span class="picker-view-header__title">Mitspieler</span>
+        </div>
+        <div class="picker-view-header__bulk">
+          <button type="button" class="picker-view-header__bulk-btn picker-view-header__bulk-btn--primary" id="player-bulk-all">Alle</button>
+          <div class="picker-view-header__divider"></div>
+          <button type="button" class="picker-view-header__bulk-btn" id="player-bulk-none">Keine</button>
+        </div>
+      </header>
+
+      <div class="picker-search-create">
+        <svg class="m3-icon" style="width: 18px; height: 18px; color: var(--m3-on-surface-variant)"><use href="#icon-search"></use></svg>
+        <input type="text" id="combined-player-input" placeholder="Spieler suchen oder eingeben zum Erstellen…" />
+        <button type="button" class="picker-search-create__add" id="create-player-inline-btn" title="Spieler hinzufügen">
+          <svg class="m3-icon" style="width: 18px; height: 18px"><use href="#icon-add"></use></svg>
+        </button>
+      </div>
+
+      <div class="picker-list-toolbar">
+        <span>Spielerpool</span>
+        <span class="picker-list-toolbar__count" id="player-active-counter">Aktiv: 0</span>
+      </div>
+
+      <div class="player-picker__list" id="select-players-scroll"></div>
+
+      <div class="game-bottom-bar">
+        <button type="button" class="m3-button m3-button--tonal" id="player-select-confirm-button">
+          <svg class="m3-icon"><use href="#icon-check"></use></svg> Auswahl bestätigen
+        </button>
+      </div>
+    </section>
+
+    <!-- ---------- Identitäts-Weitergabe: Jeder muss hochwischen (Vollbild) ---------- -->
+    <section class="game-view app-view" id="view-reveal" hidden>
+      <div class="reveal-stage">
+        <p class="reveal-stage__label">Gib das Handy weiter an</p>
+        <h2 class="reveal-stage__name" id="reveal-player-name">–</h2>
+        <p class="reveal-stage__progress" id="reveal-progress">1 / 1</p>
+
+        <div class="reveal-card reveal-card--list" id="reveal-card">
+          <div class="reveal-card__face reveal-card__face--front" id="reveal-card-front">
+            <svg class="m3-icon reveal-card__chevron"><use href="#icon-chevron-up"></use></svg>
+            <p class="reveal-card__hint">Nach oben wischen und halten,<br />um zu sehen, wer die anderen sind</p>
+          </div>
+          <div class="reveal-card__face reveal-card__face--back" id="reveal-card-back" hidden>
+            <p class="reveal-card__role">Die anderen sind:</p>
+            <div class="identity-list" id="reveal-identity-list"></div>
+          </div>
+        </div>
+
+        <button type="button" class="m3-button m3-button--filled" id="reveal-next-button" hidden>
+          Verstanden, weitergeben
+        </button>
+      </div>
+    </section>
+
+    <!-- ---------- Spiel läuft (verbale Runde) ---------- -->
+    <section class="game-view app-view" id="play-view" hidden>
+      <div class="game-play">
+        <svg class="m3-icon" style="width: 64px; height: 64px; color: var(--m3-primary); opacity: 0.6"><use href="#icon-question"></use></svg>
+        <p class="m3-headline">Alle kennen die anderen – nur nicht sich selbst!</p>
+        <p class="m3-body" style="text-align: center; max-width: 320px">
+          Stellt reihum Ja/Nein-Fragen, um eure eigene Identität zu erraten. Wer's zuerst weiß, hat gewonnen.
+        </p>
+      </div>
+      <div class="game-bottom-bar">
+        <button type="button" class="m3-button m3-button--tonal" id="open-lookup-button">
+          <svg class="m3-icon" style="width: 18px; height: 18px"><use href="#icon-search"></use></svg> Nachschlagen
+        </button>
+        <button type="button" class="m3-button m3-button--filled" id="restart-button" style="margin-top: 8px">Neue Runde</button>
+        <button type="button" class="m3-button m3-button--text" id="exit-button" style="margin-top: 8px">
+          Zur Startseite
+        </button>
+      </div>
+    </section>
+
+    <!-- ---------- Nachschlagen: falls jemand vergessen hat, wer die anderen sind ---------- -->
+    <section class="game-view app-view" id="view-lookup" hidden>
+      <div class="lookup-stage" id="lookup-select-stage">
+        <p class="m3-title" style="text-align: center">Wer schaut nach?</p>
+        <p class="m3-body" style="text-align: center">Wähle deinen eigenen Namen – du siehst dann alle anderen, aber nicht dich selbst.</p>
+        <div class="lookup-player-list" id="lookup-player-list"></div>
+      </div>
+      <div class="lookup-stage" id="lookup-result-stage" hidden>
+        <p class="m3-title" style="text-align: center">Die anderen sind:</p>
+        <div class="identity-list" id="lookup-identity-list"></div>
+        <button type="button" class="m3-button m3-button--tonal" id="lookup-change-player-button">Andere Person wählen</button>
+      </div>
+      <div class="game-bottom-bar">
+        <button type="button" class="m3-button m3-button--text" id="lookup-close-button">Zurück zur Runde</button>
+      </div>
+    </section>
+  </div>
+
+  <script src="/js/storage.js"></script>
+  <script src="/js/game-registry.js"></script>
+  <script src="/js/toast.js"></script>
+  <script src="/js/ripple.js"></script>
+  <script src="/js/view-nav.js"></script>
+  <script src="/js/confirm-dialog.js"></script>
+  <script src="/js/player-picker.js"></script>
+  <script src="/js/category-picker.js"></script>
+  <script src="/js/audio.js"></script>
+  <script src="/js/touch-fixes.js"></script>
+  <script src="/games/werbinich/werbinich.js"></script>
+  <script src="/js/pwa-helper.js"></script>
+</body>
+</html>
