@@ -30,7 +30,8 @@
       "Bash(docker --version)",
       "Bash(powershell -NoProfile -Command \"Get-CimInstance Win32_Process -Filter 'ProcessId=7844' | Select-Object CommandLine\")",
       "Bash(powershell -NoProfile -Command \"Stop-Process -Id 7844 -Force -ErrorAction SilentlyContinue\")",
-      "Bash(python -m unittest test_werwolf_backend -v)"
+      "Bash(python -m unittest test_werwolf_backend -v)",
+      "Bash(node --check \"c:/Users/Docker/Videos/Anna/public/games/werwolf/werwolf.js\")"
     ]
   }
 }

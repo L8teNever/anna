@@ -102,6 +102,12 @@
 
   const playerPicker = PlayerPicker.create();
 
+  // Muss vor updatePlayerSummary() (siehe unten, wird schon beim Laden
+  // einmal aufgerufen) initialisiert sein, sonst ReferenceError durch die
+  // "temporal dead zone" von let - und JEDE Event-Listener-Registrierung
+  // danach im Skript würde nie ausgeführt.
+  let mode = "local";
+
   /* ------------------------------------------------------------------ */
   /* Einstellungen laden / speichern                                      */
   /* ------------------------------------------------------------------ */
@@ -179,8 +185,6 @@
   /* ------------------------------------------------------------------ */
   /* Modus-Auswahl (Einzelgerät / Online)                                  */
   /* ------------------------------------------------------------------ */
-  let mode = "local";
-
   function updateModeUI() {
     const isOnline = mode === "online";
     openPlayerSelectBtn.hidden = isOnline;
