@@ -855,7 +855,16 @@
   }
 
   /* ---------------- Host: Raum erstellen ---------------- */
+  let creatingOnlineRoom = false;
+
   async function createOnlineRoom() {
+    // Schützt gegen Doppelklick/ungeduldiges Mehrfachtippen, während die
+    // erste Anfrage noch läuft - sonst könnten zwei Räume gleichzeitig
+    // entstehen und Anzeige/gespeicherter Token durcheinandergeraten.
+    if (creatingOnlineRoom) return;
+    creatingOnlineRoom = true;
+    startButton.disabled = true;
+
     const hostName = onlineHostNameInput.value.trim() || "Host";
     let created;
     try {
@@ -863,8 +872,12 @@
       await apiPost(`/rooms/${created.roomToken}/config`, { hostToken: created.hostToken, roleConfig: { ...roleConfig } });
     } catch (err) {
       Toast.show(err.message, "alert-triangle");
+      creatingOnlineRoom = false;
+      startButton.disabled = false;
       return;
     }
+    creatingOnlineRoom = false;
+    startButton.disabled = false;
     onlineRoomToken = created.roomToken;
     onlineHostToken = created.hostToken;
     onlinePlayerToken = created.playerToken;

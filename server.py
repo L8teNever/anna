@@ -133,6 +133,7 @@ class AnnaRequestHandler(SimpleHTTPRequestHandler):
             result = werwolf_backend.handle_post(segments, body, self.client_address[0])
             self._send_json(HTTPStatus.OK, result)
         except werwolf_backend.ApiError as exc:
+            print(f"[anna][werwolf] {exc.status} '{exc.message}' for /{'/'.join(segments)} body={body}")
             self._send_json(exc.status, {"error": exc.message})
 
     def _handle_werwolf_stream(self, token: str) -> None:
