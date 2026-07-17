@@ -89,6 +89,11 @@
     <symbol id="icon-minus" viewBox="0 0 24 24">
       <line x1="5" y1="12" x2="19" y2="12"/>
     </symbol>
+    <symbol id="icon-drink" viewBox="0 0 24 24">
+      <path d="M4 4h16l-8 10z"/>
+      <line x1="12" y1="14" x2="12" y2="20"/>
+      <line x1="8" y1="20" x2="16" y2="20"/>
+    </symbol>
   `;
   document.body.prepend(sprite);
 })();

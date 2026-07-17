@@ -34,6 +34,18 @@
       maxPlayers: 12,
       assets: ["/games/impostor/impostor.js", "/games/impostor/impostor.css", "/games/impostor/categories.json"],
     },
+    {
+      id: "nie",
+      name: "Ich hab noch nie",
+      tag: "Trinkspiel",
+      description: "Eine Aussage nach der anderen – wer war's schon mal?",
+      detail: "Der Reihe nach zeigt die App eine Aussage, die mit „Ich habe noch nie …“ beginnt. Wer das schon mal gemacht hat, trinkt, nimmt einen Schluck oder macht einen Finger runter – ganz wie ihr wollt.",
+      icon: "drink",
+      color: "green",
+      minPlayers: 2,
+      maxPlayers: 20,
+      assets: ["/games/nie/nie.js", "/games/nie/nie.css", "/games/nie/categories.json"],
+    },
   ];
 
   root.GAMES = GAMES;
