@@ -62,9 +62,15 @@
     banner.querySelector(".update-banner__confirm").addEventListener("click", () => {
       banner.querySelector(".update-banner__confirm").textContent = "Wird aktualisiert…";
       onConfirm();
-      // Fallback: falls "SW_ACTIVATED" aus irgendeinem Grund nicht
-      // empfangen wird, trotzdem nach 4 Sekunden neu laden.
-      setTimeout(reloadOnce, 4000);
+      // Fallback: Falls "SW_ACTIVATED" aus irgendeinem Grund nicht ankommt
+      // (Aktivierung hängt fest, alter Worker in einem komischen Zwischen-
+      // zustand o.ä.), NICHT einfach nur stumpf neu laden – das würde bei
+      // einer wirklich feststeckenden Registrierung nur dieselbe alte
+      // Version nochmal laden. Stattdessen komplett zurücksetzen (siehe
+      // forceFreshReload): Cache leeren + Worker abmelden + neu laden.
+      // Damit führt "Aktualisieren" IMMER zu einem echten frischen Stand,
+      // ganz ohne dass man manuell "Cache löschen" suchen muss.
+      setTimeout(forceFreshReload, 5000);
     });
   }
 
@@ -72,6 +78,25 @@
   function reloadOnce() {
     if (hasReloaded) return;
     hasReloaded = true;
+    window.location.reload();
+  }
+
+  // Letzter Rettungsanker, falls der normale Update-Handshake (SKIP_WAITING
+  // -> activate -> SW_ACTIVATED) aus irgendeinem Grund nicht durchläuft:
+  // alles zurücksetzen statt nur zu hoffen, dass ein einfacher Reload hilft.
+  async function forceFreshReload() {
+    if (hasReloaded) return;
+    hasReloaded = true;
+    try {
+      if ("caches" in window) {
+        const names = await caches.keys();
+        await Promise.all(names.map((name) => caches.delete(name)));
+      }
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(registrations.map((registration) => registration.unregister()));
+    } catch (err) {
+      // Aufräumen fehlgeschlagen -> trotzdem neu laden, besser als nichts.
+    }
     window.location.reload();
   }
 

@@ -1,5 +1,46 @@
 # Anna – Partyspiele
 
+## Client-seitige Update-Architektur (Service Worker)
+
+Kurzfassung: **`public/js/version.js`** ist die einzige Stelle mit der
+Versionsnummer. Sie wird von `sw.js` per `importScripts()` eingebunden
+und bestimmt den Cache-Namen (`anna-cache-<version>`). Erhöhe sie, sobald
+sich Design/Spiele/Code/Daten ändern – alles andere läuft automatisch:
+
+1. Browser erkennt einen Byte-Unterschied in `/sw.js` und installiert die
+   neue Version im Hintergrund (alter Worker bleibt bis zur Bestätigung aktiv).
+2. `public/js/pwa-helper.js` zeigt ein Update-Banner. Der Nutzer muss aktiv
+   auf "Aktualisieren" tippen – es gibt **keinen** automatischen Wechsel
+   mitten in einer laufenden Spielrunde.
+3. Nach Bestätigung schickt die Seite `SKIP_WAITING` an den neuen Worker,
+   der aktiviert danach und meldet sich per `SW_ACTIVATED` zurück – die
+   Seite lädt einmal sauber neu.
+4. **Sicherheitsnetz:** Kommt `SW_ACTIVATED` innerhalb von 5 Sekunden nach
+   Klick auf "Aktualisieren" nicht an (z.B. weil der Handshake aus
+   irgendeinem Grund hängen bleibt), löscht `forceFreshReload()` in
+   `pwa-helper.js` **alle** Caches und meldet **alle**
+   Service-Worker-Registrierungen ab, bevor neu geladen wird. "Aktualisieren"
+   führt dadurch garantiert zu einem echten frischen Stand – nie zu einem
+   Reload derselben feststeckenden alten Version.
+5. Zusätzlich prüft die Seite **sofort bei jedem Laden** aktiv auf Updates
+   (nicht erst bei einem Sichtbarkeits-Wechsel oder nach 20 Minuten) – siehe
+   Kommentare in `pwa-helper.js`.
+
+Offline-Caching (das eigentliche Vorladen der ganzen App) passiert NUR für
+die installierte PWA (Standalone-Fenster), nie für einen normalen
+Browser-Tab – Details dazu direkt in den Kommentaren von `sw.js`.
+
+**Wenn ein Gerät trotzdem mal "feststeckt"** (z.B. nach vielen schnellen
+Versionswechseln während der Entwicklung): Einstellungen → "Cache löschen"
+räumt manuell alles auf (`public/js/cache-tools.js`). Das sollte im
+Normalbetrieb aber dank Punkt 4 oben nicht mehr nötig sein.
+
+**Bevor du hier einen echten Bug vermutest:** immer zuerst in einem
+privaten/Inkognito-Fenster testen. Das startet komplett ohne alten Cache/
+Service Worker. Tritt das Problem dort NICHT auf, liegt es an einem alten,
+lokal feststeckenden Zustand auf dem ursprünglichen Testgerät (siehe oben),
+nicht am Code oder an Cloudflare.
+
 ## Cloudflare Cache-Busting & Updates
 
 Die Anwendung verwendet eine Kombination aus einem Service Worker (für Offline-Fähigkeit) und einem Cloudflare Worker (für dynamisches Cache-Busting bei Updates).
