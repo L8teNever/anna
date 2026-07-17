@@ -34,23 +34,24 @@ wie `game-registry.js` sich geändert hat!). Alles andere läuft automatisch:
 4. **Sicherheitsnetz:** Kommt `SW_ACTIVATED` innerhalb von 5 Sekunden nach
    Klick auf "Aktualisieren" nicht an (z.B. weil der Handshake aus
    irgendeinem Grund hängen bleibt), löscht `forceFreshReload()` in
-   `pwa-helper.js` **alle** Caches und meldet **alle**
-   Service-Worker-Registrierungen ab, bevor neu geladen wird. "Aktualisieren"
-   führt dadurch garantiert zu einem echten frischen Stand – nie zu einem
-   Reload derselben feststeckenden alten Version.
+   `pwa-helper.js` alle **versionierten** Caches (`anna-cache-*`) und meldet
+   **alle** Service-Worker-Registrierungen ab, bevor neu geladen wird. Der
+   dauerhafte Flag-Cache (siehe unten) bleibt dabei bewusst erhalten – ein
+   holpriges Update soll ein Gerät nicht fälschlich wie eine brandneue
+   Installation behandeln. "Aktualisieren" führt dadurch garantiert zu einem
+   echten frischen Stand – nie zu einem Reload derselben feststeckenden
+   alten Version.
 5. Zusätzlich prüft die Seite **sofort bei jedem Laden** aktiv auf Updates
    (nicht erst bei einem Sichtbarkeits-Wechsel oder nach 20 Minuten) – siehe
    Kommentare in `pwa-helper.js`.
-6. **Zweiter, unabhängiger Sicherheitsnetz-Check:** Neben dem normalen
-   Service-Worker-Update (Punkt 1) fragt die Seite bei jedem der obigen
-   Zeitpunkte zusätzlich `/js/version.js` roh vom Netz ab (`cache: "no-store"`
-   + Zeitstempel, umgeht damit jeden HTTP-/CDN-Zwischenspeicher) und
-   vergleicht die Versionsnummer darin mit der gerade laufenden. Das fängt
-   Fälle ab, in denen der normale SW-Byte-Vergleich aus irgendeinem Grund
-   nicht anschlägt (z.B. eine PWA, die tagelang im Hintergrund offen bleibt,
-   ohne dass der Browser von selbst nochmal nachfragt). Bei einem Fund geht
-   es direkt zu `forceFreshReload()` (kompletter Reset), ganz ohne auf den
-   normalen SKIP_WAITING-Handshake zu warten.
+
+(Ein früherer Versuch, hier zusätzlich einen zweiten, vom Service-Worker
+unabhängigen Versionsabgleich per Roh-Fetch von `version.js` einzubauen,
+wurde wieder entfernt: er hat durch CDN-/Cache-Eigenheiten gelegentlich
+einen falschen Unterschied gemeldet und dadurch das Update-Banner in einer
+Schleife erneut angezeigt. Da Punkt 1 oben (Byte-Diff direkt in `sw.js`)
+die eigentliche Ursache bereits zuverlässig löst, war der Zusatz-Check
+unnötiges Risiko ohne echten Zusatznutzen.)
 
 Offline-Caching (das eigentliche Vorladen der ganzen App) passiert NUR für
 die installierte PWA (Standalone-Fenster), nie für einen normalen
