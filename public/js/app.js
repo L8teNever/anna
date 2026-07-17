@@ -291,5 +291,10 @@
     }
   });
 
+  const appVersionLabel = document.getElementById("app-version-label");
+  if (appVersionLabel && window.APP_VERSION) {
+    appVersionLabel.textContent = `ANNA · v${window.APP_VERSION}`;
+  }
+
   renderGames("");
 })();

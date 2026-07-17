@@ -61,7 +61,11 @@
  * angerührt.
  */
 
-const APP_VERSION = "3.3.1";
+importScripts("/js/version.js");
+// Kommt aus version.js (einzige Quelle für die Versionsnummer, siehe dort) –
+// wird dort auch in den Einstellungen angezeigt, damit man nachschauen kann,
+// ob ein Gerät wirklich die neueste Version geladen hat.
+const APP_VERSION = self.APP_VERSION;
 const CACHE_NAME = `anna-cache-${APP_VERSION}`;
 
 // Versionsunabhängige Marker: NICHT umbenennen und NICHT in CACHE_NAME
@@ -86,6 +90,7 @@ const CORE_ASSETS = [
   "/css/material.css",
   "/css/components.css",
   "/css/main.css",
+  "/js/version.js",
   "/js/storage.js",
   "/js/icons.js",
   "/js/player-picker.js",

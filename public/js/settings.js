@@ -9,6 +9,11 @@
   const vibrationToggle = document.getElementById("vibration-toggle");
   const updateCheckButton = document.getElementById("update-check-button");
   const clearCacheButton = document.getElementById("clear-cache-button");
+  const appVersionLabel = document.getElementById("app-version-label");
+
+  if (appVersionLabel) {
+    appVersionLabel.textContent = window.APP_VERSION ? `v${window.APP_VERSION}` : "unbekannt";
+  }
 
   function applyTheme(theme) {
     if (theme === "light" || theme === "dark") {
