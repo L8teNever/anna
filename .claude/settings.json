@@ -14,7 +14,9 @@
       "Bash(node --check games/bombe/bombe.js)",
       "Bash(node -e \"JSON.parse\\(require\\('fs'\\).readFileSync\\('games/bombe/categories.json','utf8'\\)\\); console.log\\('OK-json'\\)\")",
       "Bash(node --check js/game-registry.js)",
-      "Bash(node -e \"global.self=global; require\\('./js/game-registry.js'\\); console.log\\(JSON.stringify\\(self.GAMES.map\\(g=>g.id\\)\\)\\);\")"
+      "Bash(node -e \"global.self=global; require\\('./js/game-registry.js'\\); console.log\\(JSON.stringify\\(self.GAMES.map\\(g=>g.id\\)\\)\\);\")",
+      "Bash(PORT=8099 python server.py)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:8099/nie)"
     ]
   }
 }

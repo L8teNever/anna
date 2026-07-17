@@ -13,7 +13,6 @@
 
   const startButton = document.getElementById("start-button");
   const nextStatementButton = document.getElementById("next-statement-button");
-  const exitButton = document.getElementById("exit-button");
 
   const openCategorySelectBtn = document.getElementById("open-category-select-button");
   const categoryBackButton = document.getElementById("category-select-back-button");
@@ -104,7 +103,6 @@
 
   startButton.addEventListener("click", startRound);
   nextStatementButton.addEventListener("click", showNextStatement);
-  exitButton.addEventListener("click", () => { window.location.href = "/"; });
 
   backButton.addEventListener("click", () => {
     if (!playView.hidden && setupView.hidden) {
@@ -112,7 +110,7 @@
         title: "Spiel verlassen?",
         message: "Die laufende Runde wird abgebrochen.",
         confirmLabel: "Verlassen",
-        onConfirm: () => ViewNav.transition(playView, setupView),
+        onConfirm: () => { window.location.href = "/"; },
       });
       return;
     }
