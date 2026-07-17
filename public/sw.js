@@ -42,8 +42,10 @@
  *     Nachricht erneut schicken muss. Ist es NICHT gesetzt (reiner
  *     Browser-Tab, nie als PWA geöffnet), bleibt der Worker ein reiner
  *     Passthrough: fetch-Anfragen gehen 1:1 ans Netz, nichts wird gecacht.
- *  4. APP_VERSION hier hochzählen, sobald sich Design/Spiele/Code/Daten
- *     ändern. Der Browser erkennt die neue sw.js (Byte-Diff), installiert
+ *  4. APP_VERSION HIER IN DIESER DATEI (nicht nur in version.js!) hochzählen,
+ *     sobald sich Design/Spiele/Code/Daten ändern – siehe ausführliche
+ *     Begründung direkt bei der Konstante weiter unten. Der Browser erkennt
+ *     die neue sw.js (Byte-Diff), installiert
  *     sie im Hintergrund. War Offline-Modus aktiv, wird sofort der neue
  *     Stand komplett vorgecacht (alter Cache bleibt bis zur Aktivierung
  *     unangetastet). pwa-helper.js zeigt daraufhin das Update-Banner;
@@ -61,11 +63,23 @@
  * angerührt.
  */
 
-importScripts("/js/version.js");
-// Kommt aus version.js (einzige Quelle für die Versionsnummer, siehe dort) –
-// wird dort auch in den Einstellungen angezeigt, damit man nachschauen kann,
-// ob ein Gerät wirklich die neueste Version geladen hat.
-const APP_VERSION = self.APP_VERSION;
+// WICHTIG – Kernstück des Selbstheilungs-Mechanismus: Der Browser erkennt
+// ein Update AUSSCHLIESSLICH über einen Byte-Unterschied in DIESER Datei
+// (sw.js) selbst. Dateien, die per importScripts() nachgeladen werden (wie
+// früher version.js), zählen für diesen Vergleich NICHT mit! Stand die
+// Versionsnummer nur dort (z.B. "const APP_VERSION = self.APP_VERSION"
+// nach importScripts("/js/version.js")), konnte man sie dort beliebig oft
+// hochzählen, ohne dass sw.js jemals andere Bytes bekam – der Browser hat
+// dann NIE ein Update erkannt, und Geräte mit installierter PWA blieben
+// für immer auf einem alten Stand hängen (unabhängig von allen Checks in
+// pwa-helper.js – die können nur etwas melden, das der Browser überhaupt
+// als "neu" registriert hat). Deshalb steht die Versionsnummer jetzt HIER
+// zusätzlich als literaler String: bei JEDER Änderung – auch wenn nur
+// andere Dateien wie game-registry.js sich geändert haben – MUSS dieser
+// String mit hochgezählt werden (parallel zu version.js, das weiterhin die
+// in den Einstellungen angezeigte Versionsnummer liefert), sonst bleibt
+// sw.js byte-identisch und das gesamte Update-System bleibt wirkungslos.
+const APP_VERSION = "3.7.1";
 const CACHE_NAME = `anna-cache-${APP_VERSION}`;
 
 // Versionsunabhängige Marker: NICHT umbenennen und NICHT in CACHE_NAME

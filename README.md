@@ -2,10 +2,26 @@
 
 ## Client-seitige Update-Architektur (Service Worker)
 
-Kurzfassung: **`public/js/version.js`** ist die einzige Stelle mit der
-Versionsnummer. Sie wird von `sw.js` per `importScripts()` eingebunden
-und bestimmt den Cache-Namen (`anna-cache-<version>`). Erhöhe sie, sobald
-sich Design/Spiele/Code/Daten ändern – alles andere läuft automatisch:
+Kurzfassung: Die Versionsnummer steht an **zwei** Stellen, die **beide**
+bei jeder Änderung hochgezählt werden müssen:
+
+- **`public/js/version.js`** – wird auf normalen Seiten eingebunden und in
+  den Einstellungen angezeigt (`window.APP_VERSION`).
+- **`public/sw.js`** (die Konstante `APP_VERSION` direkt am Dateianfang,
+  nach den einleitenden Kommentaren) – bestimmt den Cache-Namen
+  (`anna-cache-<version>`).
+
+**Warum nicht nur eine Stelle?** Der Browser erkennt ein Update
+ausschließlich über einen Byte-Unterschied in `sw.js` selbst – Dateien,
+die per `importScripts()` nachgeladen werden (das wäre `version.js`),
+zählen dafür NICHT mit. Stünde die Versionsnummer nur in `version.js`,
+könnte man sie beliebig oft hochzählen, ohne dass der Browser jemals ein
+Update erkennt: `sw.js` sähe für ihn immer gleich aus, installierte PWAs
+blieben für immer auf dem alten Stand hängen (das war tatsächlich lange
+Zeit ein aktiver, unbemerkter Bug hier). Deshalb steht die Zahl jetzt
+redundant in `sw.js` selbst – erhöhe **beide** Stellen gemeinsam, sobald
+sich Design/Spiele/Code/Daten ändern (auch wenn nur eine importierte Datei
+wie `game-registry.js` sich geändert hat!). Alles andere läuft automatisch:
 
 1. Browser erkennt einen Byte-Unterschied in `/sw.js` und installiert die
    neue Version im Hintergrund (alter Worker bleibt bis zur Bestätigung aktiv).
