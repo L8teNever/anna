@@ -118,6 +118,16 @@
     <symbol id="icon-moon" viewBox="0 0 24 24">
       <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z"/>
     </symbol>
+    <symbol id="icon-sound-on" viewBox="0 0 24 24">
+      <path d="M4 9v6h4l5 5V4L8 9H4Z"/>
+      <path d="M16 8.5a5 5 0 0 1 0 7"/>
+      <path d="M18.5 6a8.5 8.5 0 0 1 0 12"/>
+    </symbol>
+    <symbol id="icon-sound-off" viewBox="0 0 24 24">
+      <path d="M4 9v6h4l5 5V4L8 9H4Z"/>
+      <line x1="16" y1="9" x2="22" y2="15"/>
+      <line x1="22" y1="9" x2="16" y2="15"/>
+    </symbol>
   `;
   document.body.prepend(sprite);
 })();

@@ -36,7 +36,10 @@
         <svg class="m3-icon" style="vertical-align: -5px"><use href="#icon-moon"></use></svg>
         Werwolf
       </h1>
-      <a href="https://legal.kulbarts.com/" target="_blank" class="m3-label" style="text-decoration: none; color: var(--m3-on-surface-variant); margin-left: auto;">Rechtliches</a>
+      <button type="button" class="m3-icon-button" id="mute-toggle-button" aria-label="Ansagen stummschalten" title="Ansagen auf diesem Gerät stummschalten" style="margin-left: auto">
+        <svg class="m3-icon"><use href="#icon-sound-on"></use></svg>
+      </button>
+      <a href="https://legal.kulbarts.com/" target="_blank" class="m3-label" style="text-decoration: none; color: var(--m3-on-surface-variant); margin-left: 8px;">Rechtliches</a>
     </header>
 
     <!-- ---------- Setup-Ansicht ---------- -->
@@ -61,6 +64,14 @@
       <div class="game-option-row" id="online-host-name-row" hidden>
         <span class="game-option-row__label">Dein Name<br /><span class="game-option-row__hint">du bist auch Mitspieler:in</span></span>
         <input type="text" id="online-host-name-input" class="m3-text-input" placeholder="Host" maxlength="30" style="max-width: 140px" />
+      </div>
+
+      <div class="game-option-row" id="online-announce-row" hidden>
+        <span class="game-option-row__label">Ansagen auf allen Geräten<br /><span class="game-option-row__hint">sonst nur auf deinem (Host)</span></span>
+        <label class="m3-switch">
+          <input type="checkbox" id="online-announce-toggle" checked />
+          <span class="m3-switch__track"></span>
+        </label>
       </div>
 
       <button type="button" class="picker-launch-btn" id="open-player-select-button">

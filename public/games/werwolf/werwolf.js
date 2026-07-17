@@ -77,6 +77,9 @@
   const modeSelect = document.getElementById("werwolf-mode-select");
   const onlineHostNameRow = document.getElementById("online-host-name-row");
   const onlineHostNameInput = document.getElementById("online-host-name-input");
+  const onlineAnnounceRow = document.getElementById("online-announce-row");
+  const onlineAnnounceToggle = document.getElementById("online-announce-toggle");
+  const muteToggleButton = document.getElementById("mute-toggle-button");
   const onlineLobbyView = document.getElementById("view-online-lobby");
   const onlinePlayView = document.getElementById("view-online-play");
   const onlineHostPanel = document.getElementById("online-host-panel");
@@ -189,6 +192,7 @@
     const isOnline = mode === "online";
     openPlayerSelectBtn.hidden = isOnline;
     onlineHostNameRow.hidden = !isOnline;
+    onlineAnnounceRow.hidden = !isOnline;
     validationWarning.hidden = isOnline || validationWarning.hidden;
     startButton.innerHTML = isOnline
       ? `<svg class="m3-icon" style="width: 18px; height: 18px"><use href="#icon-users"></use></svg> Online-Runde erstellen`
@@ -814,6 +818,18 @@
 
   function isOnlineMuted() { return localStorage.getItem("anna:werwolf:muted") === "1"; }
 
+  function updateMuteButton() {
+    const muted = isOnlineMuted();
+    muteToggleButton.innerHTML = `<svg class="m3-icon"><use href="#icon-sound-${muted ? "off" : "on"}"></use></svg>`;
+    muteToggleButton.setAttribute("aria-label", muted ? "Ansagen einschalten" : "Ansagen stummschalten");
+  }
+  updateMuteButton();
+
+  muteToggleButton.addEventListener("click", () => {
+    localStorage.setItem("anna:werwolf:muted", isOnlineMuted() ? "0" : "1");
+    updateMuteButton();
+  });
+
   async function apiPost(path, body) {
     const res = await fetch(`/api/werwolf${path}`, {
       method: "POST",
@@ -833,6 +849,7 @@
   let onlineEventSource = null;
   let onlineLatestSnapshot = null;
   let onlineRoleRevealShown = false;
+  let onlineRoleAcked = false;
   let onlineLastNarrated = "";
   let onlinePrivateResultPending = false;
 
@@ -869,7 +886,11 @@
     let created;
     try {
       created = await apiPost("/rooms", { hostName });
-      await apiPost(`/rooms/${created.roomToken}/config`, { hostToken: created.hostToken, roleConfig: { ...roleConfig } });
+      await apiPost(`/rooms/${created.roomToken}/config`, {
+        hostToken: created.hostToken,
+        roleConfig: { ...roleConfig },
+        announceAllDevices: onlineAnnounceToggle.checked,
+      });
     } catch (err) {
       Toast.show(err.message, "alert-triangle");
       creatingOnlineRoom = false;
@@ -1017,6 +1038,7 @@
   function renderOnlineSnapshot(snapshot) {
     if (snapshot.phase === "lobby") {
       onlineRoleRevealShown = false;
+      onlineRoleAcked = false;
       onlineLastNarrated = "";
       onlinePrivateResultPending = false;
       if (onlineLobbyView.hidden) {
@@ -1045,6 +1067,23 @@
       showOnlineRoleReveal(snapshot);
       return;
     }
+
+    // Solange die Rollen-Enthüllungs-Phase läuft: nach dem eigenen "Weiter"
+    // (siehe showOnlineRoleReveal) auf einem gemeinsamen Warte-Screen
+    // bleiben, bis WIRKLICH alle bestätigt haben - erst dann schickt der
+    // Server die erste Nacht-Phase, und der Screen wechselt automatisch.
+    if (snapshot.phase === "reveal") {
+      if (onlineRoleAcked) {
+        showOnlineView(onlinePlayView);
+        onlineEndActions.hidden = true;
+        onlineActions.hidden = true;
+        onlineBody.innerHTML = "";
+        const gate = snapshot.readyGate || { acked: 0, total: 1 };
+        onlineStatusText.textContent = `Warte auf die anderen … (${gate.acked}/${gate.total} bereit)`;
+      }
+      return;
+    }
+
     if (!onlinePlayView.hidden || revealView.hidden) {
       renderOnlinePlay(snapshot);
     }
@@ -1073,9 +1112,26 @@
       revealIdentityList.hidden = true;
     }
 
-    revealNextButton.onclick = () => {
-      showOnlineView(onlinePlayView);
-      if (onlineLatestSnapshot) renderOnlinePlay(onlineLatestSnapshot);
+    revealNextButton.onclick = async () => {
+      if (onlineLatestSnapshot && onlineLatestSnapshot.phase === "reveal") {
+        onlineRoleAcked = true;
+        showOnlineView(onlinePlayView);
+        onlineEndActions.hidden = true;
+        onlineActions.hidden = true;
+        onlineBody.innerHTML = "";
+        onlineStatusText.textContent = "Warte auf die anderen …";
+        try {
+          await apiPost(`/rooms/${onlineRoomToken}/ack-role`, { playerToken: onlinePlayerToken });
+        } catch (err) {
+          Toast.show(err.message, "alert-triangle");
+        }
+      } else {
+        // Reconnect-Fall: die Runde ist schon weiter als die Rollen-
+        // Enthüllung (z.B. schon mitten in der Nacht) - direkt zum
+        // gemeinsamen Screen mit dem aktuellen Stand.
+        showOnlineView(onlinePlayView);
+        if (onlineLatestSnapshot) renderOnlinePlay(onlineLatestSnapshot);
+      }
     };
   }
 
@@ -1083,7 +1139,8 @@
     if (snapshot.publicStatus && snapshot.publicStatus !== onlineLastNarrated) {
       onlineLastNarrated = snapshot.publicStatus;
       onlineStatusText.textContent = snapshot.publicStatus;
-      if (!isOnlineMuted()) Sound.say(snapshot.publicStatus);
+      const shouldAnnounce = snapshot.announceAllDevices || snapshot.isHost;
+      if (shouldAnnounce && !isOnlineMuted()) Sound.say(snapshot.publicStatus);
     }
 
     if (snapshot.phase === "ended") {
@@ -1123,7 +1180,76 @@
     renderOnlineAction(snapshot.myAction);
   }
 
+  // Werwolf-Abstimmung ist anders als die übrigen Nacht-Aktionen: mehrere
+  // Personen wählen gemeinsam EIN Ziel, sehen sich dabei gegenseitig live
+  // beim Wählen zu (wie am Tisch), und müssen sich erst auf dasselbe Ziel
+  // einigen, bevor überhaupt bestätigt werden kann. Deshalb ein eigener
+  // Render-Pfad statt der generischen Einzel-Auswahl-Liste.
+  function renderWerwolfVoteAction(action) {
+    const votesHtml = action.wolfVotes.map((w) => `
+      <div class="identity-list__item">
+        <span class="identity-list__name">${escapeHtml(w.name)}${w.confirmed ? " ✓" : ""}</span>
+        <span class="identity-list__value">${w.votedForName ? escapeHtml(w.votedForName) : "…"}</span>
+      </div>
+    `).join("");
+
+    const optionsHtml = action.options.map((o) => `
+      <button type="button" class="m3-button m3-button--tonal werwolf-choice-list__btn" data-id="${o.playerId}" data-selected="${o.playerId === action.myVote}">${escapeHtml(o.name)}</button>
+    `).join("");
+
+    onlineBody.innerHTML = `
+      <p class="m3-body" style="text-align: center">Wählt gemeinsam ein Opfer – erst wenn alle dieselbe Person gewählt haben, kann bestätigt werden.</p>
+      <div class="identity-list">${votesHtml}</div>
+      <div class="werwolf-choice-list">${optionsHtml}</div>
+    `;
+    onlineBody.onclick = (event) => {
+      const btn = event.target.closest("[data-id]");
+      if (!btn) return;
+      submitWolfVote(btn.dataset.id);
+    };
+
+    onlineActions.hidden = false;
+    if (action.confirmed) {
+      onlineActions.innerHTML = `<p class="m3-body" style="text-align: center">Warte auf die anderen Werwölfe …</p>`;
+    } else if (action.canConfirm) {
+      onlineActions.innerHTML = `<button type="button" class="m3-button m3-button--filled" id="online-wolf-confirm-button">Bestätigen</button>`;
+      document.getElementById("online-wolf-confirm-button").addEventListener("click", submitWolfConfirm);
+    } else {
+      onlineActions.innerHTML = `<p class="m3-body" style="text-align: center; color: var(--m3-on-surface-variant)">Noch nicht einig …</p>`;
+    }
+  }
+
+  async function submitWolfVote(targetId) {
+    try {
+      // Absichtlich KEIN generisches "Wartet …" danach - die Live-Stimmen-
+      // Liste bleibt sichtbar, sie aktualisiert sich über den nächsten
+      // SSE-Snapshot von selbst.
+      await apiPost(`/rooms/${onlineRoomToken}/action`, { playerToken: onlinePlayerToken, targetPlayerId: targetId });
+    } catch (err) {
+      Toast.show(err.message, "alert-triangle");
+    }
+  }
+
+  async function submitWolfConfirm() {
+    try {
+      await apiPost(`/rooms/${onlineRoomToken}/action`, { playerToken: onlinePlayerToken, action: "confirm" });
+    } catch (err) {
+      Toast.show(err.message, "alert-triangle");
+    }
+  }
+
   function renderOnlineAction(action) {
+    if (action.type === "werwolf") {
+      renderWerwolfVoteAction(action);
+      return;
+    }
+    if (action.type === "discussion-ready") {
+      onlineBody.innerHTML = `<p class="m3-body" style="text-align: center">Wenn ihr fertig diskutiert habt, tippe hier.</p>`;
+      onlineActions.hidden = false;
+      onlineActions.innerHTML = `<button type="button" class="m3-button m3-button--filled" id="online-discussion-ready-button">Bereit zur Abstimmung</button>`;
+      document.getElementById("online-discussion-ready-button").addEventListener("click", submitDiscussionReady);
+      return;
+    }
     if (action.type === "hexe-heal") {
       onlineBody.innerHTML = `<p class="m3-body" style="text-align: center">Die Werwölfe haben <strong>${escapeHtml(action.victimName)}</strong> gewählt. Heiltrank einsetzen?</p>`;
       onlineActions.hidden = false;
@@ -1207,6 +1333,17 @@
         onlineActions.innerHTML = "";
         onlineBody.innerHTML = `<p class="m3-body" style="text-align: center">Wartet …</p>`;
       }
+    } catch (err) {
+      Toast.show(err.message, "alert-triangle");
+    }
+  }
+
+  async function submitDiscussionReady() {
+    try {
+      await apiPost(`/rooms/${onlineRoomToken}/discussion-ready`, { playerToken: onlinePlayerToken });
+      onlineActions.hidden = true;
+      onlineActions.innerHTML = "";
+      onlineBody.innerHTML = `<p class="m3-body" style="text-align: center">Warte auf die anderen …</p>`;
     } catch (err) {
       Toast.show(err.message, "alert-triangle");
     }

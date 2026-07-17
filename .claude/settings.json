@@ -42,7 +42,13 @@
       "Bash(cat /tmp/anna-server6.log 2>/dev/null)",
       "Bash(python -c \"import ast; ast.parse\\(open\\('c:/Users/Docker/Videos/Anna/server.py', encoding='utf-8'\\).read\\(\\)\\); print\\('SYNTAX_OK'\\)\")",
       "Bash(powershell -NoProfile -Command \"Get-CimInstance Win32_Process -Filter 'ProcessId=14380' | Select-Object CommandLine\")",
-      "Bash(powershell -NoProfile -Command \"Stop-Process -Id 14380 -Force -ErrorAction SilentlyContinue\")"
+      "Bash(powershell -NoProfile -Command \"Stop-Process -Id 14380 -Force -ErrorAction SilentlyContinue\")",
+      "Bash(python -c \"import ast; ast.parse\\(open\\('c:/Users/Docker/Videos/Anna/werwolf_backend.py', encoding='utf-8'\\).read\\(\\)\\); print\\('SYNTAX_OK'\\)\")",
+      "PowerShell(Get-NetTCPConnection -LocalPort 8199 -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-CimInstance Win32_Process -Filter 'ProcessId=22396')",
+      "Bash(powershell -NoProfile -Command \"Stop-Process -Id 22396 -Force -ErrorAction SilentlyContinue\")",
+      "PowerShell(Get-CimInstance Win32_Process -Filter 'ProcessId=20200')",
+      "Bash(powershell -NoProfile -Command \"Stop-Process -Id 20200 -Force -ErrorAction SilentlyContinue\")"
     ]
   }
 }

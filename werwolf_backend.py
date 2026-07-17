@@ -86,6 +86,10 @@ class Room:
     role_config: dict = field(default_factory=lambda: {
         "werwolfCount": 1, "seherin": False, "hexe": False, "amor": False, "jaeger": False,
     })
+    # Sollen die Sprachansagen (Nacht/Tag-Ansagen) auf JEDEM verbundenen
+    # Gerät laufen, oder nur auf dem des Hosts? Unabhängig davon kann jedes
+    # Gerät sich zusätzlich rein lokal selbst stummschalten (siehe Client).
+    announce_all_devices: bool = True
     players: dict[str, Player] = field(default_factory=dict)
 
     night_victim: str | None = None
@@ -97,6 +101,13 @@ class Room:
     last_deaths: list[str] = field(default_factory=list)
     winner: str | None = None
     pending_votes: dict[str, str | None] = field(default_factory=dict)
+    # Wer hat schon bestätigt? Wiederverwendet für zwei Synchronisations-
+    # Barrieren: Rollen-Enthüllung ("reveal", alle müssen ihre Rolle gesehen
+    # haben, bevor die erste Nacht beginnt) und Tages-Diskussion
+    # ("day-discussion", alle Lebenden müssen "bereit" klicken, bevor die
+    # Abstimmung öffnet). Niemand steuert das für die Gruppe - der letzte
+    # Bestätigende löst automatisch den nächsten Schritt für alle aus.
+    pending_acks: set[str] = field(default_factory=set)
 
     def touch(self):
         self.last_activity = time.time()
@@ -229,6 +240,7 @@ def _start_night(room: Room):
     room.night_healed = False
     room.night_poison = None
     room.pending_votes = {}
+    room.pending_acks = set()
     amor = room.role_index_player("amor")
     if room.round == 1 and amor and amor.alive and not amor.love_linked_with:
         room.step = "amor"
@@ -279,6 +291,7 @@ def _after_day_reveal(room: Room):
         room.step = "hunter-shot"
     else:
         room.step = "day-discussion"
+        room.pending_acks = set()
 
 
 def _apply_hunter_shot(room: Room, target_id: str):
@@ -293,7 +306,11 @@ def _apply_hunter_shot(room: Room, target_id: str):
             room.pending_hunters.append(pid)
     if _check_win(room):
         return
-    room.step = "hunter-shot" if room.pending_hunters else "day-discussion"
+    if room.pending_hunters:
+        room.step = "hunter-shot"
+    else:
+        room.step = "day-discussion"
+        room.pending_acks = set()
 
 
 def _resolve_day_vote(room: Room):
@@ -406,8 +423,10 @@ def configure_room(token: str, body: dict, client_ip: str) -> dict:
             "amor": bool(cfg.get("amor")),
             "jaeger": bool(cfg.get("jaeger")),
         }
+        if "announceAllDevices" in body:
+            room.announce_all_devices = bool(body.get("announceAllDevices"))
         room.touch()
-        return {"roleConfig": room.role_config}
+        return {"roleConfig": room.role_config, "announceAllDevices": room.announce_all_devices}
 
 
 def start_room(token: str, body: dict, client_ip: str) -> dict:
@@ -430,7 +449,13 @@ def start_room(token: str, body: dict, client_ip: str) -> dict:
         room.witch_poison_used = False
         room.round = 1
         room.winner = None
-        _start_night(room)
+        # Erst mal alle ihre Rolle bestätigen lassen (siehe ack_role) - die
+        # eigentliche erste Nacht (_start_night) beginnt erst, wenn die
+        # letzte Person bestätigt hat, damit niemand mitten in der eigenen
+        # Rollen-Enthüllung von der schon laufenden Nacht überrascht wird.
+        room.phase = "reveal"
+        room.step = "reveal"
+        room.pending_acks = set()
         room.touch()
         return {"ok": True}
 
@@ -469,26 +494,53 @@ def submit_action(token: str, body: dict, client_ip: str) -> dict:
         return {"ok": True, "result": result}
 
 
-def advance_discussion(token: str, body: dict, client_ip: str) -> dict:
-    """Host-Aktion: von 'day-discussion' zur Abstimmung."""
+def ack_role(token: str, body: dict, client_ip: str) -> dict:
+    """Jede Person bestätigt, dass sie ihre Rolle gesehen hat. Erst wenn
+    ALLE bestätigt haben, beginnt für alle gleichzeitig die erste Nacht -
+    sonst könnte jemand mitten in der eigenen Rollen-Enthüllung von einer
+    schon laufenden Nacht überrascht werden."""
     with LOCK:
         room = _get_room(token)
-        _require_host(room, body)
+        player = _require_player(room, body)
+        if room.phase != "reveal":
+            raise ApiError(409, "Gerade keine Rollen-Bestätigung möglich")
+        room.pending_acks.add(player.player_id)
+        if len(room.pending_acks) >= len(room.players):
+            _start_night(room)
+        room.touch()
+        return {"ok": True}
+
+
+def discussion_ready(token: str, body: dict, client_ip: str) -> dict:
+    """Jede lebende Person bestätigt, dass sie mit der Diskussion fertig
+    ist. Erst wenn ALLE bereit sind, öffnet die Abstimmung für alle
+    gleichzeitig - kein einzelnes Gerät bestimmt das Tempo der anderen."""
+    with LOCK:
+        room = _get_room(token)
+        player = _require_player(room, body)
         if room.step != "day-discussion":
             raise ApiError(409, "Gerade nicht in der Diskussionsphase")
-        room.step = "day-vote"
-        room.pending_votes = {}
+        if not player.alive:
+            raise ApiError(403, "Tote Spieler entscheiden das nicht mit")
+        room.pending_acks.add(player.player_id)
+        if len(room.pending_acks) >= len(room.alive_players()):
+            room.step = "day-vote"
+            room.pending_votes = {}
+            room.pending_acks = set()
         room.touch()
         return {"ok": True}
 
 
 def force_advance(token: str, body: dict, client_ip: str) -> dict:
-    """Host-Override: aktuellen Schritt auch ohne alle Stimmen weiterschieben
-    (z.B. wenn ein Gerät ausgefallen ist)."""
+    """Host-Override: aktuellen Schritt auch ohne alle Bestätigungen/Stimmen
+    weiterschieben (z.B. wenn ein Gerät ausgefallen ist und die Gruppe sonst
+    ewig auf eine Bestätigung wartet, die nie kommt)."""
     with LOCK:
         room = _get_room(token)
         _require_host(room, body)
-        if room.step == "werwolf":
+        if room.phase == "reveal":
+            _start_night(room)
+        elif room.step == "werwolf":
             _resolve_werwolf_step(room)
         elif room.step == "hexe-heal":
             room.step = "hexe-poison"
@@ -497,6 +549,7 @@ def force_advance(token: str, body: dict, client_ip: str) -> dict:
         elif room.step == "day-discussion":
             room.step = "day-vote"
             room.pending_votes = {}
+            room.pending_acks = set()
         elif room.step == "day-vote":
             _resolve_day_vote(room)
         room.touch()
@@ -555,6 +608,12 @@ def snapshot_for(room: Room, player: Player) -> dict:
     if player.role == "werwolf":
         wolf_pack = [p.name for p in room.players.values() if p.role == "werwolf" and p.player_id != player.player_id]
 
+    ready_gate = None
+    if room.phase == "reveal":
+        ready_gate = {"acked": len(room.pending_acks), "total": len(room.players), "youAcked": player.player_id in room.pending_acks}
+    elif room.step == "day-discussion":
+        ready_gate = {"acked": len(room.pending_acks), "total": len(room.alive_players()), "youAcked": player.player_id in room.pending_acks}
+
     return {
         "roomToken": room.token,
         "isHost": player.is_host,
@@ -572,6 +631,8 @@ def snapshot_for(room: Room, player: Player) -> dict:
         "lastDeaths": [{"name": room.players[pid].name, "role": ROLE_LABELS.get(room.players[pid].role)} for pid in room.last_deaths if pid in room.players] if room.phase in ("day", "ended") else [],
         "wolfPack": wolf_pack,
         "winner": room.winner,
+        "readyGate": ready_gate,
+        "announceAllDevices": room.announce_all_devices,
         "minPlayers": MIN_PLAYERS,
         "maxPlayers": MAX_PLAYERS,
     }
@@ -596,7 +657,8 @@ _POST_HANDLERS = {
     "config": configure_room,
     "start": start_room,
     "action": submit_action,
-    "advance-discussion": advance_discussion,
+    "ack-role": ack_role,
+    "discussion-ready": discussion_ready,
     "force-advance": force_advance,
     "end": end_room,
     "reset": reset_room,
@@ -693,22 +755,59 @@ def _handle_amor(room: Room, player: Player, body: dict):
     room.step = "werwolf"
 
 
+def _wolf_votes_summary(room: Room):
+    """Liste, wer von den (lebenden) Werwölfen aktuell für wen gestimmt hat
+    - den Werwölfen gegenseitig sichtbar, damit sie sich absprechen können,
+    wie am echten Spieltisch. Gibt außerdem zurück, ob sich schon alle auf
+    dieselbe Person geeinigt haben (Voraussetzung fürs Bestätigen)."""
+    wolves = [p for p in room.players.values() if p.alive and p.role == "werwolf"]
+    entries = []
+    values = []
+    for w in wolves:
+        target_id = room.pending_votes.get(w.player_id)
+        target_name = room.players[target_id].name if target_id and target_id in room.players else None
+        entries.append({
+            "playerId": w.player_id,
+            "name": w.name,
+            "votedForName": target_name,
+            "confirmed": w.player_id in room.pending_acks,
+        })
+        values.append(target_id)
+    all_agreed = bool(values) and all(v is not None and v == values[0] for v in values)
+    return entries, all_agreed
+
+
 def _resolve_werwolf_step(room: Room):
     target = _tally(room.pending_votes)
     room.night_victim = target
+    room.pending_acks = set()
     _next_night_step(room, "werwolf")
 
 
 def _handle_werwolf_vote(room: Room, player: Player, body: dict):
     if player.role != "werwolf" or not player.alive:
         raise ApiError(403, "Du bist gerade nicht dran")
+
+    if str(body.get("action") or "") == "confirm":
+        room.pending_acks.add(player.player_id)
+        eligible = _alive_ids_with_role(room, "werwolf")
+        if len(room.pending_acks) >= len(eligible):
+            _, all_agreed = _wolf_votes_summary(room)
+            if all_agreed:
+                _resolve_werwolf_step(room)
+            else:
+                # Doch nicht einig (z.B. jemand hat in letzter Sekunde
+                # umentschieden) - alle müssen erneut bestätigen.
+                room.pending_acks = set()
+        return
+
     target_id = body.get("targetPlayerId")
     if target_id is not None and (target_id not in room.players or not room.players[target_id].alive or room.players[target_id].role == "werwolf"):
         raise ApiError(400, "Ungültiges Ziel")
     room.pending_votes[player.player_id] = target_id
-    eligible = _alive_ids_with_role(room, "werwolf")
-    if len(room.pending_votes) >= len(eligible):
-        _resolve_werwolf_step(room)
+    # Jede Änderung der eigenen Wahl setzt alle bisherigen Bestätigungen
+    # zurück - eine "alte" Bestätigung darf nie für ein neues Ziel gelten.
+    room.pending_acks = set()
 
 
 def _handle_seherin(room: Room, player: Player, body: dict) -> dict:
@@ -770,9 +869,21 @@ def _compute_my_turn(room: Room, player: Player):
     if step == "amor" and player.role == "amor" and player.alive and player.player_id not in room.pending_votes:
         options = [{"playerId": p.player_id, "name": p.name} for p in room.alive_players()]
         return True, {"type": "amor", "multiple": True, "options": options}
-    if step == "werwolf" and player.role == "werwolf" and player.alive and player.player_id not in room.pending_votes:
+    if step == "werwolf" and player.role == "werwolf" and player.alive:
+        # Bleibt "dran" (isMyTurn=True), auch nachdem man selbst schon
+        # gewählt/bestätigt hat - man sieht weiter die Live-Stimmen der
+        # anderen Werwölfe und kann seine eigene Wahl jederzeit ändern,
+        # bis wirklich ALLE bestätigt haben.
         options = [{"playerId": p.player_id, "name": p.name} for p in room.alive_players() if p.role != "werwolf"]
-        return True, {"type": "werwolf", "options": options}
+        wolf_votes, all_agreed = _wolf_votes_summary(room)
+        return True, {
+            "type": "werwolf",
+            "options": options,
+            "wolfVotes": wolf_votes,
+            "myVote": room.pending_votes.get(player.player_id),
+            "canConfirm": all_agreed,
+            "confirmed": player.player_id in room.pending_acks,
+        }
     if step == "seherin" and player.role == "seherin" and player.alive:
         options = [{"playerId": p.player_id, "name": p.name} for p in room.alive_players() if p.player_id != player.player_id]
         return True, {"type": "seherin", "options": options}
@@ -789,6 +900,8 @@ def _compute_my_turn(room: Room, player: Player):
     if step == "hunter-shot" and room.pending_hunters and player.player_id == room.pending_hunters[0]:
         options = [{"playerId": p.player_id, "name": p.name} for p in room.alive_players()]
         return True, {"type": "hunter-shot", "options": options}
+    if step == "day-discussion" and player.alive and player.player_id not in room.pending_acks:
+        return True, {"type": "discussion-ready"}
     if step == "day-vote" and player.alive and player.player_id not in room.pending_votes:
         options = [{"playerId": p.player_id, "name": p.name} for p in room.alive_players()]
         return True, {"type": "day-vote", "options": options, "skipLabel": "Niemand - keine Stimme"}
@@ -798,6 +911,8 @@ def _compute_my_turn(room: Room, player: Player):
 def _public_status(room: Room) -> str:
     if room.phase == "lobby":
         return "Warten auf den Host …"
+    if room.phase == "reveal":
+        return f"Alle sehen sich ihre Rolle an … ({len(room.pending_acks)}/{len(room.players)} bereit)"
     if room.step == "amor":
         return "Amor wacht auf und verkuppelt zwei Spieler …"
     if room.step == "werwolf":
@@ -815,7 +930,7 @@ def _public_status(room: Room) -> str:
         if room.step == "hunter-shot" and room.pending_hunters:
             return f"{day_intro} {room.players[room.pending_hunters[0]].name} war der Jäger und darf noch schießen!"
         if room.step == "day-discussion":
-            return f"{day_intro} Diskutiert am Tisch, wer verdächtig ist."
+            return f"{day_intro} Diskutiert am Tisch, wer verdächtig ist. ({len(room.pending_acks)}/{len(room.alive_players())} bereit zur Abstimmung)"
     if room.step == "day-vote":
         return "Wer soll gehängt werden?"
     if room.phase == "ended":
