@@ -464,6 +464,9 @@
   font-weight: 600;
   border-left: 1px solid var(--m3-outline-variant);
   transition: all 0.2s var(--m3-easing-standard);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .m3-segmented__option:first-child {
