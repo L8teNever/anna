@@ -48,8 +48,12 @@ vorinstalliert sein sollen.
   gezogen, danach zufällig ein Wort aus deren `words`-Liste.
 - Alle normalen Spieler sehen genau dieses Wort.
 - Der/die Impostor(e) sehen es **nicht** – stattdessen entweder gar nichts
-  oder (falls „Hilfewort“ in den Einstellungen aktiviert ist) ein zweites,
-  zufälliges Wort **aus derselben Kategorie** als vager Hinweis.
+  oder (falls „Kategorie-Hinweis“ in den Einstellungen aktiviert ist) den
+  Namen der gezogenen Kategorie (z.B. „Technik“) als Hinweis. Bewusst der
+  Kategoriename und nicht (wie früher) ein zufälliges zweites Wort aus der
+  Kategorie – ein Sibling-Wort kann je nach Kategorie völlig unpassend zum
+  Geheimwort sein (z.B. Wort „Konsole“, Sibling „TikTok“), der Kategoriename
+  gibt dagegen immer eine sinnvolle grobe Richtung zum Bluffen vor.
 
 ## Neue Kategorie hinzufügen / Wörter erweitern
 

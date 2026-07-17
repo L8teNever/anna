@@ -204,7 +204,7 @@
   let roundPlayers = [];
   let impostorIndices = new Set();
   let secretWord = "";
-  let hintWord = null;
+  let hintCategoryLabel = null;
   let currentRevealIndex = 0;
 
   function shuffle(array) {
@@ -218,16 +218,18 @@
 
   function pickRoundWord() {
     const active = categoryPicker.getSelectedCategories().filter((c) => Array.isArray(c.words) && c.words.length);
-    if (!active.length) return { word: null, hint: null };
+    if (!active.length) return { word: null, categoryLabel: null };
     const category = active[Math.floor(Math.random() * active.length)];
     const words = category.words;
     const word = words[Math.floor(Math.random() * words.length)];
-    let hint = null;
-    if (hintWordToggle.checked && words.length > 1) {
-      const otherWords = words.filter((w) => w !== word);
-      hint = otherWords[Math.floor(Math.random() * otherWords.length)];
-    }
-    return { word, hint };
+    // Hilfewort für den Impostor: statt (wie früher) irgendein zufälliges
+    // ANDERES Wort derselben Kategorie zu zeigen - das kann je nach Kategorie
+    // völlig unpassend sein (z.B. Wort "Konsole", Hilfewort "TikTok") - zeigt
+    // der Hinweis jetzt einfach den Kategorienamen selbst. Der hilft IMMER
+    // ein bisschen beim Bluffen (grobe Richtung, ohne das genaue Wort zu
+    // verraten), unabhängig davon, wie thematisch eng die einzelnen Wörter
+    // einer Kategorie zueinander passen.
+    return { word, categoryLabel: category.label };
   }
 
   function showRevealForCurrentPlayer() {
@@ -239,7 +241,9 @@
     revealRole.classList.toggle("reveal-card__role--impostor", isImpostor);
     if (isImpostor) {
       revealRole.textContent = "Du bist der Impostor!";
-      revealWord.textContent = hintWord ? `Hinweis: ${hintWord}` : "Kein Wort – hör gut zu und bluffe mit!";
+      revealWord.textContent = hintCategoryLabel
+        ? `Hinweis: Kategorie „${hintCategoryLabel}“`
+        : "Kein Wort – hör gut zu und bluffe mit!";
     } else {
       revealRole.textContent = "Dein Wort:";
       revealWord.textContent = secretWord;
@@ -289,9 +293,9 @@
 
   function beginRound() {
     roundPlayers = shuffle(playerPicker.getSelectedNames());
-    const { word, hint } = pickRoundWord();
+    const { word, categoryLabel } = pickRoundWord();
     secretWord = word || "…";
-    hintWord = hint;
+    hintCategoryLabel = hintWordToggle.checked ? categoryLabel : null;
 
     const impostorTotal = Math.min(impostorCount, Math.max(1, roundPlayers.length - 1));
     const shuffledIdx = shuffle(roundPlayers.map((_, idx) => idx));
