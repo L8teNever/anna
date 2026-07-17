@@ -89,6 +89,3 @@ bleiben unverändert rein clientseitig.
   der Person, die gerade dran ist, zeigt kurz die private Auswahl
   (`isMyTurn`/`myAction` im Snapshot). So kann man die Handys offen auf den
   Tisch legen, ohne dass ein Blick verrät, wer welche Rolle hat.
-- **Tests**: `python -m unittest test_werwolf_backend -v` (Root-Verzeichnis)
-  deckt Rollen-Zuteilung, Nacht/Tag-Ablauf, Liebes-Kettentod, Jäger-Schuss,
-  Sieg-Bedingung, Reconnect, Rate-Limit und die Sicherheits-Checks ab.

@@ -1,9 +1,8 @@
 /**
  * Visuals, die ausschließlich zu "Wer bin ich" gehören. Layout/Grundgerüst
- * (.game-shell, .reveal-stage, .reveal-card ...) kommt aus main.css bzw.
- * impostor.css-artigen Klassen in main.css, hier nur die Liste "Die anderen
- * sind" (beim Wischen UND beim Nachschlagen) sowie die Spielerauswahl fürs
- * Nachschlagen.
+ * (.game-shell, .reveal-stage, .reveal-card ...) kommt aus main.css, hier
+ * nur die Liste "Die anderen sind" (beim Wischen UND beim Nachschlagen)
+ * sowie die Spielerauswahl fürs Nachschlagen.
  */
 
 /* Die Wisch-Karte muss hier eine Liste (bis zu 11 Namen) statt eines
