@@ -70,6 +70,11 @@ class Player:
     alive: bool = True
     connected: bool = True
     love_linked_with: str | None = None
+    # Hat die Runde aktiv verlassen (Zurück-Button + bestätigt). Anders als
+    # "not connected" (kurzer Netzwerk-Aussetzer) ist das endgültig: eine
+    # verlassene Person zählt nirgends mehr mit, damit die Gruppe nie auf
+    # eine Bestätigung/Stimme wartet, die nie mehr kommt.
+    left: bool = False
 
 
 @dataclass
@@ -123,7 +128,13 @@ class Room:
         return None
 
     def alive_players(self) -> list[Player]:
-        return [p for p in self.players.values() if p.alive]
+        return [p for p in self.players.values() if p.alive and not p.left]
+
+    def active_players(self) -> list[Player]:
+        """Alle, die die Runde noch nicht verlassen haben (unabhängig von
+        lebendig/tot) - für Schwellenwerte wie die Rollen-Bestätigung, bei
+        der auch Tote/noch-Lebende gemeinsam zählen."""
+        return [p for p in self.players.values() if not p.left]
 
     def role_index_player(self, role: str) -> Player | None:
         for p in self.players.values():
@@ -269,8 +280,8 @@ def _resolve_night(room: Room):
 
 
 def _check_win(room: Room) -> bool:
-    alive_wolves = sum(1 for p in room.players.values() if p.alive and p.role == "werwolf")
-    alive_others = sum(1 for p in room.players.values() if p.alive and p.role != "werwolf")
+    alive_wolves = sum(1 for p in room.players.values() if p.alive and not p.left and p.role == "werwolf")
+    alive_others = sum(1 for p in room.players.values() if p.alive and not p.left and p.role != "werwolf")
     if alive_wolves == 0:
         room.phase = "ended"
         room.step = "ended"
@@ -505,7 +516,7 @@ def ack_role(token: str, body: dict, client_ip: str) -> dict:
         if room.phase != "reveal":
             raise ApiError(409, "Gerade keine Rollen-Bestätigung möglich")
         room.pending_acks.add(player.player_id)
-        if len(room.pending_acks) >= len(room.players):
+        if len(room.pending_acks) >= len(room.active_players()):
             _start_night(room)
         room.touch()
         return {"ok": True}
@@ -540,12 +551,22 @@ def force_advance(token: str, body: dict, client_ip: str) -> dict:
         _require_host(room, body)
         if room.phase == "reveal":
             _start_night(room)
+        elif room.step == "amor":
+            room.step = "werwolf"
         elif room.step == "werwolf":
             _resolve_werwolf_step(room)
+        elif room.step == "seherin":
+            _next_night_step(room, "seherin")
         elif room.step == "hexe-heal":
             room.step = "hexe-poison"
         elif room.step == "hexe-poison":
             _resolve_night(room)
+        elif room.step == "hunter-shot":
+            if room.pending_hunters:
+                room.pending_hunters.pop(0)
+            if not _check_win(room) and not room.pending_hunters:
+                room.step = "day-discussion"
+                room.pending_acks = set()
         elif room.step == "day-discussion":
             room.step = "day-vote"
             room.pending_votes = {}
@@ -564,15 +585,39 @@ def end_room(token: str, body: dict, client_ip: str) -> dict:
         return {"ok": True}
 
 
+def leave_room(token: str, body: dict, client_ip: str) -> dict:
+    """Eine (nicht-Host-)Person verlässt die Runde aktiv und endgültig
+    (Zurück-Button + bestätigt) - zählt ab sofort nirgends mehr mit
+    (Bestätigungen, Stimmen, Sieg-Bedingung), damit die Gruppe nie auf eine
+    Aktion warten muss, die nie mehr kommt. Der Host beendet die Runde
+    stattdessen komplett (siehe end_room)."""
+    with LOCK:
+        room = _get_room(token)
+        player = _require_player(room, body)
+        if player.is_host:
+            raise ApiError(400, "Der Host muss die Runde stattdessen beenden")
+        if room.phase == "lobby":
+            del room.players[player.player_id]
+            room.touch()
+            return {"ok": True}
+        player.left = True
+        player.connected = False
+        _recheck_after_leave(room)
+        room.touch()
+        return {"ok": True}
+
+
 def reset_room(token: str, body: dict, client_ip: str) -> dict:
     """Host-Aktion nach Spielende: zurück in die Lobby, gleiche Mitspieler
     und Rollen-Konfiguration, damit man für eine neue Runde nicht erneut per
-    QR-Code/Link beitreten muss."""
+    QR-Code/Link beitreten muss. Wer die vorherige Runde verlassen hatte,
+    wird dabei ganz entfernt (müsste über den Link neu beitreten)."""
     with LOCK:
         room = _get_room(token)
         _require_host(room, body)
         if room.phase != "ended":
             raise ApiError(409, "Die Runde läuft noch")
+        room.players = {pid: p for pid, p in room.players.items() if not p.left}
         for p in room.players.values():
             p.role = None
             p.alive = True
@@ -601,6 +646,7 @@ def snapshot_for(room: Room, player: Player) -> dict:
         "connected": p.connected,
         "isHost": p.is_host,
         "isYou": p.player_id == player.player_id,
+        "left": p.left,
     } for p in room.player_order()]
 
     my_turn, my_action = _compute_my_turn(room, player)
@@ -610,7 +656,7 @@ def snapshot_for(room: Room, player: Player) -> dict:
 
     ready_gate = None
     if room.phase == "reveal":
-        ready_gate = {"acked": len(room.pending_acks), "total": len(room.players), "youAcked": player.player_id in room.pending_acks}
+        ready_gate = {"acked": len(room.pending_acks), "total": len(room.active_players()), "youAcked": player.player_id in room.pending_acks}
     elif room.step == "day-discussion":
         ready_gate = {"acked": len(room.pending_acks), "total": len(room.alive_players()), "youAcked": player.player_id in room.pending_acks}
 
@@ -661,6 +707,7 @@ _POST_HANDLERS = {
     "discussion-ready": discussion_ready,
     "force-advance": force_advance,
     "end": end_room,
+    "leave": leave_room,
     "reset": reset_room,
 }
 
@@ -738,7 +785,7 @@ def _require_player(room: Room, body: dict) -> Player:
 
 
 def _alive_ids_with_role(room: Room, role_filter: str) -> list[str]:
-    return [p.player_id for p in room.players.values() if p.alive and p.role == role_filter]
+    return [p.player_id for p in room.players.values() if p.alive and not p.left and p.role == role_filter]
 
 
 def _handle_amor(room: Room, player: Player, body: dict):
@@ -760,7 +807,7 @@ def _wolf_votes_summary(room: Room):
     - den Werwölfen gegenseitig sichtbar, damit sie sich absprechen können,
     wie am echten Spieltisch. Gibt außerdem zurück, ob sich schon alle auf
     dieselbe Person geeinigt haben (Voraussetzung fürs Bestätigen)."""
-    wolves = [p for p in room.players.values() if p.alive and p.role == "werwolf"]
+    wolves = [p for p in room.players.values() if p.alive and not p.left and p.role == "werwolf"]
     entries = []
     values = []
     for w in wolves:
@@ -775,6 +822,40 @@ def _wolf_votes_summary(room: Room):
         values.append(target_id)
     all_agreed = bool(values) and all(v is not None and v == values[0] for v in values)
     return entries, all_agreed
+
+
+def _recheck_after_leave(room: Room):
+    """Nachdem jemand die laufende Runde verlassen hat: prüfen, ob die
+    gerade wartende Schwelle (Rollen-Bestätigung/Werwolf-Einigung/
+    Diskussions-Bereitschaft/Tages-Abstimmung) dadurch jetzt erst erreicht
+    ist - sonst würde die Gruppe endlos auf eine Bestätigung/Stimme warten,
+    die nie mehr kommen kann."""
+    if room.phase == "reveal":
+        eligible = {p.player_id for p in room.active_players()}
+        if eligible and eligible <= room.pending_acks:
+            _start_night(room)
+        return
+    if room.step == "werwolf":
+        eligible = set(_alive_ids_with_role(room, "werwolf"))
+        if eligible and eligible <= room.pending_acks:
+            _, all_agreed = _wolf_votes_summary(room)
+            if all_agreed:
+                _resolve_werwolf_step(room)
+            else:
+                room.pending_acks = set()
+        return
+    if room.step == "day-discussion":
+        eligible = {p.player_id for p in room.alive_players()}
+        if eligible and eligible <= room.pending_acks:
+            room.step = "day-vote"
+            room.pending_votes = {}
+            room.pending_acks = set()
+        return
+    if room.step == "day-vote":
+        eligible = {p.player_id for p in room.alive_players()}
+        if eligible and eligible <= room.pending_votes.keys():
+            _resolve_day_vote(room)
+        return
 
 
 def _resolve_werwolf_step(room: Room):
@@ -912,7 +993,7 @@ def _public_status(room: Room) -> str:
     if room.phase == "lobby":
         return "Warten auf den Host …"
     if room.phase == "reveal":
-        return f"Alle sehen sich ihre Rolle an … ({len(room.pending_acks)}/{len(room.players)} bereit)"
+        return f"Alle sehen sich ihre Rolle an … ({len(room.pending_acks)}/{len(room.active_players())} bereit)"
     if room.step == "amor":
         return "Amor wacht auf und verkuppelt zwei Spieler …"
     if room.step == "werwolf":

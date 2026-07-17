@@ -757,7 +757,7 @@
           ? "Als Host beendest du die Runde damit für alle Mitspieler."
           : "Du verlässt die Runde auf diesem Gerät. Andere können weiterspielen.",
         confirmLabel: onlineIsHost ? "Runde beenden" : "Verlassen",
-        onConfirm: () => { endOnlineRoomIfHost(); stopOnlineStream(); window.location.href = "/"; },
+        onConfirm: () => { leaveOrEndOnlineRoom(); stopOnlineStream(); window.location.href = "/"; },
       });
       return;
     }
@@ -797,7 +797,7 @@
     if (["view-reveal", "play-view", "view-online-lobby", "view-online-play"].includes(currentActive.id)) {
       const leaving = confirm("Möchtest du das laufende Spiel wirklich beenden?");
       if (leaving && ["view-online-lobby", "view-online-play"].includes(currentActive.id)) {
-        endOnlineRoomIfHost();
+        leaveOrEndOnlineRoom();
         stopOnlineStream();
       }
       return leaving;
@@ -1390,7 +1390,7 @@
     if (onlineIsHost) renderQrAndLink(onlineRoomToken);
   });
   onlineExitButton.addEventListener("click", () => {
-    endOnlineRoomIfHost();
+    leaveOrEndOnlineRoom();
     stopOnlineStream();
     window.location.href = "/";
   });
@@ -1399,11 +1399,18 @@
   // Ergebnis-Ansicht aus), wird sie für alle beendet - ohne Host kann
   // niemand mehr Phasen weiterschieben oder neu starten, die Runde würde
   // sonst nur verwaist im Speicher hängen bleiben (bis zum TTL-Ablauf).
-  function endOnlineRoomIfHost() {
-    if (!onlineIsHost || !onlineRoomToken || !onlineHostToken) return;
-    apiPost(`/rooms/${onlineRoomToken}/end`, { hostToken: onlineHostToken }).catch(() => {
-      /* Verlassen soll auch klappen, wenn der Server schon nicht mehr antwortet. */
-    });
+  // Verlässt eine NICHT-Host-Person, wird sie serverseitig als "left"
+  // markiert, damit die Gruppe nie auf ihre Bestätigung/Stimme wartet, die
+  // nie mehr kommt (siehe leave_room in werwolf_backend.py).
+  function leaveOrEndOnlineRoom() {
+    if (!onlineRoomToken) return;
+    if (onlineIsHost) {
+      if (!onlineHostToken) return;
+      apiPost(`/rooms/${onlineRoomToken}/end`, { hostToken: onlineHostToken }).catch(() => {});
+    } else if (onlinePlayerToken) {
+      apiPost(`/rooms/${onlineRoomToken}/leave`, { playerToken: onlinePlayerToken }).catch(() => {});
+      clearSession(onlineRoomToken);
+    }
   }
 
   /* ---------------- Beim Laden: Join-Link erkennen ---------------- */

@@ -48,7 +48,9 @@
       "PowerShell(Get-CimInstance Win32_Process -Filter 'ProcessId=22396')",
       "Bash(powershell -NoProfile -Command \"Stop-Process -Id 22396 -Force -ErrorAction SilentlyContinue\")",
       "PowerShell(Get-CimInstance Win32_Process -Filter 'ProcessId=20200')",
-      "Bash(powershell -NoProfile -Command \"Stop-Process -Id 20200 -Force -ErrorAction SilentlyContinue\")"
+      "Bash(powershell -NoProfile -Command \"Stop-Process -Id 20200 -Force -ErrorAction SilentlyContinue\")",
+      "PowerShell(Get-CimInstance Win32_Process -Filter 'ProcessId=23020')",
+      "Bash(powershell -NoProfile -Command \"Stop-Process -Id 23020 -Force -ErrorAction SilentlyContinue\")"
     ]
   }
 }
