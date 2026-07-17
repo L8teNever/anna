@@ -73,6 +73,33 @@
   const restartButton = document.getElementById("restart-button");
   const exitButton = document.getElementById("exit-button");
 
+  // Online-Mehrgeräte-Modus (siehe Abschnitt weiter unten)
+  const modeSelect = document.getElementById("werwolf-mode-select");
+  const onlineHostNameRow = document.getElementById("online-host-name-row");
+  const onlineHostNameInput = document.getElementById("online-host-name-input");
+  const onlineLobbyView = document.getElementById("view-online-lobby");
+  const onlinePlayView = document.getElementById("view-online-play");
+  const onlineHostPanel = document.getElementById("online-host-panel");
+  const onlineJoinForm = document.getElementById("online-join-form");
+  const onlineJoinNameInput = document.getElementById("online-join-name-input");
+  const onlineJoinSubmitButton = document.getElementById("online-join-submit-button");
+  const onlineJoinError = document.getElementById("online-join-error");
+  const onlinePlayerListPanel = document.getElementById("online-player-list-panel");
+  const onlinePlayerCount = document.getElementById("online-player-count");
+  const onlinePlayerList = document.getElementById("online-player-list");
+  const onlineWaitingText = document.getElementById("online-waiting-text");
+  const onlineLobbyActions = document.getElementById("online-lobby-actions");
+  const onlineStartButton = document.getElementById("online-start-button");
+  const werwolfQrWrap = document.getElementById("werwolf-qr-wrap");
+  const werwolfJoinLinkInput = document.getElementById("werwolf-join-link-input");
+  const werwolfCopyLinkButton = document.getElementById("werwolf-copy-link-button");
+  const onlineStatusText = document.getElementById("online-status-text");
+  const onlineBody = document.getElementById("online-body");
+  const onlineActions = document.getElementById("online-actions");
+  const onlineEndActions = document.getElementById("online-end-actions");
+  const onlineRestartButton = document.getElementById("online-restart-button");
+  const onlineExitButton = document.getElementById("online-exit-button");
+
   const playerPicker = PlayerPicker.create();
 
   /* ------------------------------------------------------------------ */
@@ -132,13 +159,13 @@
     playerSummary.textContent = count === 1 ? "1 Spieler ausgewählt" : `${count} Spieler ausgewählt`;
 
     const valid = count >= MIN_PLAYERS && count <= MAX_PLAYERS;
-    validationWarning.hidden = valid;
+    validationWarning.hidden = valid || mode !== "local";
     if (!valid) {
       validationWarningText.textContent = count < MIN_PLAYERS
         ? `Mindestens ${MIN_PLAYERS} Mitspieler nötig (aktuell ${count}).`
         : `Höchstens ${MAX_PLAYERS} Mitspieler möglich (aktuell ${count}).`;
     }
-    startButton.disabled = !valid;
+    if (mode === "local") startButton.disabled = !valid;
     renderWerwolfCount();
   }
 
@@ -148,6 +175,30 @@
   openPlayerSelectBtn.addEventListener("click", () => ViewNav.transition(setupView, playerSelectView));
   playerBackButton.addEventListener("click", () => ViewNav.transition(playerSelectView, setupView));
   playerConfirmButton.addEventListener("click", () => ViewNav.transition(playerSelectView, setupView));
+
+  /* ------------------------------------------------------------------ */
+  /* Modus-Auswahl (Einzelgerät / Online)                                  */
+  /* ------------------------------------------------------------------ */
+  let mode = "local";
+
+  function updateModeUI() {
+    const isOnline = mode === "online";
+    openPlayerSelectBtn.hidden = isOnline;
+    onlineHostNameRow.hidden = !isOnline;
+    validationWarning.hidden = isOnline || validationWarning.hidden;
+    startButton.innerHTML = isOnline
+      ? `<svg class="m3-icon" style="width: 18px; height: 18px"><use href="#icon-users"></use></svg> Online-Runde erstellen`
+      : `<svg class="m3-icon" style="width: 18px; height: 18px"><use href="#icon-play"></use></svg> Runde starten`;
+    startButton.disabled = isOnline ? false : !(playerPicker.getActiveCount() >= MIN_PLAYERS && playerPicker.getActiveCount() <= MAX_PLAYERS);
+  }
+
+  modeSelect.addEventListener("click", (event) => {
+    const btn = event.target.closest(".m3-segmented__option");
+    if (!btn) return;
+    mode = btn.dataset.mode;
+    modeSelect.querySelectorAll(".m3-segmented__option").forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
+    updateModeUI();
+  });
 
   /* ------------------------------------------------------------------ */
   /* Hilfsfunktionen                                                       */
@@ -333,6 +384,7 @@
   setupSwipeReveal(revealCard, revealCardFront, peekCurrentPlayer, hideCurrentPlayer);
 
   revealNextButton.addEventListener("click", () => {
+    if (mode === "online") return; // Online-Reveal hat seinen eigenen Handler (siehe unten, per .onclick gesetzt)
     currentRevealIndex += 1;
     const total = revealStage === "self" ? roundPlayers.length : wolfIndices.length;
     if (currentRevealIndex < total) {
@@ -674,6 +726,10 @@
   }
 
   startButton.addEventListener("click", () => {
+    if (mode === "online") {
+      createOnlineRoom();
+      return;
+    }
     const count = playerPicker.getActiveCount();
     if (count < MIN_PLAYERS || count > MAX_PLAYERS) return;
     beginRound();
@@ -686,6 +742,15 @@
   /* Zurück-Navigation                                                     */
   /* ------------------------------------------------------------------ */
   backButton.addEventListener("click", () => {
+    if ((!onlineLobbyView.hidden || !onlinePlayView.hidden) && setupView.hidden) {
+      ConfirmDialog.show({
+        title: "Online-Runde verlassen?",
+        message: "Du verlässt die Runde auf diesem Gerät. Andere können weiterspielen.",
+        confirmLabel: "Verlassen",
+        onConfirm: () => { stopOnlineStream(); window.location.href = "/"; },
+      });
+      return;
+    }
     if (!revealView.hidden && setupView.hidden) {
       ConfirmDialog.show({
         title: "Spiel verlassen?",
@@ -717,9 +782,458 @@
   // rechtzeitig aufhalten.
   window.confirmGameExit = function () {
     const currentActive = document.querySelector(".app-view:not([hidden])");
-    if (currentActive && (currentActive.id === "view-reveal" || currentActive.id === "play-view")) {
+    if (!currentActive) return true;
+    if (currentActive.id === "view-reveal" && mode === "online") return true; // eigener Reveal, kein Gruppenzustand
+    if (["view-reveal", "play-view", "view-online-lobby", "view-online-play"].includes(currentActive.id)) {
       return confirm("Möchtest du das laufende Spiel wirklich beenden?");
     }
     return true;
   };
+
+  /* ==================================================================== */
+  /* Online-Mehrgeräte-Modus                                               */
+  /* ==================================================================== */
+
+  function sessionKey(token) { return `anna:werwolf:session:${token}`; }
+  function saveSession(token, data) { localStorage.setItem(sessionKey(token), JSON.stringify(data)); }
+  function loadSession(token) {
+    try { return JSON.parse(localStorage.getItem(sessionKey(token)) || "null"); } catch { return null; }
+  }
+  function clearSession(token) { localStorage.removeItem(sessionKey(token)); }
+
+  function isOnlineMuted() { return localStorage.getItem("anna:werwolf:muted") === "1"; }
+
+  async function apiPost(path, body) {
+    const res = await fetch(`/api/werwolf${path}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body || {}),
+    });
+    let data = {};
+    try { data = await res.json(); } catch { /* leere Antwort */ }
+    if (!res.ok) throw new Error(data.error || `Fehler (${res.status})`);
+    return data;
+  }
+
+  let onlineRoomToken = null;
+  let onlineHostToken = null;
+  let onlinePlayerToken = null;
+  let onlineIsHost = false;
+  let onlineEventSource = null;
+  let onlineLatestSnapshot = null;
+  let onlineRoleRevealShown = false;
+  let onlineLastNarrated = "";
+  let onlinePrivateResultPending = false;
+
+  function onlineJoinUrl(token) {
+    return `${window.location.origin}/werwolf/join/${token}`;
+  }
+
+  function detectJoinToken() {
+    const parts = window.location.pathname.split("/").filter(Boolean);
+    if (parts[0] === "werwolf" && parts[1] === "join" && parts[2]) return parts[2];
+    return null;
+  }
+
+  function showOnlineView(viewEl) {
+    [setupView, playerSelectView, revealView, playView, onlineLobbyView, onlinePlayView].forEach((v) => {
+      v.hidden = v !== viewEl;
+    });
+    const topbar = document.getElementById("game-topbar");
+    if (topbar) topbar.hidden = false;
+  }
+
+  /* ---------------- Host: Raum erstellen ---------------- */
+  async function createOnlineRoom() {
+    const hostName = onlineHostNameInput.value.trim() || "Host";
+    let created;
+    try {
+      created = await apiPost("/rooms", { hostName });
+      await apiPost(`/rooms/${created.roomToken}/config`, { hostToken: created.hostToken, roleConfig: { ...roleConfig } });
+    } catch (err) {
+      Toast.show(err.message, "alert-triangle");
+      return;
+    }
+    onlineRoomToken = created.roomToken;
+    onlineHostToken = created.hostToken;
+    onlinePlayerToken = created.playerToken;
+    onlineIsHost = true;
+    saveSession(onlineRoomToken, { playerToken: onlinePlayerToken, hostToken: onlineHostToken, isHost: true });
+
+    showOnlineView(onlineLobbyView);
+    onlineHostPanel.hidden = false;
+    onlineJoinForm.hidden = true;
+    onlinePlayerListPanel.hidden = false;
+    renderQrAndLink(onlineRoomToken);
+    startOnlineStream();
+  }
+
+  function renderQrAndLink(token) {
+    const url = onlineJoinUrl(token);
+    werwolfJoinLinkInput.value = url;
+    werwolfQrWrap.innerHTML = "";
+    try {
+      let typeNumber = 4;
+      let qr = null;
+      while (typeNumber <= 40) {
+        try {
+          qr = qrcode(typeNumber, "M");
+          qr.addData(url);
+          qr.make();
+          break;
+        } catch (e) {
+          qr = null;
+          typeNumber += 1;
+        }
+      }
+      if (qr) werwolfQrWrap.innerHTML = qr.createSvgTag(4, 8);
+    } catch (e) {
+      /* QR-Code ist ein Extra, der Link allein funktioniert trotzdem. */
+    }
+  }
+
+  werwolfCopyLinkButton.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(werwolfJoinLinkInput.value);
+      Toast.show("Link kopiert", "check");
+    } catch (e) {
+      werwolfJoinLinkInput.select();
+      try { document.execCommand("copy"); Toast.show("Link kopiert", "check"); } catch (e2) { /* Zwischenablage nicht verfügbar */ }
+    }
+  });
+
+  /* ---------------- Beitreten über Join-Link ---------------- */
+  function enterAsJoiner(token) {
+    mode = "online";
+    onlineRoomToken = token;
+    showOnlineView(onlineLobbyView);
+    onlineHostPanel.hidden = true;
+
+    const saved = loadSession(token);
+    if (saved && saved.playerToken) {
+      onlinePlayerToken = saved.playerToken;
+      onlineHostToken = saved.hostToken || null;
+      onlineIsHost = !!saved.isHost;
+      rejoinRoom();
+    } else {
+      showJoinForm();
+    }
+  }
+
+  function showJoinForm() {
+    onlineJoinForm.hidden = false;
+    onlinePlayerListPanel.hidden = true;
+  }
+
+  async function rejoinRoom() {
+    try {
+      const snap = await apiPost(`/rooms/${onlineRoomToken}/rejoin`, { playerToken: onlinePlayerToken });
+      onlineIsHost = snap.isHost;
+      onlineJoinForm.hidden = true;
+      onlinePlayerListPanel.hidden = false;
+      startOnlineStream();
+    } catch (err) {
+      clearSession(onlineRoomToken);
+      showJoinForm();
+    }
+  }
+
+  onlineJoinSubmitButton.addEventListener("click", async () => {
+    const name = onlineJoinNameInput.value.trim();
+    onlineJoinError.hidden = true;
+    if (!name) {
+      onlineJoinError.textContent = "Bitte einen Namen eingeben";
+      onlineJoinError.hidden = false;
+      return;
+    }
+    try {
+      const r = await apiPost(`/rooms/${onlineRoomToken}/join`, { name });
+      onlinePlayerToken = r.playerToken;
+      onlineIsHost = false;
+      saveSession(onlineRoomToken, { playerToken: onlinePlayerToken, isHost: false });
+      onlineJoinForm.hidden = true;
+      onlinePlayerListPanel.hidden = false;
+      startOnlineStream();
+    } catch (err) {
+      onlineJoinError.textContent = err.message;
+      onlineJoinError.hidden = false;
+    }
+  });
+
+  /* ---------------- Live-Stream (SSE) ---------------- */
+  function stopOnlineStream() {
+    if (onlineEventSource) {
+      onlineEventSource.close();
+      onlineEventSource = null;
+    }
+    WakeLock.disable();
+  }
+
+  function startOnlineStream() {
+    stopOnlineStream();
+    WakeLock.enable();
+    const url = `/api/werwolf/rooms/${onlineRoomToken}/stream?playerToken=${encodeURIComponent(onlinePlayerToken)}`;
+    onlineEventSource = new EventSource(url);
+    onlineEventSource.addEventListener("state", (event) => {
+      onlineLatestSnapshot = JSON.parse(event.data);
+      renderOnlineSnapshot(onlineLatestSnapshot);
+    });
+    onlineEventSource.addEventListener("room-error", (event) => {
+      const payload = JSON.parse(event.data);
+      Toast.show(payload.message || "Die Runde ist nicht mehr aktiv", "alert-triangle");
+      clearSession(onlineRoomToken);
+      stopOnlineStream();
+      window.location.href = "/";
+    });
+  }
+
+  /* ---------------- Lobby-Ansicht rendern ---------------- */
+  function renderOnlineSnapshot(snapshot) {
+    if (snapshot.phase === "lobby") {
+      onlineRoleRevealShown = false;
+      onlineLastNarrated = "";
+      onlinePrivateResultPending = false;
+      if (onlineLobbyView.hidden) {
+        showOnlineView(onlineLobbyView);
+        onlineHostPanel.hidden = !snapshot.isHost;
+        onlineJoinForm.hidden = true;
+        onlinePlayerListPanel.hidden = false;
+        if (snapshot.isHost) renderQrAndLink(onlineRoomToken);
+      }
+      onlinePlayerCount.textContent = String(snapshot.players.length);
+      onlinePlayerList.innerHTML = snapshot.players.map((p) => `
+        <div class="werwolf-death-list__item">${escapeHtml(p.name)}${p.isYou ? " (du)" : ""}${p.isHost ? " · Host" : ""}</div>
+      `).join("");
+      onlineWaitingText.hidden = snapshot.isHost;
+      onlineLobbyActions.hidden = !snapshot.isHost;
+      if (snapshot.isHost) {
+        onlineStartButton.disabled = snapshot.players.length < snapshot.minPlayers || snapshot.players.length > snapshot.maxPlayers;
+      }
+      return;
+    }
+
+    // Spiel hat begonnen: erst einmal die eigene Rolle privat per Wisch-Karte
+    // zeigen (wie im Einzelgerät-Modus), danach weiter zum gemeinsamen Screen.
+    if (!onlineRoleRevealShown) {
+      onlineRoleRevealShown = true;
+      showOnlineRoleReveal(snapshot);
+      return;
+    }
+    if (!onlinePlayView.hidden || revealView.hidden) {
+      renderOnlinePlay(snapshot);
+    }
+  }
+
+  function showOnlineRoleReveal(snapshot) {
+    showOnlineView(revealView);
+    revealStageLabel.textContent = "Deine Rolle";
+    revealPlayerName.textContent = "";
+    revealProgress.textContent = "";
+    revealCard.classList.remove("reveal-card--revealed");
+    revealCardBack.hidden = false;
+    revealCardFront.hidden = false;
+    revealNextButton.hidden = true;
+    delete revealCard.dataset.peeked;
+    revealCardHint.innerHTML = "Nach oben wischen und halten,<br/>um deine Rolle zu sehen";
+
+    revealRole.textContent = snapshot.myRoleLabel || "";
+    revealWord.textContent = ROLE_DESCRIPTIONS[snapshot.myRole] || "";
+    revealWord.hidden = false;
+    if (snapshot.wolfPack && snapshot.wolfPack.length) {
+      revealIdentityList.hidden = false;
+      revealIdentityList.innerHTML = `<p class="identity-list__item"><span class="identity-list__name">Eure Mitwölfe:</span></p>` +
+        snapshot.wolfPack.map((name) => `<div class="identity-list__item"><span class="identity-list__name">${escapeHtml(name)}</span><span class="identity-list__value">🐺</span></div>`).join("");
+    } else {
+      revealIdentityList.hidden = true;
+    }
+
+    revealNextButton.onclick = () => {
+      showOnlineView(onlinePlayView);
+      if (onlineLatestSnapshot) renderOnlinePlay(onlineLatestSnapshot);
+    };
+  }
+
+  function renderOnlinePlay(snapshot) {
+    if (snapshot.publicStatus && snapshot.publicStatus !== onlineLastNarrated) {
+      onlineLastNarrated = snapshot.publicStatus;
+      onlineStatusText.textContent = snapshot.publicStatus;
+      if (!isOnlineMuted()) Sound.say(snapshot.publicStatus);
+    }
+
+    if (snapshot.phase === "ended") {
+      onlineActions.hidden = true;
+      onlineBody.innerHTML = `
+        <div class="werwolf-result-card">
+          <p class="m3-headline">${snapshot.winner === "dorf" ? "Das Dorf hat gewonnen!" : "Die Werwölfe haben gewonnen!"}</p>
+          <div class="identity-list">
+            ${snapshot.players.map((p) => `<div class="identity-list__item"><span class="identity-list__name">${escapeHtml(p.name)}</span><span class="identity-list__value">${p.alive ? "" : "☠"}</span></div>`).join("")}
+          </div>
+        </div>
+      `;
+      onlineEndActions.hidden = false;
+      onlineRestartButton.hidden = !snapshot.isHost;
+      if (!snapshot.isHost) {
+        onlineBody.innerHTML += `<p class="m3-body" style="text-align: center; margin-top: 8px">Warte, bis der Host eine neue Runde startet …</p>`;
+      }
+      return;
+    }
+
+    onlineEndActions.hidden = true;
+
+    if (onlinePrivateResultPending) return; // Seherin-Ergebnis wird gerade angezeigt, nicht überschreiben
+
+    if (!snapshot.myAlive) {
+      onlineBody.innerHTML = `<p class="m3-body" style="text-align: center">Du bist ausgeschieden – schau weiter zu, wie es ausgeht.</p>`;
+      onlineActions.hidden = true;
+      return;
+    }
+
+    if (!snapshot.isMyTurn || !snapshot.myAction) {
+      onlineBody.innerHTML = `<p class="m3-body" style="text-align: center">Wartet …</p>`;
+      onlineActions.hidden = true;
+      return;
+    }
+
+    renderOnlineAction(snapshot.myAction);
+  }
+
+  function renderOnlineAction(action) {
+    if (action.type === "hexe-heal") {
+      onlineBody.innerHTML = `<p class="m3-body" style="text-align: center">Die Werwölfe haben <strong>${escapeHtml(action.victimName)}</strong> gewählt. Heiltrank einsetzen?</p>`;
+      onlineActions.hidden = false;
+      onlineActions.innerHTML = `
+        <button type="button" class="m3-button m3-button--filled" id="online-heal-yes">Ja, retten</button>
+        <button type="button" class="m3-button m3-button--text" id="online-heal-no" style="margin-top: 8px">Nein</button>
+      `;
+      document.getElementById("online-heal-yes").addEventListener("click", () => submitOnlineAction({ action: "heal-yes" }));
+      document.getElementById("online-heal-no").addEventListener("click", () => submitOnlineAction({ action: "heal-no" }));
+      return;
+    }
+
+    const multiple = !!action.multiple;
+    renderOnlineChoiceList(action.options, {
+      multiple,
+      skipLabel: action.skipLabel || null,
+      onConfirm: (idOrIds) => {
+        if (action.type === "amor") {
+          submitOnlineAction({ targetPlayerIds: idOrIds });
+          return;
+        }
+        if (action.type === "hexe-poison") {
+          submitOnlineAction(idOrIds === null ? { action: "poison-skip" } : { action: "poison", targetPlayerId: idOrIds });
+          return;
+        }
+        submitOnlineAction({ targetPlayerId: idOrIds });
+      },
+    });
+  }
+
+  function renderOnlineChoiceList(options, { multiple = false, skipLabel = null, onConfirm }) {
+    let selected = [];
+
+    function updateActions() {
+      if (!multiple) { onlineActions.hidden = true; onlineActions.innerHTML = ""; return; }
+      if (selected.length === 2) {
+        onlineActions.hidden = false;
+        onlineActions.innerHTML = `<button type="button" class="m3-button m3-button--filled" id="online-choice-confirm-button">Bestätigen</button>`;
+        document.getElementById("online-choice-confirm-button").addEventListener("click", () => onConfirm([...selected]));
+      } else {
+        onlineActions.hidden = true;
+        onlineActions.innerHTML = "";
+      }
+    }
+
+    function draw() {
+      onlineBody.innerHTML = `
+        <div class="werwolf-choice-list">
+          ${options.map((o) => `
+            <button type="button" class="m3-button m3-button--tonal werwolf-choice-list__btn" data-id="${o.playerId}" data-selected="${selected.includes(o.playerId)}">${escapeHtml(o.name)}</button>
+          `).join("")}
+          ${skipLabel ? `<button type="button" class="m3-button m3-button--text" data-skip="true">${escapeHtml(skipLabel)}</button>` : ""}
+        </div>
+      `;
+    }
+
+    draw();
+    updateActions();
+
+    onlineBody.onclick = (event) => {
+      const skipBtn = event.target.closest("[data-skip]");
+      if (skipBtn) { onConfirm(null); return; }
+      const btn = event.target.closest("[data-id]");
+      if (!btn) return;
+      const id = btn.dataset.id;
+      if (!multiple) { onConfirm(id); return; }
+      if (selected.includes(id)) selected = selected.filter((i) => i !== id);
+      else if (selected.length < 2) selected = [...selected, id];
+      draw();
+      updateActions();
+    };
+  }
+
+  async function submitOnlineAction(body) {
+    try {
+      const res = await apiPost(`/rooms/${onlineRoomToken}/action`, { playerToken: onlinePlayerToken, ...body });
+      if (res.result && res.result.type === "seherin-result") {
+        showOnlinePrivateResult(`${res.result.targetName} ist: ${res.result.targetRole}`);
+      } else {
+        onlineActions.hidden = true;
+        onlineActions.innerHTML = "";
+        onlineBody.innerHTML = `<p class="m3-body" style="text-align: center">Wartet …</p>`;
+      }
+    } catch (err) {
+      Toast.show(err.message, "alert-triangle");
+    }
+  }
+
+  function showOnlinePrivateResult(text) {
+    onlinePrivateResultPending = true;
+    onlineBody.innerHTML = `
+      <div class="werwolf-result-card">
+        <p class="m3-headline">${escapeHtml(text)}</p>
+      </div>
+    `;
+    onlineActions.hidden = false;
+    onlineActions.innerHTML = `<button type="button" class="m3-button m3-button--filled" id="online-private-result-continue">Weiter</button>`;
+    document.getElementById("online-private-result-continue").addEventListener("click", () => {
+      onlinePrivateResultPending = false;
+      if (onlineLatestSnapshot) renderOnlinePlay(onlineLatestSnapshot);
+    });
+  }
+
+  onlineStartButton.addEventListener("click", async () => {
+    try {
+      await apiPost(`/rooms/${onlineRoomToken}/start`, { hostToken: onlineHostToken });
+    } catch (err) {
+      Toast.show(err.message, "alert-triangle");
+    }
+  });
+
+  onlineRestartButton.addEventListener("click", async () => {
+    if (onlineIsHost) {
+      try {
+        await apiPost(`/rooms/${onlineRoomToken}/reset`, { hostToken: onlineHostToken });
+      } catch (err) {
+        Toast.show(err.message, "alert-triangle");
+        return;
+      }
+    }
+    onlineRoleRevealShown = false;
+    onlineLastNarrated = "";
+    showOnlineView(onlineLobbyView);
+    onlineHostPanel.hidden = !onlineIsHost;
+    onlineJoinForm.hidden = true;
+    onlinePlayerListPanel.hidden = false;
+    if (onlineIsHost) renderQrAndLink(onlineRoomToken);
+  });
+  onlineExitButton.addEventListener("click", () => {
+    stopOnlineStream();
+    window.location.href = "/";
+  });
+
+  /* ---------------- Beim Laden: Join-Link erkennen ---------------- */
+  const joinTokenFromUrl = detectJoinToken();
+  if (joinTokenFromUrl) {
+    enterAsJoiner(joinTokenFromUrl);
+  }
 })();

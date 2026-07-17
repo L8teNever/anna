@@ -5,11 +5,18 @@ Der Server enthält bewusst KEINE Spiellogik. Er liefert nur Dateien aus
 und public/games/<id>/), damit sie nach dem ersten Laden auch offline
 (über den Service Worker) funktionieren.
 
+EINZIGE Ausnahme: der Online-Mehrgeräte-Modus von "Werwolf" braucht echten
+Server-Zustand (mehrere Geräte müssen sich eine Runde teilen). Diese Logik
+lebt komplett separat in `werwolf_backend.py` - der Server hier delegiert
+nur `/api/werwolf/...`-Anfragen dorthin, alles andere bleibt unverändert
+reines Datei-Ausliefern.
+
 Routing-Konvention (macht neue Spiele "plug and play"):
-  /                -> public/index.html
-  /settings        -> public/settings/index.html
-  /<game-id>       -> public/games/<game-id>/index.html   (falls vorhanden)
-  /alles-andere    -> public/<pfad> als statische Datei
+  /                     -> public/index.html
+  /settings             -> public/settings/index.html
+  /<game-id>            -> public/games/<game-id>/index.html   (falls vorhanden)
+  /api/werwolf/...      -> werwolf_backend.py (JSON-POST + SSE-Stream)
+  /alles-andere         -> public/<pfad> als statische Datei
 
 Ein neues Spiel hinzufügen = neuen Ordner unter public/games/<id>/ mit
 einer index.html anlegen. Der Server erkennt die Route automatisch.
@@ -17,12 +24,15 @@ einer index.html anlegen. Der Server erkennt die Route automatisch.
 
 from __future__ import annotations
 
+import json
 import mimetypes
 import os
 from http import HTTPStatus
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
-from urllib.parse import unquote, urlsplit
+from urllib.parse import parse_qs, unquote, urlsplit
+
+import werwolf_backend
 
 PUBLIC_DIR = Path(__file__).resolve().parent / "public"
 GAMES_DIR = PUBLIC_DIR / "games"
@@ -81,12 +91,70 @@ class AnnaRequestHandler(SimpleHTTPRequestHandler):
         return super().send_head()
 
     def end_headers(self):
-        filename = Path(urlsplit(self.path).path).name
-        if filename in NO_CACHE_FILENAMES or filename == "":
-            self.send_header("Cache-Control", "no-cache, must-revalidate")
+        path = urlsplit(self.path).path
+        if path.startswith("/api/"):
+            # API-Antworten (JSON + SSE) dürfen nie zwischengespeichert
+            # werden - enthalten Session-/Rollen-Zustand.
+            self.send_header("Cache-Control", "no-store")
         else:
-            self.send_header("Cache-Control", "public, max-age=3600")
+            filename = Path(path).name
+            if filename in NO_CACHE_FILENAMES or filename == "":
+                self.send_header("Cache-Control", "no-cache, must-revalidate")
+            else:
+                self.send_header("Cache-Control", "public, max-age=3600")
         super().end_headers()
+
+    def do_GET(self):
+        segments = [p for p in urlsplit(self.path).path.strip("/").split("/") if p]
+        if len(segments) == 5 and segments[:3] == ["api", "werwolf", "rooms"] and segments[4] == "stream":
+            self._handle_werwolf_stream(segments[3])
+            return
+        super().do_GET()
+
+    def do_POST(self):
+        segments = [p for p in urlsplit(self.path).path.strip("/").split("/") if p]
+        if len(segments) >= 2 and segments[0] == "api" and segments[1] == "werwolf":
+            self._handle_werwolf_post(segments[2:])
+            return
+        self.send_error(HTTPStatus.NOT_IMPLEMENTED, f"Unsupported method ({self.command!r})")
+
+    def _handle_werwolf_post(self, segments: list[str]) -> None:
+        length = int(self.headers.get("Content-Length") or 0)
+        raw = self.rfile.read(length) if length else b""
+        try:
+            body = json.loads(raw.decode("utf-8")) if raw else {}
+            if not isinstance(body, dict):
+                raise ValueError("body must be a JSON object")
+        except (json.JSONDecodeError, UnicodeDecodeError, ValueError):
+            self._send_json(HTTPStatus.BAD_REQUEST, {"error": "Ungültiges JSON"})
+            return
+
+        try:
+            result = werwolf_backend.handle_post(segments, body, self.client_address[0])
+            self._send_json(HTTPStatus.OK, result)
+        except werwolf_backend.ApiError as exc:
+            self._send_json(exc.status, {"error": exc.message})
+
+    def _handle_werwolf_stream(self, token: str) -> None:
+        query = parse_qs(urlsplit(self.path).query)
+        player_token = (query.get("playerToken") or [""])[0]
+        self.send_response(HTTPStatus.OK)
+        self.send_header("Content-Type", "text/event-stream")
+        self.send_header("Connection", "keep-alive")
+        self.send_header("X-Accel-Buffering", "no")
+        self.end_headers()
+        try:
+            werwolf_backend.stream_room(token, player_token, self.wfile)
+        except (BrokenPipeError, ConnectionResetError, OSError):
+            pass
+
+    def _send_json(self, status: int, payload: dict) -> None:
+        data = json.dumps(payload).encode("utf-8")
+        self.send_response(status)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Length", str(len(data)))
+        self.end_headers()
+        self.wfile.write(data)
 
     def send_error(self, code, message=None, explain=None):
         if code == HTTPStatus.NOT_FOUND:

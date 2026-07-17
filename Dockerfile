@@ -2,8 +2,8 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Copy the server script and the public assets
-COPY server.py .
+# Copy the server scripts and the public assets
+COPY server.py werwolf_backend.py ./
 COPY public/ ./public/
 
 EXPOSE 8080

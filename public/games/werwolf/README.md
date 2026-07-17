@@ -50,6 +50,45 @@ echten Spieltisch).
 
 ## Online-Mehrgeräte-Modus
 
-Noch nicht enthalten – geplant als zweiter Ausbauschritt mit eigenem
-Backend (Server-Sent Events + Raum-Token), siehe Projektplan. Aktuell ist
-nur der Einzelgerät-Modus implementiert.
+Zweiter Spielmodus (Segmented-Control oben im Setup): jede Person joint mit
+ihrem EIGENEN Gerät über QR-Code/Link, sieht ihre Rolle privat auf ihrem
+eigenen Screen und macht Nacht-Aktionen (Werwolf-Opfer, Seherin, Hexe, Amor)
+auf ihrem eigenen Gerät statt am gemeinsam herumgereichten Handy.
+
+**Einziges Spiel dieser App mit echter Server-Spiellogik** – die komplette
+Backend-Logik (Räume, Rollen-Zustandsmaschine, Abstimmungen) lebt in
+[`werwolf_backend.py`](../../../werwolf_backend.py) im Projekt-Root, rein im
+Arbeitsspeicher (kein Datenbank, keine neue Abhängigkeit). `server.py`
+delegiert nur `/api/werwolf/...`-Anfragen dorthin – alle anderen Spiele
+bleiben unverändert rein clientseitig.
+
+- **Architektur**: Server-Sent Events (Server→Client, 1×/Sekunde gepollt,
+  siehe `STREAM_POLL_INTERVAL`) + normale POST-JSON-Endpunkte
+  (Client→Server). Kein WebSocket, keine neue pip-Abhängigkeit, ein Prozess.
+- **Sicherheit**: Raum-/Spieler-Token sind 128-Bit-Zufallswerte
+  (`secrets.token_urlsafe`), es gibt keinen Endpunkt, der Räume auflistet –
+  nur wer den exakten Link/QR-Code hat, kann beitreten. Beitritt geht nur,
+  solange die Runde noch in der Lobby ist. Rate-Limiting pro IP auf
+  join/action-Endpunkten.
+- **Datensparsamkeit (DSGVO)**: alles nur im Arbeitsspeicher, kein Logging
+  von Namen/Rollen auf Platte, Räume verfallen nach 6h Inaktivität
+  (`ROOM_TTL_SECONDS`) oder wenn der Host beendet. **Kein Ersatz für eine
+  rechtliche Prüfung** – falls diese App über den Freundeskreis hinaus
+  genutzt wird, gehört eine entsprechende Ergänzung auf die externe
+  `legal.kulbarts.com`-Seite dazu, da hier zum ersten Mal Namen über einen
+  Server laufen (wenn auch nur temporär und im Arbeitsspeicher).
+- **Reconnect**: der Client speichert `{playerToken}` pro Raum in
+  `localStorage` (`anna:werwolf:session:<roomToken>`) – Handy aus/an oder
+  Tab neu laden wirft niemanden raus, solange der Raum noch existiert.
+- **QR-Code**: rein clientseitig erzeugt (vendored `public/js/qrcode.js`,
+  MIT-lizenzierter Encoder von Kazuhiko Arase) – die Einladungs-URL wird
+  NIE an einen externen QR-Bild-Dienst geschickt.
+- **Bildschirm-Verhalten**: `WakeLock.enable()` hält alle verbundenen
+  Bildschirme an, solange die Runde läuft. Außerhalb der eigenen Aktion
+  zeigt jedes Gerät denselben neutralen `publicStatus`-Text – nur das Gerät
+  der Person, die gerade dran ist, zeigt kurz die private Auswahl
+  (`isMyTurn`/`myAction` im Snapshot). So kann man die Handys offen auf den
+  Tisch legen, ohne dass ein Blick verrät, wer welche Rolle hat.
+- **Tests**: `python -m unittest test_werwolf_backend -v` (Root-Verzeichnis)
+  deckt Rollen-Zuteilung, Nacht/Tag-Ablauf, Liebes-Kettentod, Jäger-Schuss,
+  Sieg-Bedingung, Reconnect, Rate-Limit und die Sicherheits-Checks ab.

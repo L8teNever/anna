@@ -17,7 +17,20 @@
       "Bash(node -e \"global.self=global; require\\('./js/game-registry.js'\\); console.log\\(JSON.stringify\\(self.GAMES.map\\(g=>g.id\\)\\)\\);\")",
       "Bash(PORT=8099 python server.py)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:8099/nie)",
-      "mcp__plugin_context-mode_context-mode__ctx_execute"
+      "mcp__plugin_context-mode_context-mode__ctx_execute",
+      "Bash(powershell -NoProfile -Command \"Get-NetTCPConnection -LocalPort 8099 -ErrorAction SilentlyContinue | Select-Object State,OwningProcess\")",
+      "Bash(powershell -NoProfile -Command \"Stop-Process -Id 17352 -Force -ErrorAction SilentlyContinue; Start-Sleep -Milliseconds 500; Get-NetTCPConnection -LocalPort 8099 -ErrorAction SilentlyContinue\")",
+      "Bash(powershell -NoProfile -Command \"Get-CimInstance Win32_Process -Filter 'ProcessId=5924' | Select-Object ProcessId,Name,CommandLine\")",
+      "Bash(PORT=8199 python server.py)",
+      "Bash(curl -s -o /dev/null -w \"static route: %{http_code}\\\\n\" http://localhost:8199/werwolf)",
+      "Bash(powershell -NoProfile -Command \"Get-NetTCPConnection -LocalPort 8199 -ErrorAction SilentlyContinue | Select-Object OwningProcess\")",
+      "Bash(powershell -NoProfile -Command \"Get-CimInstance Win32_Process -Filter 'ProcessId=10912' | Select-Object ProcessId,Name,CommandLine\")",
+      "Bash(powershell -NoProfile -Command \"Stop-Process -Id 10912 -Force -ErrorAction SilentlyContinue\")",
+      "Read(//tmp/**)",
+      "Bash(docker --version)",
+      "Bash(powershell -NoProfile -Command \"Get-CimInstance Win32_Process -Filter 'ProcessId=7844' | Select-Object CommandLine\")",
+      "Bash(powershell -NoProfile -Command \"Stop-Process -Id 7844 -Force -ErrorAction SilentlyContinue\")",
+      "Bash(python -m unittest test_werwolf_backend -v)"
     ]
   }
 }

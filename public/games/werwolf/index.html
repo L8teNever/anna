@@ -53,6 +53,16 @@
         </p>
       </div>
 
+      <div class="m3-segmented werwolf-mode-select" id="werwolf-mode-select" role="group" aria-label="Spielmodus wählen">
+        <button type="button" class="m3-segmented__option" data-mode="local" aria-pressed="true">Einzelgerät</button>
+        <button type="button" class="m3-segmented__option" data-mode="online">Online (mehrere Geräte)</button>
+      </div>
+
+      <div class="game-option-row" id="online-host-name-row" hidden>
+        <span class="game-option-row__label">Dein Name<br /><span class="game-option-row__hint">du bist auch Mitspieler:in</span></span>
+        <input type="text" id="online-host-name-input" class="m3-text-input" placeholder="Host" maxlength="30" style="max-width: 140px" />
+      </div>
+
       <button type="button" class="picker-launch-btn" id="open-player-select-button">
         <div class="picker-launch-btn__left">
           <div class="picker-launch-btn__icon"><svg class="m3-icon"><use href="#icon-users"></use></svg></div>
@@ -185,6 +195,57 @@
       </div>
     </section>
 
+    <!-- ---------- Online-Lobby: QR/Link (Host) oder Beitritts-Formular (Joiner) ---------- -->
+    <section class="game-view app-view" id="view-online-lobby" hidden>
+      <div class="werwolf-online-stage">
+        <div id="online-host-panel" hidden>
+          <p class="m3-title" style="text-align: center">Andere beitreten lassen</p>
+          <div class="werwolf-qr-wrap" id="werwolf-qr-wrap"></div>
+          <div class="werwolf-join-link-row">
+            <input type="text" id="werwolf-join-link-input" class="m3-text-input" readonly />
+            <button type="button" class="m3-icon-button" id="werwolf-copy-link-button" aria-label="Link kopieren" title="Link kopieren">
+              <svg class="m3-icon"><use href="#icon-check"></use></svg>
+            </button>
+          </div>
+        </div>
+
+        <div id="online-join-form" hidden>
+          <p class="m3-title" style="text-align: center">Wie heißt du?</p>
+          <input type="text" id="online-join-name-input" class="m3-text-input" placeholder="Dein Name" maxlength="30" style="width: 100%" />
+          <button type="button" class="m3-button m3-button--filled" id="online-join-submit-button" style="width: 100%; margin-top: 12px">Beitreten</button>
+          <p class="m3-body" id="online-join-error" style="color: var(--m3-error); text-align: center" hidden></p>
+        </div>
+
+        <div id="online-player-list-panel" hidden>
+          <div class="picker-list-toolbar">
+            <span>Mitspieler</span>
+            <span class="picker-list-toolbar__count" id="online-player-count">0</span>
+          </div>
+          <div class="werwolf-choice-list" id="online-player-list"></div>
+          <p class="m3-body" id="online-waiting-text" style="text-align: center" hidden>Warte auf den Host …</p>
+        </div>
+      </div>
+      <div class="game-bottom-bar" id="online-lobby-actions" hidden>
+        <button type="button" class="m3-button m3-button--filled" id="online-start-button">Runde starten</button>
+      </div>
+    </section>
+
+    <!-- ---------- Online-Spiel: gemeinsamer Screen + private Aktion, wenn man dran ist ---------- -->
+    <section class="game-view app-view" id="view-online-play" hidden>
+      <div class="werwolf-stage">
+        <svg class="m3-icon werwolf-stage__icon"><use href="#icon-moon"></use></svg>
+        <p class="werwolf-stage__status" id="online-status-text">…</p>
+        <div class="werwolf-stage__body" id="online-body"></div>
+      </div>
+      <div class="game-bottom-bar" id="online-actions" hidden></div>
+      <div class="game-bottom-bar" id="online-end-actions" hidden>
+        <button type="button" class="m3-button m3-button--filled" id="online-restart-button">Zurück zur Lobby</button>
+        <button type="button" class="m3-button m3-button--text" id="online-exit-button" style="margin-top: 8px">
+          Zur Startseite
+        </button>
+      </div>
+    </section>
+
     <!-- ---------- Nacht/Tag-Ablauf ---------- -->
     <section class="game-view app-view" id="play-view" hidden>
       <div class="werwolf-stage">
@@ -210,7 +271,9 @@
   <script src="/js/confirm-dialog.js"></script>
   <script src="/js/player-picker.js"></script>
   <script src="/js/audio.js"></script>
+  <script src="/js/wake-lock.js"></script>
   <script src="/js/touch-fixes.js"></script>
+  <script src="/js/qrcode.js"></script>
   <script src="/games/werwolf/werwolf.js"></script>
   <script src="/js/pwa-helper.js"></script>
 </body>
