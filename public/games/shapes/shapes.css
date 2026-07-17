@@ -1,0 +1,74 @@
+/**
+ * Visuals, die ausschließlich zu "Perfekte Form" gehören. Layout/Grundgerüst
+ * kommt aus main.css (.game-shell, .game-view, .game-bottom-bar, .m3-segmented ...),
+ * hier nur die Formauswahl-Leiste und die Zeichenfläche.
+ */
+
+.shape-select {
+  width: 100%;
+  display: flex;
+}
+
+.shape-select .m3-segmented__option {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 6px;
+}
+
+.shape-prompt {
+  text-align: center;
+  font-family: var(--m3-font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--m3-on-surface);
+}
+
+.shape-canvas-wrap {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  border-radius: var(--m3-shape-xxl);
+  background: var(--m3-surface-container);
+  border: 1px solid var(--m3-outline-variant);
+  overflow: hidden;
+}
+
+#shape-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
+}
+
+/* Kleines Ergebnis-Badge statt Vollbild-Overlay: die gepunktete Idealform
+   bleibt neben der eigenen Zeichnung sichtbar, damit man den Vergleich sieht. */
+.shape-result {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 10px 18px;
+  border-radius: var(--m3-shape-full);
+  background: color-mix(in srgb, var(--m3-surface-container-highest) 92%, transparent);
+  border: 1px solid var(--m3-outline-variant);
+  box-shadow: var(--m3-elevation-2);
+}
+
+.shape-result__score {
+  font-family: var(--m3-font-display);
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--game-orange);
+}
+
+.shape-result__verdict {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--m3-on-surface-variant);
+}

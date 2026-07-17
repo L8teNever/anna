@@ -94,6 +94,22 @@
       <line x1="12" y1="14" x2="12" y2="20"/>
       <line x1="8" y1="20" x2="16" y2="20"/>
     </symbol>
+    <symbol id="icon-shapes" viewBox="0 0 24 24">
+      <circle cx="9" cy="9" r="6"/>
+      <rect x="9" y="9" width="12" height="12" rx="1.5"/>
+    </symbol>
+    <symbol id="icon-shape-circle" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9"/>
+    </symbol>
+    <symbol id="icon-shape-rectangle" viewBox="0 0 24 24">
+      <rect x="3" y="6" width="18" height="12" rx="1.5"/>
+    </symbol>
+    <symbol id="icon-shape-triangle" viewBox="0 0 24 24">
+      <path d="M12 3 21 20H3Z"/>
+    </symbol>
+    <symbol id="icon-shape-star" viewBox="0 0 24 24">
+      <path d="M12 2.5l2.6 6.4 6.9.5-5.3 4.4 1.8 6.7L12 16.9 5.9 20.5l1.8-6.7-5.3-4.4 6.9-.5Z"/>
+    </symbol>
   `;
   document.body.prepend(sprite);
 })();

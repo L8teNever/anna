@@ -46,6 +46,18 @@
       maxPlayers: 20,
       assets: ["/games/nie/nie.js", "/games/nie/nie.css", "/games/nie/categories.json"],
     },
+    {
+      id: "shapes",
+      name: "Perfekte Form",
+      tag: "Geschick",
+      description: "Zeichne eine Form freihand – wie perfekt wird sie?",
+      detail: "Wähle eine Form, zeichne sie so genau wie möglich mit dem Finger auf den Bildschirm und lass dir per Prozentzahl anzeigen, wie perfekt sie geworden ist. Reihum probieren – wer schafft die höchste Punktzahl?",
+      icon: "shapes",
+      color: "orange",
+      minPlayers: 1,
+      maxPlayers: 20,
+      assets: ["/games/shapes/shapes.js", "/games/shapes/shapes.css"],
+    },
   ];
 
   root.GAMES = GAMES;
