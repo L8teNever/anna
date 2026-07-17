@@ -748,10 +748,12 @@
   backButton.addEventListener("click", () => {
     if ((!onlineLobbyView.hidden || !onlinePlayView.hidden) && setupView.hidden) {
       ConfirmDialog.show({
-        title: "Online-Runde verlassen?",
-        message: "Du verlässt die Runde auf diesem Gerät. Andere können weiterspielen.",
-        confirmLabel: "Verlassen",
-        onConfirm: () => { stopOnlineStream(); window.location.href = "/"; },
+        title: onlineIsHost ? "Runde für alle beenden?" : "Online-Runde verlassen?",
+        message: onlineIsHost
+          ? "Als Host beendest du die Runde damit für alle Mitspieler."
+          : "Du verlässt die Runde auf diesem Gerät. Andere können weiterspielen.",
+        confirmLabel: onlineIsHost ? "Runde beenden" : "Verlassen",
+        onConfirm: () => { endOnlineRoomIfHost(); stopOnlineStream(); window.location.href = "/"; },
       });
       return;
     }
@@ -789,7 +791,12 @@
     if (!currentActive) return true;
     if (currentActive.id === "view-reveal" && mode === "online") return true; // eigener Reveal, kein Gruppenzustand
     if (["view-reveal", "play-view", "view-online-lobby", "view-online-play"].includes(currentActive.id)) {
-      return confirm("Möchtest du das laufende Spiel wirklich beenden?");
+      const leaving = confirm("Möchtest du das laufende Spiel wirklich beenden?");
+      if (leaving && ["view-online-lobby", "view-online-play"].includes(currentActive.id)) {
+        endOnlineRoomIfHost();
+        stopOnlineStream();
+      }
+      return leaving;
     }
     return true;
   };
@@ -941,6 +948,8 @@
       showJoinForm();
     }
   }
+
+  onlineJoinNameInput.addEventListener("input", () => { onlineJoinError.hidden = true; });
 
   onlineJoinSubmitButton.addEventListener("click", async () => {
     const name = onlineJoinNameInput.value.trim();
@@ -1231,9 +1240,21 @@
     if (onlineIsHost) renderQrAndLink(onlineRoomToken);
   });
   onlineExitButton.addEventListener("click", () => {
+    endOnlineRoomIfHost();
     stopOnlineStream();
     window.location.href = "/";
   });
+
+  // Verlässt der Host die Runde (egal ob mitten im Spiel oder von der
+  // Ergebnis-Ansicht aus), wird sie für alle beendet - ohne Host kann
+  // niemand mehr Phasen weiterschieben oder neu starten, die Runde würde
+  // sonst nur verwaist im Speicher hängen bleiben (bis zum TTL-Ablauf).
+  function endOnlineRoomIfHost() {
+    if (!onlineIsHost || !onlineRoomToken || !onlineHostToken) return;
+    apiPost(`/rooms/${onlineRoomToken}/end`, { hostToken: onlineHostToken }).catch(() => {
+      /* Verlassen soll auch klappen, wenn der Server schon nicht mehr antwortet. */
+    });
+  }
 
   /* ---------------- Beim Laden: Join-Link erkennen ---------------- */
   const joinTokenFromUrl = detectJoinToken();
