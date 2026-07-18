@@ -655,10 +655,9 @@
 .reveal-card {
   position: relative;
   width: 100%;
-  /* Deckelt sich selbst auf kurzen Bildschirmen (min() statt fixer Höhe),
-     damit auf kleinen/PWA-Fenstern nie Inhalt/Button unten abgeschnitten
-     wirkt, ohne auf die genaue Media-Query-Schwelle unten angewiesen zu sein. */
-  height: min(260px, 34dvh);
+  max-width: 300px;
+  aspect-ratio: 1 / 1;
+  height: auto;
   border-radius: var(--m3-shape-xxl);
   background: var(--m3-surface-container);
   border: 1px solid var(--m3-outline-variant);

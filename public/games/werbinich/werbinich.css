@@ -8,7 +8,7 @@
 /* Die Wisch-Karte muss hier eine Liste (bis zu 11 Namen) statt eines
    einzelnen Worts fassen -> deutlich mehr Höhe als beim Impostor-Wort. */
 .reveal-card--list {
-  height: min(420px, 58dvh);
+  /* Keep the base square aspect-ratio */
 }
 
 .reveal-card--list .reveal-card__face--back {
@@ -24,6 +24,7 @@
   flex-direction: column;
   gap: 8px;
   padding-right: 4px;
+  padding-bottom: 24px;
 }
 
 .identity-list__item {

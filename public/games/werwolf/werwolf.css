@@ -38,7 +38,7 @@
 
 /* ---------- Rollen-Wischkarte (eigene Rolle ODER Werwolf-Rudel-Liste) ---------- */
 .reveal-card--list {
-  height: min(420px, 58dvh);
+  /* Keep the base square aspect-ratio */
 }
 
 .reveal-card--list .reveal-card__face--back {
@@ -54,6 +54,7 @@
   flex-direction: column;
   gap: 8px;
   padding-right: 4px;
+  padding-bottom: 24px;
 }
 
 .identity-list__item {
