@@ -260,7 +260,7 @@
     revealCardFront.hidden = false;
     revealNextButton.hidden = true;
     delete revealCard.dataset.peeked;
-    const hint = revealCardFront.querySelector(".reveal-card__hint");
+    const hint = document.getElementById("reveal-card-hint");
     if (hint) hint.innerHTML = "Nach oben wischen und halten,<br/>um zu sehen, wer die anderen sind";
   }
 
@@ -277,7 +277,7 @@
     revealCard.classList.remove("reveal-card--revealed");
     if (finished || revealCard.dataset.peeked) {
       revealNextButton.hidden = false;
-      const hint = revealCardFront.querySelector(".reveal-card__hint");
+      const hint = document.getElementById("reveal-card-hint");
       if (hint) hint.innerHTML = "Erneut ansehen<br/>(Wischen & Halten)";
     }
   }

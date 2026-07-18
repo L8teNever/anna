@@ -707,23 +707,44 @@
   z-index: 1;
 }
 
+.reveal-hint-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 16px;
+  min-height: 64px;
+  text-align: center;
+  transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-card--revealed ~ .reveal-hint-container,
+.reveal-card--dragging ~ .reveal-hint-container {
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+}
+
 .reveal-card__chevron {
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   color: var(--m3-primary);
+  margin-bottom: 4px;
   animation: reveal-chevron-bounce 1.4s ease-in-out infinite;
 }
 
 @keyframes reveal-chevron-bounce {
-  0%, 100% { transform: translateY(0); opacity: 0.6; }
-  50% { transform: translateY(-10px); opacity: 1; }
+  0%, 100% { transform: translateY(0); opacity: 0.5; }
+  50% { transform: translateY(-6px); opacity: 1; }
 }
 
 .reveal-card__hint {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--m3-on-surface-variant);
   line-height: 1.4;
+  margin: 0;
 }
 
 .reveal-card__role {
