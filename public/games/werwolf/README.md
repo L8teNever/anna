@@ -25,7 +25,7 @@ bei 6), damit die Werwölfe nie versehentlich in der Überzahl starten.
 ## Ablauf
 
 Reine Zustandsmaschine in `werwolf.js` (`goToStep`/`renderStep`):
-`lobby → Rollen-Wisch-Karte (eigene Rolle, danach nur die Werwölfe
+`lobby → Rollen-Halte-Karte (eigene Rolle, danach nur die Werwölfe
 untereinander) → Nacht (Amor nur Runde 1 → Werwölfe → Seherin → Hexe) → Tag
 (Ergebnis → Jäger-Schuss falls nötig → Diskussion → Abstimmung) → nächste
 Nacht (Runde+1) → Ende`, sobald alle Werwölfe tot sind oder die Werwölfe in

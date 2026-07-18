@@ -98,6 +98,10 @@
     <symbol id="icon-minus" viewBox="0 0 24 24">
       <line x1="5" y1="12" x2="19" y2="12"/>
     </symbol>
+    <symbol id="icon-touch" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="3.5"/>
+      <circle cx="12" cy="12" r="9" opacity="0.45"/>
+    </symbol>
     <symbol id="icon-drink" viewBox="0 0 24 24">
       <path d="M4 4h16l-8 10z"/>
       <line x1="12" y1="14" x2="12" y2="20"/>

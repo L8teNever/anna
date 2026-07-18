@@ -786,9 +786,9 @@ body.page-transition-out {
   width: 100%;
 }
 
-/* ---------- Wisch-nach-oben-Bühne + -Karte ----------
+/* ---------- Gedrückt-halten-Bühne + -Karte ----------
    Gemeinsame Rollen-Reveal-Mechanik, von Impostor, Wer bin ich und Werwolf
-   genutzt (jeweils per JS: setupSwipeReveal). Farb-Varianten für einzelne
+   genutzt (jeweils per JS: setupHoldReveal). Farb-Varianten für einzelne
    Spiele (z.B. .reveal-card--impostor) bleiben in deren eigenem CSS. */
 .reveal-stage {
   flex: 1;
@@ -855,16 +855,11 @@ body.page-transition-out {
   align-items: center;
   justify-content: center;
   touch-action: none;
-  cursor: grab;
+  cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
   overflow: hidden;
-  transition: transform 0.25s var(--m3-easing-emphasized), background-color 0.2s, border-color 0.2s;
-}
-
-.reveal-card--dragging {
-  transition: none;
-  cursor: grabbing;
+  transition: background-color 0.2s, border-color 0.2s;
 }
 
 .reveal-card--revealed {
@@ -889,7 +884,12 @@ body.page-transition-out {
 .reveal-card__face--front {
   background: var(--m3-surface-container);
   z-index: 2;
-  transition: transform 0.25s var(--m3-easing-emphasized);
+  transition: opacity 0.15s var(--m3-easing-emphasized);
+}
+
+.reveal-card--revealed .reveal-card__face--front {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .reveal-card__face--back {
@@ -909,24 +909,23 @@ body.page-transition-out {
   transform: translateY(0);
 }
 
-.reveal-card--revealed ~ .reveal-hint-container,
-.reveal-card--dragging ~ .reveal-hint-container {
+.reveal-card--revealed ~ .reveal-hint-container {
   opacity: 0;
   transform: translateY(12px);
   pointer-events: none;
 }
 
-.reveal-card__chevron {
-  width: 24px;
-  height: 24px;
+.reveal-card__touch-icon {
+  width: 28px;
+  height: 28px;
   color: var(--m3-primary);
   margin-bottom: 4px;
-  animation: reveal-chevron-bounce 1.4s ease-in-out infinite;
+  animation: reveal-touch-pulse 1.6s ease-in-out infinite;
 }
 
-@keyframes reveal-chevron-bounce {
-  0%, 100% { transform: translateY(0); opacity: 0.5; }
-  50% { transform: translateY(-6px); opacity: 1; }
+@keyframes reveal-touch-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.15); opacity: 1; }
 }
 
 .reveal-card__hint {

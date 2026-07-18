@@ -38,7 +38,7 @@ erhalten, auch nach einem App-Update oder „Cache löschen“.
 - Aus allen ausgewählten Kategorien wird ein gemeinsamer Topf aller Begriffe
   gebildet, gemischt, und jeder Mitspieler bekommt einen eindeutigen Begriff
   zugeteilt (keine Wiederholungen innerhalb einer Runde).
-- Beim Reihum-Wischen sieht jede Person NICHT ihren eigenen Begriff, sondern
+- Beim Reihum-Halten sieht jede Person NICHT ihren eigenen Begriff, sondern
   die Begriffe aller anderen – genau wie beim klassischen „Wer bin ich“ mit
   Zettel auf der Stirn.
 - Es müssen daher mindestens so viele Begriffe in den ausgewählten

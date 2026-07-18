@@ -1,6 +1,6 @@
 /**
  * Wer bin ich – jede Person bekommt eine geheime Identität, sieht aber beim
- * Reihum-Wischen NICHT die eigene, sondern die aller anderen (wie der
+ * Reihum-Halten NICHT die eigene, sondern die aller anderen (wie der
  * klassische Zettel auf der Stirn). Zusätzlich gibt es während der
  * laufenden Runde ein "Nachschlagen": falls jemand vergessen hat, was eine
  * andere Person ist, kann man (nach Auswahl der eigenen Person, damit man
@@ -89,61 +89,28 @@
   playerConfirmButton.addEventListener("click", () => ViewNav.transition(playerSelectView, setupView));
 
   /* ------------------------------------------------------------------ */
-  /* Wisch-nach-oben-Karte (identisch zu Impostor, nur Inhalt anders)      */
+  /* Gedrückt-halten-Karte (identisch zu Impostor, nur Inhalt anders)      */
   /* ------------------------------------------------------------------ */
-  function setupSwipeReveal(cardEl, coverEl, onPeek, onRelease) {
-    const THRESHOLD = 60;
-    let dragging = false;
-    let startY = 0;
-    let deltaY = 0;
-    let revealed = false;
+  function setupHoldReveal(cardEl, onPeek, onRelease) {
+    let holding = false;
 
-    function resetTransform() {
-      coverEl.style.transform = "";
-      coverEl.style.transition = "transform 0.25s var(--m3-easing-emphasized)";
-      cardEl.classList.remove("reveal-card--dragging");
-    }
-
-    cardEl.addEventListener("pointerdown", (event) => {
-      dragging = true;
-      startY = event.clientY;
-      deltaY = 0;
-      revealed = false;
-      coverEl.style.transition = "none";
-      cardEl.classList.add("reveal-card--dragging");
+    function startHold(event) {
+      if (holding) return;
+      holding = true;
       cardEl.setPointerCapture(event.pointerId);
-    });
-
-    cardEl.addEventListener("pointermove", (event) => {
-      if (!dragging) return;
-      deltaY = Math.min(0, event.clientY - startY);
-
-      const maxDrag = -cardEl.offsetHeight + 40;
-      const moveY = Math.max(deltaY, maxDrag);
-      coverEl.style.transform = `translateY(${moveY}px)`;
-
-      if (!revealed && Math.abs(deltaY) > THRESHOLD) {
-        revealed = true;
-        onPeek();
-      } else if (revealed && Math.abs(deltaY) <= THRESHOLD) {
-        revealed = false;
-        onRelease(false);
-      }
-    });
-
-    function endDrag() {
-      if (!dragging) return;
-      dragging = false;
-      resetTransform();
-      if (revealed) {
-        revealed = false;
-        onRelease(true);
-      }
-      deltaY = 0;
+      onPeek();
     }
 
-    cardEl.addEventListener("pointerup", endDrag);
-    cardEl.addEventListener("pointercancel", endDrag);
+    function endHold() {
+      if (!holding) return;
+      holding = false;
+      onRelease(true);
+    }
+
+    cardEl.addEventListener("pointerdown", startHold);
+    cardEl.addEventListener("pointerup", endHold);
+    cardEl.addEventListener("pointercancel", endHold);
+    cardEl.addEventListener("pointerleave", endHold);
     cardEl.addEventListener("contextmenu", (e) => e.preventDefault());
   }
 
@@ -214,7 +181,7 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* Gemeinsame Liste "Die anderen sind" (Wischen UND Nachschlagen)        */
+  /* Gemeinsame Liste "Die anderen sind" (Halten UND Nachschlagen)         */
   /* ------------------------------------------------------------------ */
   function renderIdentityList(containerEl, excludeIndex) {
     containerEl.innerHTML = roundPlayers
@@ -240,7 +207,7 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* Runden-Ablauf: Reihum wischen                                         */
+  /* Runden-Ablauf: Reihum halten                                          */
   /* ------------------------------------------------------------------ */
   let currentRevealIndex = 0;
 
@@ -261,7 +228,7 @@
     revealNextButton.hidden = true;
     delete revealCard.dataset.peeked;
     const hint = document.getElementById("reveal-card-hint");
-    if (hint) hint.innerHTML = "Nach oben wischen und halten,<br/>um zu sehen, wer die anderen sind";
+    if (hint) hint.innerHTML = "Gedrückt halten,<br/>um zu sehen, wer die anderen sind";
   }
 
   function peekCurrentPlayer() {
@@ -278,11 +245,11 @@
     if (finished || revealCard.dataset.peeked) {
       revealNextButton.hidden = false;
       const hint = document.getElementById("reveal-card-hint");
-      if (hint) hint.innerHTML = "Erneut ansehen<br/>(Wischen & Halten)";
+      if (hint) hint.innerHTML = "Erneut ansehen<br/>(gedrückt halten)";
     }
   }
 
-  setupSwipeReveal(revealCard, revealCardFront, peekCurrentPlayer, hideCurrentPlayer);
+  setupHoldReveal(revealCard, peekCurrentPlayer, hideCurrentPlayer);
 
   revealNextButton.addEventListener("click", () => {
     currentRevealIndex += 1;

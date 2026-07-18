@@ -1,6 +1,6 @@
 /**
  * Impostor – alle Mitspieler außer dem/den Impostor(en) sehen ein
- * gemeinsames Geheimwort (per Wisch-nach-oben-Karte, einer nach dem
+ * gemeinsames Geheimwort (per Gedrückt-halten-Karte, einer nach dem
  * anderen). Danach beschreibt reihum jeder das Wort, ohne es zu sagen -
  * der Impostor muss mitreden, ohne aufzufliegen. Die eigentliche
  * Diskussion/Abstimmung läuft verbal, die App übernimmt nur die geheime
@@ -140,62 +140,29 @@
   playerConfirmButton.addEventListener("click", () => ViewNav.transition(playerSelectView, setupView));
 
   /* ------------------------------------------------------------------ */
-  /* Wisch-nach-oben-Karte                                                 */
+  /* Gedrückt-halten-Karte                                                 */
   /* ------------------------------------------------------------------ */
-  function setupSwipeReveal(cardEl, coverEl, onPeek, onRelease) {
-    const THRESHOLD = 60;
-    let dragging = false;
-    let startY = 0;
-    let deltaY = 0;
-    let revealed = false;
+  function setupHoldReveal(cardEl, onPeek, onRelease) {
+    let holding = false;
 
-    function resetTransform() {
-      coverEl.style.transform = "";
-      coverEl.style.transition = "transform 0.25s var(--m3-easing-emphasized)";
-      cardEl.classList.remove("reveal-card--dragging");
-    }
-
-    cardEl.addEventListener("pointerdown", (event) => {
-      dragging = true;
-      startY = event.clientY;
-      deltaY = 0;
-      revealed = false;
-      coverEl.style.transition = "none";
-      cardEl.classList.add("reveal-card--dragging");
+    function startHold(event) {
+      if (holding) return;
+      holding = true;
       cardEl.setPointerCapture(event.pointerId);
-    });
-
-    cardEl.addEventListener("pointermove", (event) => {
-      if (!dragging) return;
-      deltaY = Math.min(0, event.clientY - startY);
-      
-      const maxDrag = -cardEl.offsetHeight + 40;
-      const moveY = Math.max(deltaY, maxDrag);
-      coverEl.style.transform = `translateY(${moveY}px)`;
-
-      if (!revealed && Math.abs(deltaY) > THRESHOLD) {
-        revealed = true;
-        onPeek();
-      } else if (revealed && Math.abs(deltaY) <= THRESHOLD) {
-        revealed = false;
-        onRelease(false);
-      }
-    });
-
-    function endDrag() {
-      if (!dragging) return;
-      dragging = false;
-      resetTransform();
-      if (revealed) {
-        revealed = false;
-        onRelease(true);
-      }
-      deltaY = 0;
+      onPeek();
     }
 
-    cardEl.addEventListener("pointerup", endDrag);
-    cardEl.addEventListener("pointercancel", endDrag);
-    cardEl.addEventListener("contextmenu", e => e.preventDefault());
+    function endHold() {
+      if (!holding) return;
+      holding = false;
+      onRelease(true);
+    }
+
+    cardEl.addEventListener("pointerdown", startHold);
+    cardEl.addEventListener("pointerup", endHold);
+    cardEl.addEventListener("pointercancel", endHold);
+    cardEl.addEventListener("pointerleave", endHold);
+    cardEl.addEventListener("contextmenu", (e) => e.preventDefault());
   }
 
   /* ------------------------------------------------------------------ */
@@ -298,7 +265,7 @@
     revealNextButton.hidden = true;
     delete revealCard.dataset.peeked;
     const hint = document.getElementById("reveal-card-hint");
-    if (hint) hint.innerHTML = "Nach oben wischen und halten,<br/>um dein Wort zu sehen";
+    if (hint) hint.innerHTML = "Gedrückt halten,<br/>um dein Wort zu sehen";
   }
 
   function peekCurrentPlayer() {
@@ -320,11 +287,11 @@
     if (finished || revealCard.dataset.peeked) {
       revealNextButton.hidden = false;
       const hint = document.getElementById("reveal-card-hint");
-      if (hint) hint.innerHTML = "Erneut ansehen<br/>(Wischen & Halten)";
+      if (hint) hint.innerHTML = "Erneut ansehen<br/>(gedrückt halten)";
     }
   }
 
-  setupSwipeReveal(revealCard, revealCardFront, peekCurrentPlayer, hideCurrentPlayer);
+  setupHoldReveal(revealCard, peekCurrentPlayer, hideCurrentPlayer);
 
   revealNextButton.addEventListener("click", () => {
     currentRevealIndex += 1;

@@ -240,59 +240,28 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* Wisch-nach-oben-Karte (identisch zu Impostor/Wer-bin-ich)             */
+  /* Gedrückt-halten-Karte (identisch zu Impostor/Wer-bin-ich)             */
   /* ------------------------------------------------------------------ */
-  function setupSwipeReveal(cardEl, coverEl, onPeek, onRelease) {
-    const THRESHOLD = 60;
-    let dragging = false;
-    let startY = 0;
-    let deltaY = 0;
-    let revealed = false;
+  function setupHoldReveal(cardEl, onPeek, onRelease) {
+    let holding = false;
 
-    function resetTransform() {
-      coverEl.style.transform = "";
-      coverEl.style.transition = "transform 0.25s var(--m3-easing-emphasized)";
-      cardEl.classList.remove("reveal-card--dragging");
-    }
-
-    cardEl.addEventListener("pointerdown", (event) => {
-      dragging = true;
-      startY = event.clientY;
-      deltaY = 0;
-      revealed = false;
-      coverEl.style.transition = "none";
-      cardEl.classList.add("reveal-card--dragging");
+    function startHold(event) {
+      if (holding) return;
+      holding = true;
       cardEl.setPointerCapture(event.pointerId);
-    });
-
-    cardEl.addEventListener("pointermove", (event) => {
-      if (!dragging) return;
-      deltaY = Math.min(0, event.clientY - startY);
-      const maxDrag = -cardEl.offsetHeight + 40;
-      const moveY = Math.max(deltaY, maxDrag);
-      coverEl.style.transform = `translateY(${moveY}px)`;
-      if (!revealed && Math.abs(deltaY) > THRESHOLD) {
-        revealed = true;
-        onPeek();
-      } else if (revealed && Math.abs(deltaY) <= THRESHOLD) {
-        revealed = false;
-        onRelease(false);
-      }
-    });
-
-    function endDrag() {
-      if (!dragging) return;
-      dragging = false;
-      resetTransform();
-      if (revealed) {
-        revealed = false;
-        onRelease(true);
-      }
-      deltaY = 0;
+      onPeek();
     }
 
-    cardEl.addEventListener("pointerup", endDrag);
-    cardEl.addEventListener("pointercancel", endDrag);
+    function endHold() {
+      if (!holding) return;
+      holding = false;
+      onRelease(true);
+    }
+
+    cardEl.addEventListener("pointerdown", startHold);
+    cardEl.addEventListener("pointerup", endHold);
+    cardEl.addEventListener("pointercancel", endHold);
+    cardEl.addEventListener("pointerleave", endHold);
     cardEl.addEventListener("contextmenu", (e) => e.preventDefault());
   }
 
@@ -411,7 +380,7 @@
       revealWord.textContent = ROLE_DESCRIPTIONS[roles[idx]];
       revealWord.hidden = false;
       revealIdentityList.hidden = true;
-      revealCardHint.innerHTML = "Nach oben wischen und halten,<br/>um deine Rolle zu sehen";
+      revealCardHint.innerHTML = "Gedrückt halten,<br/>um deine Rolle zu sehen";
     } else {
       const idx = wolfIndices[currentRevealIndex];
       revealStageLabel.textContent = "Werwölfe – gib weiter an";
@@ -421,7 +390,7 @@
       revealWord.hidden = true;
       revealIdentityList.hidden = false;
       renderWolfList(revealIdentityList, idx);
-      revealCardHint.innerHTML = "Nach oben wischen und halten,<br/>um eure Mitwölfe zu sehen";
+      revealCardHint.innerHTML = "Gedrückt halten,<br/>um eure Mitwölfe zu sehen";
     }
   }
 
@@ -438,11 +407,11 @@
     revealCard.classList.remove("reveal-card--revealed");
     if (finished || revealCard.dataset.peeked) {
       revealNextButton.hidden = false;
-      revealCardHint.innerHTML = "Erneut ansehen<br/>(Wischen &amp; Halten)";
+      revealCardHint.innerHTML = "Erneut ansehen<br/>(gedrückt halten)";
     }
   }
 
-  setupSwipeReveal(revealCard, revealCardFront, peekCurrentPlayer, hideCurrentPlayer);
+  setupHoldReveal(revealCard, peekCurrentPlayer, hideCurrentPlayer);
 
   revealNextButton.addEventListener("click", () => {
     if (mode === "online") return; // Online-Reveal hat seinen eigenen Handler (siehe unten, per .onclick gesetzt)
@@ -1262,7 +1231,7 @@
     revealCardFront.hidden = false;
     revealNextButton.hidden = true;
     delete revealCard.dataset.peeked;
-    revealCardHint.innerHTML = "Nach oben wischen und halten,<br/>um deine Rolle zu sehen";
+    revealCardHint.innerHTML = "Gedrückt halten,<br/>um deine Rolle zu sehen";
 
     const imgEl = document.getElementById("reveal-card-image");
     if (imgEl) {
