@@ -207,6 +207,45 @@
   let hintCategoryLabel = null;
   let currentRevealIndex = 0;
 
+  let revealAvatars = [
+    "/assets/reveal_images/avatar_1.png",
+    "/assets/reveal_images/avatar_2.png",
+    "/assets/reveal_images/avatar_3.png",
+    "/assets/reveal_images/avatar_4.png"
+  ];
+  let playerRevealAvatars = {};
+  let avatarSeedOffset = 0;
+
+  async function loadRevealAvatars() {
+    try {
+      const res = await fetch("/api/reveal-avatars");
+      if (res.ok) {
+        const list = await res.json();
+        if (Array.isArray(list) && list.length > 0) {
+          revealAvatars = list;
+        }
+      }
+    } catch (e) {
+      console.warn("Could not load custom reveal avatars, using defaults:", e);
+    }
+  }
+  loadRevealAvatars();
+
+  function getPlayerRevealAvatar(name) {
+    if (!name) {
+      return revealAvatars[Math.floor(Math.random() * revealAvatars.length)];
+    }
+    if (!playerRevealAvatars[name]) {
+      let hash = 0;
+      for (let i = 0; i < name.length; i++) {
+        hash = name.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      const index = Math.abs(hash + avatarSeedOffset) % revealAvatars.length;
+      playerRevealAvatars[name] = revealAvatars[index];
+    }
+    return playerRevealAvatars[name];
+  }
+
   function shuffle(array) {
     const copy = [...array];
     for (let i = copy.length - 1; i > 0; i--) {
@@ -236,6 +275,11 @@
     revealPlayerName.textContent = roundPlayers[currentRevealIndex];
     revealProgress.textContent = `${currentRevealIndex + 1} / ${roundPlayers.length}`;
     revealCard.classList.remove("reveal-card--revealed", "reveal-card--impostor");
+
+    const imgEl = document.getElementById("reveal-card-image");
+    if (imgEl) {
+      imgEl.src = getPlayerRevealAvatar(roundPlayers[currentRevealIndex]);
+    }
     
     const isImpostor = impostorIndices.has(currentRevealIndex);
     revealRole.classList.toggle("reveal-card__role--impostor", isImpostor);
@@ -296,6 +340,8 @@
     const { word, categoryLabel } = pickRoundWord();
     secretWord = word || "…";
     hintCategoryLabel = hintWordToggle.checked ? categoryLabel : null;
+    playerRevealAvatars = {};
+    avatarSeedOffset = Math.floor(Math.random() * revealAvatars.length);
 
     const impostorTotal = Math.min(impostorCount, Math.max(1, roundPlayers.length - 1));
     const shuffledIdx = shuffle(roundPlayers.map((_, idx) => idx));

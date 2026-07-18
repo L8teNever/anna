@@ -22,3 +22,8 @@ Desktop.ini
 # Local app data & tools
 .gemini/
 antigravity/
+
+# Game-specific assets
+public/assets/reveal_images/
+public/assets/reveal_images_import/
+

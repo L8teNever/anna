@@ -105,7 +105,36 @@ class AnnaRequestHandler(SimpleHTTPRequestHandler):
         super().end_headers()
 
     def do_GET(self):
-        segments = [p for p in urlsplit(self.path).path.strip("/").split("/") if p]
+        path = urlsplit(self.path).path
+        if path == "/api/reveal-avatars":
+            try:
+                import image_processor
+                image_processor.process_import_folder()
+            except Exception as e:
+                print(f"[anna] Error processing import: {e}")
+
+            avatars = []
+            try:
+                processed_dir = PUBLIC_DIR / "assets" / "reveal_images"
+                if processed_dir.is_dir():
+                    for f in sorted(os.listdir(processed_dir)):
+                        if f.lower().endswith((".png", ".webp")):
+                            avatars.append(f"/assets/reveal_images/{f}")
+            except Exception as e:
+                print(f"[anna] Error listing avatars: {e}")
+
+            if not avatars:
+                avatars = [
+                    "/assets/reveal_images/avatar_1.png",
+                    "/assets/reveal_images/avatar_2.png",
+                    "/assets/reveal_images/avatar_3.png",
+                    "/assets/reveal_images/avatar_4.png"
+                ]
+
+            self._send_json(HTTPStatus.OK, avatars)
+            return
+
+        segments = [p for p in path.strip("/").split("/") if p]
         if len(segments) == 5 and segments[:3] == ["api", "werwolf", "rooms"] and segments[4] == "stream":
             self._handle_werwolf_stream(segments[3])
             return
@@ -175,6 +204,12 @@ class AnnaRequestHandler(SimpleHTTPRequestHandler):
 
 
 def main() -> None:
+    try:
+        import image_processor
+        image_processor.process_import_folder()
+    except Exception as e:
+        print(f"[anna] Error on startup import processing: {e}")
+
     server = ThreadingHTTPServer((HOST, PORT), AnnaRequestHandler)
     print(f"[anna] serving {PUBLIC_DIR} on http://{HOST}:{PORT}")
     try:

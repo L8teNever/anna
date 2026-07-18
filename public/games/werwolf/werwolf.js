@@ -338,6 +338,45 @@
   let wolfIndices = [];
   let currentRevealIndex = 0;
 
+  let revealAvatars = [
+    "/assets/reveal_images/avatar_1.png",
+    "/assets/reveal_images/avatar_2.png",
+    "/assets/reveal_images/avatar_3.png",
+    "/assets/reveal_images/avatar_4.png"
+  ];
+  let playerRevealAvatars = {};
+  let avatarSeedOffset = 0;
+
+  async function loadRevealAvatars() {
+    try {
+      const res = await fetch("/api/reveal-avatars");
+      if (res.ok) {
+        const list = await res.json();
+        if (Array.isArray(list) && list.length > 0) {
+          revealAvatars = list;
+        }
+      }
+    } catch (e) {
+      console.warn("Could not load custom reveal avatars, using defaults:", e);
+    }
+  }
+  loadRevealAvatars();
+
+  function getPlayerRevealAvatar(name) {
+    if (!name) {
+      return revealAvatars[Math.floor(Math.random() * revealAvatars.length)];
+    }
+    if (!playerRevealAvatars[name]) {
+      let hash = 0;
+      for (let i = 0; i < name.length; i++) {
+        hash = name.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      const index = Math.abs(hash + avatarSeedOffset) % revealAvatars.length;
+      playerRevealAvatars[name] = revealAvatars[index];
+    }
+    return playerRevealAvatars[name];
+  }
+
   function renderWolfList(container, excludeIdx) {
     container.innerHTML = wolfIndices
       .filter((i) => i !== excludeIdx)
@@ -356,6 +395,12 @@
     revealCardFront.hidden = false;
     revealNextButton.hidden = true;
     delete revealCard.dataset.peeked;
+
+    const imgEl = document.getElementById("reveal-card-image");
+    if (imgEl) {
+      const name = revealStage === "self" ? roundPlayers[currentRevealIndex] : roundPlayers[wolfIndices[currentRevealIndex]];
+      imgEl.src = getPlayerRevealAvatar(name);
+    }
 
     if (revealStage === "self") {
       const idx = currentRevealIndex;
@@ -725,6 +770,8 @@
 
     roundPlayers = shuffle(activePlayers);
     roles = builtRoles;
+    playerRevealAvatars = {};
+    avatarSeedOffset = Math.floor(Math.random() * revealAvatars.length);
     alive = roundPlayers.map(() => true);
     loveLink = null;
     witchHealUsed = false;
@@ -1204,6 +1251,11 @@
     revealNextButton.hidden = true;
     delete revealCard.dataset.peeked;
     revealCardHint.innerHTML = "Nach oben wischen und halten,<br/>um deine Rolle zu sehen";
+
+    const imgEl = document.getElementById("reveal-card-image");
+    if (imgEl) {
+      imgEl.src = getPlayerRevealAvatar("");
+    }
 
     revealRole.textContent = snapshot.myRoleLabel || "";
     revealWord.textContent = ROLE_DESCRIPTIONS[snapshot.myRole] || "";
