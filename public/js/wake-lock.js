@@ -21,11 +21,15 @@
     }
   }
 
-  document.addEventListener("visibilitychange", () => {
-    if (wanted && document.visibilityState === "visible" && sentinel === null) {
-      requestLock();
-    }
-  });
+  document.addEventListener(
+    "visibilitychange",
+    () => {
+      if (wanted && document.visibilityState === "visible" && sentinel === null) {
+        requestLock();
+      }
+    },
+    { signal: window.Router.signal }
+  );
 
   root.WakeLock = {
     async enable() {

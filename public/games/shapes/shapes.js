@@ -94,7 +94,7 @@
     canvas.addEventListener(type, () => { drawing = false; });
   });
 
-  window.addEventListener("resize", () => { if (!playView.hidden) resizeCanvas(); });
+  window.addEventListener("resize", () => { if (!playView.hidden) resizeCanvas(); }, { signal: Router.signal });
 
   /* ------------------------------------------------------------------ */
   /* Ideal-Formen (Einheitsgröße, Zentrum 0,0)                             */

@@ -66,17 +66,8 @@
         </div>
       `;
 
-      // View Transition für flüssigen App-like Übergang (Chrome 111+, Fallback: normale Navigation)
-      card.addEventListener("click", (event) => {
-        const fav = event.target.closest(".game-card__fav");
-        if (fav) return; // Favoriten-Klick nicht abfangen
-        if (!document.startViewTransition) return; // Kein Support → normaler Link-Klick
-        event.preventDefault();
-        document.startViewTransition(() => {
-          window.location.href = card.href;
-        });
-      });
-
+      // Klick + flüssiger Übergang übernimmt jetzt router.js zentral für
+      // jeden internen <a>-Link - kein Extra-Handler hier nötig.
       grid.appendChild(card);
     });
 
@@ -143,9 +134,13 @@
 
   resetSearchButton.addEventListener("click", resetAllFilters);
 
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && searchActive) closeSearch();
-  });
+  document.addEventListener(
+    "keydown",
+    (event) => {
+      if (event.key === "Escape" && searchActive) closeSearch();
+    },
+    { signal: Router.signal }
+  );
 
   /* ------------------------------------------------------------------ */
   /* Filter-Panel                                                         */

@@ -1,13 +1,22 @@
 /**
  * Zentrales Icon-Sprite (Material-Symbols-artige Linien-Icons als SVG,
  * selbst gehostet statt Emoji – funktioniert offline, sieht auf jedem
- * Gerät gleich aus). Wird als allererstes Script im <body> jeder Seite
- * eingebunden, damit die <symbol>-Definitionen vor allen <use>-Referenzen
- * im Dokument existieren. Neues Icon = neuer <symbol>-Eintrag hier, danach
- * überall per <svg class="m3-icon"><use href="#icon-name"/></svg> nutzbar.
+ * Gerät gleich aus). Lädt als `defer`-Script im <head> jeder Seite (siehe
+ * router.js: nur Session-globale Head-Scripts überleben einen
+ * Seiten-Swap unverändert), damit die <symbol>-Definitionen vor allen
+ * <use>-Referenzen im Dokument existieren. Neues Icon = neuer
+ * <symbol>-Eintrag hier, danach überall per
+ * <svg class="m3-icon"><use href="#icon-name"/></svg> nutzbar.
  */
 (function () {
+  // Idempotent + im <head> statt <body>: dieses Script lädt einmalig als
+  // Head-Script (siehe <head> jeder Seite) und wird vom Router NIE erneut
+  // ausgeführt. Läge das Sprite in <body>, würde es beim Seiten-Swap
+  // (body.innerHTML wird ersetzt) mitgelöscht und alle <use href="#icon-…">
+  // liefen ins Leere.
+  if (document.getElementById("anna-icon-sprite")) return;
   const sprite = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  sprite.id = "anna-icon-sprite";
   sprite.setAttribute("aria-hidden", "true");
   sprite.style.display = "none";
   sprite.innerHTML = `
@@ -129,5 +138,5 @@
       <line x1="22" y1="9" x2="16" y2="15"/>
     </symbol>
   `;
-  document.body.prepend(sprite);
+  document.head.appendChild(sprite);
 })();

@@ -13,14 +13,19 @@
  * 4. Kein Kontextmenü bei langem Drücken auf Nicht-Input-Elemente.
  */
 (function () {
+  const { signal } = window.Router;
 
   // ── 1. Kein Kontextmenü auf nicht-eingebbare Elemente ────────────────────
-  document.addEventListener("contextmenu", (e) => {
-    const tag = e.target.tagName.toLowerCase();
-    if (tag !== "input" && tag !== "textarea" && !e.target.isContentEditable) {
-      e.preventDefault();
-    }
-  });
+  document.addEventListener(
+    "contextmenu",
+    (e) => {
+      const tag = e.target.tagName.toLowerCase();
+      if (tag !== "input" && tag !== "textarea" && !e.target.isContentEditable) {
+        e.preventDefault();
+      }
+    },
+    { signal }
+  );
 
   // ── 2. Tastatur & VisualViewport ─────────────────────────────────────────
   // Die VisualViewport API ist auf modernen mobilen Browsern verfügbar und
@@ -59,35 +64,42 @@
     });
   }
 
-  window.visualViewport.addEventListener("resize", onViewportChange);
-  window.visualViewport.addEventListener("scroll", onViewportChange);
+  window.visualViewport.addEventListener("resize", onViewportChange, { signal });
+  window.visualViewport.addEventListener("scroll", onViewportChange, { signal });
 
   // ── 3. Beim Fokussieren eines Feldes: sofort ins Sichtfeld scrollen ───────
-  document.addEventListener("focusin", (e) => {
-    const tag = e.target.tagName.toLowerCase();
-    if (tag !== "input" && tag !== "textarea" && !e.target.isContentEditable) return;
+  document.addEventListener(
+    "focusin",
+    (e) => {
+      const tag = e.target.tagName.toLowerCase();
+      if (tag !== "input" && tag !== "textarea" && !e.target.isContentEditable) return;
 
-    // Kurz warten bis Tastatur-Animation begonnen hat
-    setTimeout(() => {
-      onViewportChange();
-      // Fallback: native scrollIntoView für einfache Fälle
-      e.target.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 300);
-  });
+      // Kurz warten bis Tastatur-Animation begonnen hat
+      setTimeout(() => {
+        onViewportChange();
+        // Fallback: native scrollIntoView für einfache Fälle
+        e.target.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 300);
+    },
+    { signal }
+  );
 
   // ── 4. Beim Schließen der Tastatur: Scroll-Position zurücksetzen ──────────
-  document.addEventListener("focusout", () => {
-    // Kurz warten bis Tastatur geschlossen ist
-    setTimeout(() => {
-      if (document.activeElement &&
-          (document.activeElement.tagName.toLowerCase() === "input" ||
-           document.activeElement.tagName.toLowerCase() === "textarea" ||
-           document.activeElement.isContentEditable)) {
-        return; // Focus ist auf ein anderes Feld gewechselt
-      }
-      // Zurück zum Top falls die Seite verschoben wurde
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }, 100);
-  });
-
+  document.addEventListener(
+    "focusout",
+    () => {
+      // Kurz warten bis Tastatur geschlossen ist
+      setTimeout(() => {
+        if (document.activeElement &&
+            (document.activeElement.tagName.toLowerCase() === "input" ||
+             document.activeElement.tagName.toLowerCase() === "textarea" ||
+             document.activeElement.isContentEditable)) {
+          return; // Focus ist auf ein anderes Feld gewechselt
+        }
+        // Zurück zum Top falls die Seite verschoben wurde
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }, 100);
+    },
+    { signal }
+  );
 })();

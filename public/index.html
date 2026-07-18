@@ -23,11 +23,16 @@
   <link rel="stylesheet" href="/css/material.css" />
   <link rel="stylesheet" href="/css/components.css" />
   <link rel="stylesheet" href="/css/main.css" />
+  <!-- Session-globale Scripts: laufen EINMALIG pro echtem Seitenaufruf,
+       nie erneut bei einem Router-Seitenwechsel (siehe router.js). Bewusst
+       NICHT defer/async, damit sie synchron VOR allen <body>-Scripts
+       fertig sind (window.Router muss für diese existieren). -->
+  <script src="/js/icons.js"></script>
+  <script src="/js/router.js"></script>
+  <script src="/js/page-transition.js"></script>
+  <script src="/js/pwa-helper.js"></script>
 </head>
 <body>
-  <script src="/js/icons.js"></script>
-  <script src="/js/page-transition.js"></script>
-
   <div class="app-shell">
     <!-- ---------- Header mit Morph-Suche ---------- -->
     <header class="app-topbar" id="app-topbar">
@@ -181,6 +186,5 @@
   <script src="/js/touch-fixes.js"></script>
   <script src="/js/app.js"></script>
   <script src="/js/privacy-banner.js"></script>
-  <script src="/js/pwa-helper.js"></script>
 </body>
 </html>

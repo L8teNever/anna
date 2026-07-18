@@ -39,14 +39,19 @@
   from { opacity: 0; transform: scale(1.02); }
 }
 
-/* Universeller Rückfall, der IMMER greift (auch in Browsern ohne
-   Cross-Document View Transitions, z.B. Firefox/älteres Safari): reines
-   CSS, läuft automatisch bei jedem Seitenaufbau, keine JS-Abhängigkeit
-   (kein Risiko einer "hängen gebliebenen", unsichtbaren Seite). Sorgt
-   dafür, dass JEDE Navigation zwischen Start- und Spiel-Seiten spürbar
-   sanfter wirkt als ein harter Reload - unabhängig vom Browser. */
+/* Reiner CSS-Fade beim EINMALIGEN echten Seitenaufbau (Bookmark, Tab-
+   Neustart, Router-Fallback bei Fetch-Fehler) - keine JS-Abhängigkeit,
+   kein Risiko einer "hängen gebliebenen", unsichtbaren Seite. Für
+   spätere Router-Wechsel (siehe router.js) übernimmt die identische,
+   klassenbasierte Variante .page-transition-in weiter unten, da eine
+   bereits einmal gelaufene Element-Animation sich nicht von selbst neu
+   startet, nur weil sich body.innerHTML ändert. */
 @media (prefers-reduced-motion: no-preference) {
   body {
+    animation: anna-page-fade-in 0.22s var(--m3-easing-standard) both;
+  }
+
+  body.page-transition-in {
     animation: anna-page-fade-in 0.22s var(--m3-easing-standard) both;
   }
 }
@@ -56,10 +61,9 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Von PageTransition.navigate() (page-transition.js) gesetzt, kurz bevor
-   JS-ausgelöste Navigationen (z.B. "Zurück zur Startseite"-Buttons, keine
-   echten <a>-Klicks) tatsächlich losgehen, damit auch diese nicht hart
-   abbrechen, sondern erst sanft ausblenden. */
+/* Von router.js gesetzt, kurz bevor eine Navigation (Link-Klick, Zurück-
+   Button, Browser-Vor/Zurück) tatsächlich losgeht, damit der Wechsel
+   nicht hart abbricht, sondern erst sanft ausblendet. */
 body.page-transition-out {
   opacity: 0;
   transition: opacity 0.14s var(--m3-easing-standard);

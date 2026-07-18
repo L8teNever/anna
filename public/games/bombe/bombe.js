@@ -263,5 +263,9 @@
   };
 
   playView.addEventListener("viewhide", stopRound);
-  window.addEventListener("beforeunload", stopRound);
+  window.addEventListener("beforeunload", stopRound, { signal: Router.signal });
+  // beforeunload feuert nur bei einem ECHTEN Browser-Reload/-Schließen,
+  // nicht bei einem Router-Seitenwechsel (siehe router.js) - deshalb
+  // zusätzlich explizit hier abmelden, damit WakeLock nicht aktiv bleibt.
+  Router.onTeardown(stopRound);
 })();

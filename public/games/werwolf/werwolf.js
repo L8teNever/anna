@@ -1600,6 +1600,12 @@
     }
   }
 
+  // beforeunload feuert nur bei einem ECHTEN Browser-Reload/-Schließen,
+  // nicht bei einem Router-Seitenwechsel (siehe router.js) - deshalb hier
+  // explizit abmelden, damit eine offene EventSource-Verbindung und ein
+  // aktiver WakeLock beim Verlassen nicht hängen bleiben.
+  Router.onTeardown(stopOnlineStream);
+
   /* ---------------- Beim Laden: Join-Link erkennen ---------------- */
   const joinTokenFromUrl = detectJoinToken();
   if (joinTokenFromUrl) {
