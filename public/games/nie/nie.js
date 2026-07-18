@@ -118,7 +118,7 @@
       ViewNav.transition(categorySelectView, setupView);
       return;
     }
-    window.location.href = "/";
+    PageTransition.navigate("/");
   });
 
   // Bestätigung beim System-Zurück (Android/iOS-Zurück-Geste, siehe

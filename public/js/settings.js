@@ -35,7 +35,7 @@
   vibrationToggle.checked = settings.vibrationEnabled;
 
   backButton.addEventListener("click", () => {
-    window.location.href = "/";
+    PageTransition.navigate("/");
   });
 
   themeSegmented.addEventListener("click", (event) => {

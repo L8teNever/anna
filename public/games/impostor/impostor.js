@@ -386,7 +386,7 @@
       ViewNav.transition(categorySelectView.hidden ? playerSelectView : categorySelectView, setupView);
       return;
     }
-    window.location.href = "/";
+    PageTransition.navigate("/");
   });
 
   // Bestätigung beim System-Zurück (Android/iOS-Zurück-Geste, siehe
