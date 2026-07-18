@@ -412,6 +412,9 @@ class AdminRequestHandler(SimpleHTTPRequestHandler):
                     config[game_id]["zoom"] = float(body["zoom"])
                 except (ValueError, TypeError):
                     pass
+            for field in ("hideName", "hideDescription", "hideCategory"):
+                if field in body:
+                    config[game_id][field] = bool(body[field])
 
             save_banners_config(config)
 

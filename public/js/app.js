@@ -86,15 +86,20 @@
       card.dataset.color = game.color;
       
       const bannerUrl = banners[game.id];
+      const bannerCfg = (bannerUrl && bannerConfig[game.id]) || {};
+      const hideCategory = bannerUrl && bannerCfg.hideCategory;
+      const hideName = bannerUrl && bannerCfg.hideName;
+      const hideDescription = bannerUrl && bannerCfg.hideDescription;
+
       card.href = game.href || `/${game.id}`;
       card.setAttribute("aria-label", disabled ? `${game.name} – offline nicht verfügbar` : `${game.name} öffnen`);
       if (disabled) card.setAttribute("aria-disabled", "true");
       card.innerHTML = `
         <div class="game-card__icon"><svg class="m3-icon"><use href="#icon-${game.icon}"></use></svg></div>
         <div class="game-card__meta">
-          <span class="game-card__label">${game.tag}</span>
-          <h2 class="game-card__title">${game.name}</h2>
-          <span class="game-card__sub">${disabled ? "Offline nicht verfügbar – braucht Internet" : game.description}</span>
+          ${hideCategory ? "" : `<span class="game-card__label">${game.tag}</span>`}
+          ${hideName ? "" : `<h2 class="game-card__title">${game.name}</h2>`}
+          ${hideDescription ? "" : `<span class="game-card__sub">${disabled ? "Offline nicht verfügbar – braucht Internet" : game.description}</span>`}
         </div>
         <div class="game-card__actions">
           ${disabled ? "" : `<span class="game-card__badge">${game.minPlayers}–${game.maxPlayers} Spieler</span>`}

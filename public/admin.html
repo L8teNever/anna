@@ -497,6 +497,33 @@
       text-align: right;
     }
 
+    .banner-text-toggles {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+    }
+
+    .text-toggle-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .text-toggle-label input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
     /* Toast Notification */
     .toast {
       position: fixed;
@@ -783,8 +810,12 @@
 
       window.GAMES.forEach(game => {
         const bannerUrl = currentBanners[game.id];
-        const pos = (currentConfig[game.id] && currentConfig[game.id].position) || '50% 50%';
-        const zoom = (currentConfig[game.id] && currentConfig[game.id].zoom) || 1.0;
+        const cfg = currentConfig[game.id] || {};
+        const pos = cfg.position || '50% 50%';
+        const zoom = cfg.zoom || 1.0;
+        const hideName = !!cfg.hideName;
+        const hideDescription = !!cfg.hideDescription;
+        const hideCategory = !!cfg.hideCategory;
         const card = document.createElement('div');
         card.className = 'banner-card';
         
@@ -831,6 +862,20 @@
                 <input type="range" id="zoom-slider-${game.id}" class="zoom-slider" min="1" max="3" step="0.05" value="${zoom}" oninput="updateBannerZoomInline('${game.id}', this.value)" onchange="saveBannerZoom('${game.id}', this.value)" />
                 <span id="zoom-badge-${game.id}" class="zoom-badge">${Math.round(zoom * 100)}%</span>
               </div>
+            </div>
+            <div class="banner-text-toggles">
+              <label class="text-toggle-label">
+                <input type="checkbox" ${hideName ? 'checked' : ''} onchange="updateBannerTextToggle('${game.id}', 'hideName', this.checked)" />
+                Name ausblenden
+              </label>
+              <label class="text-toggle-label">
+                <input type="checkbox" ${hideDescription ? 'checked' : ''} onchange="updateBannerTextToggle('${game.id}', 'hideDescription', this.checked)" />
+                Beschreibung ausblenden
+              </label>
+              <label class="text-toggle-label">
+                <input type="checkbox" ${hideCategory ? 'checked' : ''} onchange="updateBannerTextToggle('${game.id}', 'hideCategory', this.checked)" />
+                Kategorie ausblenden
+              </label>
             </div>
           </div>
           ` : ''}
@@ -897,6 +942,29 @@
           renderBanners();
         } else {
           showToast('Fehler beim Aktualisieren der Ausrichtung', true);
+        }
+      } catch (err) {
+        showToast('Netzwerkfehler beim Aktualisieren', true);
+      }
+    }
+
+    async function updateBannerTextToggle(gameId, field, value) {
+      try {
+        const res = await fetch('/api/banners/config', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ gameId, [field]: value })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          currentBanners = data.banners || {};
+          currentConfig = data.config || {};
+          showToast('Anzeige aktualisiert');
+          renderBanners();
+        } else {
+          showToast('Fehler beim Aktualisieren', true);
         }
       } catch (err) {
         showToast('Netzwerkfehler beim Aktualisieren', true);
