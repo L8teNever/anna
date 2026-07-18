@@ -652,8 +652,13 @@
       }
       case "hexe-heal": {
         if (witchHealUsed || nightVictimIdx === null) { goToStep("hexe-poison"); return; }
-        narrate(`Die Hexe wacht auf. Die Werwölfe haben ${roundPlayers[nightVictimIdx]} gewählt. Heiltrank einsetzen?`);
-        werwolfBody.innerHTML = "";
+        narrate("Die Hexe wacht auf.");
+        werwolfBody.innerHTML = `
+          <div class="werwolf-result-card">
+            <p class="m3-body">Die Werwölfe haben <strong>${escapeHtml(roundPlayers[nightVictimIdx])}</strong> gewählt.</p>
+            <p class="m3-body">Heiltrank einsetzen?</p>
+          </div>
+        `;
         werwolfActions.hidden = false;
         werwolfActions.innerHTML = `
           <button type="button" class="m3-button m3-button--filled" id="witch-heal-yes">Ja, retten</button>
@@ -799,7 +804,7 @@
   });
 
   restartButton.addEventListener("click", beginRound);
-  exitButton.addEventListener("click", () => { window.location.href = "/"; });
+  exitButton.addEventListener("click", () => { ViewNav.transition(playView, setupView); });
 
   /* ------------------------------------------------------------------ */
   /* Zurück-Navigation                                                     */
@@ -817,7 +822,12 @@
           ? "Als Host beendest du die Runde damit für alle Mitspieler."
           : "Du verlässt die Runde auf diesem Gerät. Andere können weiterspielen.",
         confirmLabel: onlineIsHost ? "Runde beenden" : "Verlassen",
-        onConfirm: () => { leaveOrEndOnlineRoom(); stopOnlineStream(); window.location.href = "/"; },
+        onConfirm: () => {
+          const fromView = onlineLobbyView.hidden ? onlinePlayView : onlineLobbyView;
+          leaveOrEndOnlineRoom();
+          resetOnlineState();
+          ViewNav.transition(fromView, setupView);
+        },
       });
       return;
     }
@@ -826,7 +836,7 @@
         title: "Spiel verlassen?",
         message: "Die Rollen-Weitergabe wird abgebrochen.",
         confirmLabel: "Verlassen",
-        onConfirm: () => { window.location.href = "/"; },
+        onConfirm: () => ViewNav.transition(revealView, setupView),
       });
       return;
     }
@@ -835,7 +845,7 @@
         title: "Spiel verlassen?",
         message: "Die laufende Runde wird abgebrochen.",
         confirmLabel: "Verlassen",
-        onConfirm: () => { window.location.href = "/"; },
+        onConfirm: () => ViewNav.transition(playView, setupView),
       });
       return;
     }
@@ -1156,8 +1166,9 @@
       const payload = JSON.parse(event.data);
       Toast.show(payload.message || "Die Runde ist nicht mehr aktiv", "alert-triangle");
       clearSession(onlineRoomToken);
-      stopOnlineStream();
-      window.location.href = "/";
+      const fromView = onlineLobbyView.hidden ? onlinePlayView : onlineLobbyView;
+      resetOnlineState();
+      ViewNav.transition(fromView, setupView);
     });
   }
 
@@ -1167,8 +1178,9 @@
     if (me && me.left) {
       Toast.show("Du wurdest aus der Runde geworfen", "alert-triangle");
       clearSession(onlineRoomToken);
-      stopOnlineStream();
-      window.location.href = "/";
+      const fromView = onlineLobbyView.hidden ? onlinePlayView : onlineLobbyView;
+      resetOnlineState();
+      ViewNav.transition(fromView, setupView);
       return;
     }
 
@@ -1566,8 +1578,8 @@
   });
   onlineExitButton.addEventListener("click", () => {
     leaveOrEndOnlineRoom();
-    stopOnlineStream();
-    window.location.href = "/";
+    resetOnlineState();
+    ViewNav.transition(onlinePlayView, setupView);
   });
 
   // Verlässt der Host die Runde (egal ob mitten im Spiel oder von der

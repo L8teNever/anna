@@ -110,7 +110,7 @@
         title: "Spiel verlassen?",
         message: "Die laufende Runde wird abgebrochen.",
         confirmLabel: "Verlassen",
-        onConfirm: () => { window.location.href = "/"; },
+        onConfirm: () => ViewNav.transition(playView, setupView),
       });
       return;
     }

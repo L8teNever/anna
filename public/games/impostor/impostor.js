@@ -359,7 +359,7 @@
   });
 
   restartButton.addEventListener("click", beginRound);
-  exitButton.addEventListener("click", () => { window.location.href = "/"; });
+  exitButton.addEventListener("click", () => { ViewNav.transition(playView, setupView); });
 
   backButton.addEventListener("click", () => {
     if (!revealView.hidden && setupView.hidden) {

@@ -230,7 +230,7 @@
   /* ------------------------------------------------------------------ */
   startButton.addEventListener("click", startRound);
   restartButton.addEventListener("click", startRound);
-  exitButton.addEventListener("click", () => { stopRound(); window.location.href = "/"; });
+  exitButton.addEventListener("click", () => { stopRound(); ViewNav.transition(playView, setupView); });
 
   backButton.addEventListener("click", () => {
     if (!playView.hidden && setupView.hidden) {

@@ -318,7 +318,7 @@
   });
 
   restartButton.addEventListener("click", beginRound);
-  exitButton.addEventListener("click", () => { window.location.href = "/"; });
+  exitButton.addEventListener("click", () => { ViewNav.transition(playView, setupView); });
 
   /* ------------------------------------------------------------------ */
   /* Nachschlagen (während der laufenden Runde)                           */
@@ -365,7 +365,7 @@
         title: "Spiel verlassen?",
         message: "Die Identitäten-Weitergabe wird abgebrochen.",
         confirmLabel: "Verlassen",
-        onConfirm: () => { window.location.href = "/"; },
+        onConfirm: () => ViewNav.transition(revealView, setupView),
       });
       return;
     }
@@ -375,7 +375,7 @@
         title: "Spiel verlassen?",
         message: "Die laufende Runde wird abgebrochen.",
         confirmLabel: "Verlassen",
-        onConfirm: () => { window.location.href = "/"; },
+        onConfirm: () => ViewNav.transition(playView, setupView),
       });
       return;
     }

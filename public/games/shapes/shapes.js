@@ -323,7 +323,7 @@
         title: "Spiel verlassen?",
         message: "Die aktuelle Zeichnung geht verloren.",
         confirmLabel: "Verlassen",
-        onConfirm: () => { window.location.href = "/"; },
+        onConfirm: () => ViewNav.transition(playView, setupView),
       });
       return;
     }

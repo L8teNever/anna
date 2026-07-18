@@ -9,6 +9,36 @@
   --app-max-width: 720px;
 }
 
+/* ---------- Nahtloser Seitenwechsel Start <-> Spiel-Seiten ---------- */
+/* Jedes Spiel ist bewusst ein eigenes HTML-Dokument (siehe server.py) - für
+   den Offline-Cache pro Spiel. Damit der Wechsel trotzdem wie eine einzige
+   App wirkt statt wie ein harter Reload, aktiviert diese Regel die native
+   Cross-Document View-Transitions-API für JEDE gleich-originäre Navigation.
+   Muss auf BEIDEN Seiten (alt + neu) vorhanden sein, deshalb hier in der
+   main.css, die jede Seite lädt. Browser ohne Unterstützung ignorieren die
+   Regel einfach - normale Navigation wie bisher, kein Nachteil.
+   Named statt Standard-Crossfade, damit die Übergabe leicht "einschwingt"
+   statt nur zu blitzen. */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root) {
+  animation: anna-page-out 0.16s var(--m3-easing-standard) both;
+}
+
+::view-transition-new(root) {
+  animation: anna-page-in 0.22s var(--m3-easing-standard) both;
+}
+
+@keyframes anna-page-out {
+  to { opacity: 0; transform: scale(0.98); }
+}
+
+@keyframes anna-page-in {
+  from { opacity: 0; transform: scale(1.02); }
+}
+
 /* ---------- Generischer View-Wechsel (view-nav.js) ---------- */
 .app-view {
   transition: opacity 0.22s var(--m3-easing-standard), transform 0.22s var(--m3-easing-standard);
