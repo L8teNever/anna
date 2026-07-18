@@ -47,25 +47,22 @@
     matches.forEach((game) => {
       const isFav = favorites.includes(game.id);
       const card = document.createElement("a");
-      card.className = "m3-card m3-card--interactive game-card";
+      card.className = "m3-card--interactive game-card";
       card.dataset.color = game.color;
       card.href = `/${game.id}`;
       card.setAttribute("aria-label", `${game.name} öffnen`);
       card.innerHTML = `
-        <div class="game-card__top">
-          <span class="m3-tag">${game.tag}</span>
-          <div class="game-card__actions">
-            <button type="button" class="game-card__fav" data-fav-id="${game.id}" aria-pressed="${isFav}" aria-label="Favorit" title="Favorit">
-              <svg class="m3-icon"><use href="#icon-heart"></use></svg>
-            </button>
-            <svg class="m3-icon" style="width: 16px; height: 16px; color: var(--m3-on-surface-variant)"><use href="#icon-arrow-up-right"></use></svg>
-          </div>
-        </div>
         <div class="game-card__icon"><svg class="m3-icon"><use href="#icon-${game.icon}"></use></svg></div>
         <div class="game-card__meta">
           <span class="game-card__label">${game.tag}</span>
           <h2 class="game-card__title">${game.name}</h2>
-          <span class="game-card__sub">${game.minPlayers}–${game.maxPlayers} Spieler</span>
+          <span class="game-card__sub">${game.description}</span>
+        </div>
+        <div class="game-card__actions">
+          <span class="game-card__badge">${game.minPlayers}–${game.maxPlayers} Spieler</span>
+          <button type="button" class="game-card__fav" data-fav-id="${game.id}" aria-pressed="${isFav}" aria-label="Favorit" title="Favorit">
+            <svg class="m3-icon"><use href="#icon-heart"></use></svg>
+          </button>
         </div>
       `;
 
