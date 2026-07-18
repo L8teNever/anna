@@ -1,0 +1,158 @@
+[
+  {
+    "id": "klassiker",
+    "label": "Klassiker",
+    "icon": "🎉",
+    "words": [
+      "aus Versehen ins Gefängnis kommen?",
+      "als Erste:r zum Mond fliegen, wenn es die Chance gäbe?",
+      "mitten in der Nacht spontan verreisen?",
+      "bei einer Quizshow gewinnen?",
+      "ein Buch über sich selbst schreiben?",
+      "einen Marathon ohne Training laufen?",
+      "berühmt werden, ohne es zu wollen?",
+      "sich verlaufen, obwohl Google Maps offen ist?",
+      "eine Notlüge nicht durchhalten?",
+      "im Lotto gewinnen und es niemandem sagen?",
+      "einen Weltrekord aufstellen?",
+      "mitten im Gespräch einschlafen?",
+      "ein Haustier heimlich vermenschlichen?",
+      "auf eine Verschwörungstheorie reinfallen?",
+      "in einer Notlage die Nerven behalten?",
+      "mit dem Auto in die falsche Richtung fahren, ohne es zu merken?",
+      "ein Fremder werden Freund fürs Leben?",
+      "eine Trophäe gewinnen und sie verlieren?"
+    ]
+  },
+  {
+    "id": "peinlich",
+    "label": "Peinliches & Fails",
+    "icon": "🙈",
+    "words": [
+      "vor der ganzen Gruppe hinfallen?",
+      "den falschen Namen rufen?",
+      "beim Vorstellungsgespräch etwas Peinliches sagen?",
+      "in der Öffentlichkeit laut furzen und so tun, als wäre nichts?",
+      "eine Nachricht an die falsche Person schicken?",
+      "mit Essen im Gesicht rumlaufen, ohne es zu merken?",
+      "in ein Fettnäpfchen treten?",
+      "eine geschlossene Glastür übersehen?",
+      "im Videocall das Mikro vergessen?",
+      "einen fremden Menschen umarmen, weil man ihn verwechselt hat?",
+      "beim Reden über jemanden erwischt werden, der hinter einem steht?",
+      "eine peinliche Autokorrektur nicht rechtzeitig bemerken?",
+      "auf der Bühne den Text vergessen?",
+      "im falschen Bus sitzen und es erst spät merken?",
+      "beim Lachen etwas rausprusten?",
+      "eine super offensichtliche Ausrede erfinden?",
+      "im Schlaf reden oder laufen?"
+    ]
+  },
+  {
+    "id": "party",
+    "label": "Party & Feiern",
+    "icon": "🍻",
+    "words": [
+      "als Erste:r auf dem Tisch tanzen?",
+      "das Trinkspiel erfinden, das alle verwirrt?",
+      "am nächsten Morgen nicht mehr wissen, wie die Nacht endete?",
+      "auf einer Feier komplett falsch angezogen erscheinen?",
+      "einen Karaoke-Song komplett versemmeln?",
+      "als Erste:r einschlafen?",
+      "spontan eine Rede halten?",
+      "die Musik-Playlist übernehmen und niemandem gefallen?",
+      "ein Trinkspiel gewinnen, ohne die Regeln zu kennen?",
+      "sich mit Glitzer bekleckern und es tagelang nicht loswerden?",
+      "auf einer Party jemand Fremdes anquatschen?",
+      "das letzte Stück Pizza klauen?",
+      "einen Toast halten, der zu lang wird?",
+      "als Erste:r auf dem Nachhauseweg ein Taxi rufen?",
+      "eine Faschingsverkleidung übertreiben?",
+      "am Lagerfeuer die beste Gruselgeschichte erzählen?"
+    ]
+  },
+  {
+    "id": "beziehung",
+    "label": "Liebe & Beziehung",
+    "icon": "❤️",
+    "words": [
+      "beim ersten Date zu spät kommen?",
+      "aus Versehen „ich liebe dich“ zur falschen Person sagen?",
+      "einen Heiratsantrag komplett vermasseln?",
+      "beim Date die Rechnung übernehmen, ohne zu zögern?",
+      "sich in eine:n Ex zurückverlieben?",
+      "beim ersten Date zu viel über sich selbst reden?",
+      "ein Dating-Profil stark aufhübschen?",
+      "eine Beziehung wegen einer Kleinigkeit beenden?",
+      "heimlich das Handy des Partners checken?",
+      "auf der Hochzeit eines anderen weinen?",
+      "sich für den Partner heimlich verändern?",
+      "beim Kennenlernen zu ehrlich sein?",
+      "eine Liebeserklärung vor allen Leuten machen?",
+      "in der Beziehung die Fernbedienung nie abgeben?",
+      "einen Heiratsantrag filmen lassen?"
+    ]
+  },
+  {
+    "id": "job_alltag",
+    "label": "Job & Alltag",
+    "icon": "🎒",
+    "words": [
+      "sich krankmelden, um einfach mal nichts zu tun?",
+      "im Meeting einschlafen?",
+      "eine E-Mail an den falschen Verteiler schicken?",
+      "eine Deadline in letzter Sekunde schaffen?",
+      "sich im eigenen Job hochschummeln?",
+      "der Chef oder die Chefin werden?",
+      "eine Präsentation komplett improvisieren?",
+      "den Wecker fünfmal snoozen und trotzdem pünktlich sein?",
+      "einen Konflikt im Büro schlichten?",
+      "sich für einen Fehler entschuldigen, der nicht der eigene war?",
+      "die meisten Überstunden freiwillig machen?",
+      "im Homeoffice im Schlafanzug bleiben?",
+      "eine Kaffeemaschine reparieren, die niemand anfassen wollte?",
+      "die ganze Abteilung zum Lachen bringen?"
+    ]
+  },
+  {
+    "id": "reisen",
+    "label": "Reisen & Abenteuer",
+    "icon": "✈️",
+    "words": [
+      "einen Flug verpassen?",
+      "sich im Urlaub so sehr verlaufen, dass ein Taxi nötig wird?",
+      "spontan einen Flug buchen, ohne genau zu wissen wohin?",
+      "im Ausland versuchen zu handeln und kläglich scheitern?",
+      "den Reisepass kurz vor dem Abflug verlegen?",
+      "eine Nacht am Flughafen verbringen?",
+      "beim Zelten mitten in der Nacht Panik bekommen?",
+      "im Urlaub mehr Fotos machen, als je wieder angeschaut werden?",
+      "sich mit Händen und Füßen verständigen?",
+      "eine völlig falsch gepackte Reisetasche mitnehmen?",
+      "im Hostel schnarchen und Beschwerden bekommen?",
+      "eine Sehenswürdigkeit komplett verpassen, weil man verschlafen hat?",
+      "mit Fremden im Zug die besten Gespräche führen?"
+    ]
+  },
+  {
+    "id": "spicy",
+    "label": "Spicy: Erotisches",
+    "icon": "🔞",
+    "words": [
+      "in der Öffentlichkeit rummachen?",
+      "beim Sex den falschen Namen stöhnen?",
+      "einen One-Night-Stand haben?",
+      "ein Nacktfoto verschicken?",
+      "über einen Dreier nachdenken?",
+      "Sexting betreiben?",
+      "an einem ungewöhnlichen Ort Sex haben?",
+      "beim Sex erwischt werden?",
+      "ein Rollenspiel im Schlafzimmer vorschlagen?",
+      "Dirty Talk am Telefon machen?",
+      "einen Striptease hinlegen?",
+      "eine Fantasie laut aussprechen?",
+      "Sex im Auto haben?",
+      "sich für jemanden ausziehen, den man gerade erst kennengelernt hat?"
+    ]
+  }
+]

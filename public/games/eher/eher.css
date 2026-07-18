@@ -1,0 +1,63 @@
+/**
+ * Visuals, die ausschließlich zu "Wer würde eher" gehören. Layout/Grundgerüst
+ * kommt aus main.css (.game-shell, .game-view, .picker-* ...), hier nur die
+ * Fragen-Bühne mit ihrer Karte.
+ */
+
+.eher-stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  max-width: 480px;
+  margin: 0 auto;
+  width: 100%;
+  text-align: center;
+}
+
+.eher-stage__eyebrow {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--game-pink);
+}
+
+.eher-card {
+  width: 100%;
+  min-height: min(220px, 30dvh);
+  border-radius: var(--m3-shape-xxl);
+  background: var(--m3-surface-container);
+  border: 1px solid var(--m3-outline-variant);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 24px;
+}
+
+.eher-card--changing {
+  animation: eher-card-in 0.3s var(--m3-easing-emphasized);
+}
+
+@keyframes eher-card-in {
+  from { opacity: 0; transform: scale(0.96) translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+.eher-card__text {
+  font-family: var(--m3-font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--m3-on-surface);
+}
+
+.eher-stage__category {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--m3-on-surface-variant);
+  min-height: 1.2em;
+}

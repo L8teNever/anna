@@ -80,6 +80,18 @@
       assets: ["/games/werbinich/werbinich.js", "/games/werbinich/werbinich.css", "/games/werbinich/categories.json"],
     },
     {
+      id: "eher",
+      name: "Wer würde eher",
+      tag: "Party",
+      description: "Eine Frage nach der anderen – wer passt am besten?",
+      detail: "Der Reihe nach zeigt die App eine Frage, die mit „Wer würde eher …“ beginnt. Alle zeigen gleichzeitig auf die Person aus der Gruppe, die am besten passt.",
+      icon: "users",
+      color: "pink",
+      minPlayers: 3,
+      maxPlayers: 20,
+      assets: ["/games/eher/eher.js", "/games/eher/eher.css", "/games/eher/categories.json"],
+    },
+    {
       id: "werwolf-lokal",
       name: "Werwolf – Einzelgerät",
       tag: "Party",

@@ -515,12 +515,19 @@ body.page-transition-out {
   color: var(--game-indigo);
 }
 
+.game-card[data-color="pink"] .game-card__icon,
+.game-card[data-color="pink"] .game-card__badge {
+  background: var(--game-pink-container);
+  color: var(--game-pink);
+}
+
 .game-card[data-color="red"] .game-card__label { color: var(--game-red); }
 .game-card[data-color="purple"] .game-card__label { color: var(--game-purple); }
 .game-card[data-color="green"] .game-card__label { color: var(--game-green); }
 .game-card[data-color="orange"] .game-card__label { color: var(--game-orange); }
 .game-card[data-color="teal"] .game-card__label { color: var(--game-teal); }
 .game-card[data-color="indigo"] .game-card__label { color: var(--game-indigo); }
+.game-card[data-color="pink"] .game-card__label { color: var(--game-pink); }
 
 /* ---------- Rechtliches (Impressum & Datenschutz) ---------- */
 .legal-nav {
