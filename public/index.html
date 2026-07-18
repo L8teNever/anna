@@ -56,16 +56,9 @@
         <button type="button" class="m3-icon-button" id="search-trigger-button" aria-label="Suche öffnen" title="Suche öffnen" style="color: var(--m3-primary)">
           <svg class="m3-icon"><use href="#icon-search"></use></svg>
         </button>
-        <button type="button" class="m3-icon-button" id="settings-button" aria-label="Einstellungen" title="Einstellungen">
-          <span class="app-topbar__settings-icon">
-            <span id="settings-icon-gear" style="opacity: 1; transform: none">
-              <svg class="m3-icon"><use href="#icon-settings"></use></svg>
-            </span>
-            <span id="settings-icon-close" style="opacity: 0; transform: rotate(-90deg) scale(0.7)">
-              <svg class="m3-icon" style="color: var(--m3-primary)"><use href="#icon-close"></use></svg>
-            </span>
-          </span>
-        </button>
+        <a href="/settings" class="m3-icon-button interactive-item" aria-label="Einstellungen" title="Einstellungen">
+          <svg class="m3-icon"><use href="#icon-settings"></use></svg>
+        </a>
       </div>
     </header>
 
@@ -102,79 +95,6 @@
       </p>
       <div class="game-grid" id="game-grid"></div>
     </main>
-  </div>
-
-  <!-- ---------- Einstellungen-Modal ---------- -->
-  <div id="settings-modal" class="m3-modal" hidden>
-    <div class="m3-modal__backdrop" id="settings-modal-backdrop"></div>
-    <div class="m3-modal__dialog">
-      <div class="m3-modal__header">
-        <h3 class="m3-modal__title">
-          <svg class="m3-icon" style="width: 20px; height: 20px; color: var(--m3-primary)"><use href="#icon-settings"></use></svg>
-          Einstellungen
-        </h3>
-        <button type="button" class="m3-icon-button" id="settings-modal-close" style="width: 40px; height: 40px">
-          <svg class="m3-icon" style="width: 18px; height: 18px"><use href="#icon-close"></use></svg>
-        </button>
-      </div>
-
-      <div class="m3-list-row">
-        <div class="m3-list-row__label">
-          <span class="m3-list-row__title">Design</span>
-          <span class="m3-list-row__hint">Hell, dunkel oder wie im Systemmodus</span>
-        </div>
-        <div class="m3-segmented" id="theme-segmented" role="group" aria-label="Design wählen">
-          <button type="button" class="m3-segmented__option" data-value="system">Auto</button>
-          <button type="button" class="m3-segmented__option" data-value="light">Hell</button>
-          <button type="button" class="m3-segmented__option" data-value="dark">Dunkel</button>
-        </div>
-      </div>
-
-      <div class="m3-list-row">
-        <div class="m3-list-row__label">
-          <span class="m3-list-row__title">Ton abspielen</span>
-          <span class="m3-list-row__hint">Ton-Effekte in den Spielen</span>
-        </div>
-        <label class="m3-switch">
-          <input type="checkbox" id="sound-toggle" />
-          <span class="m3-switch__track"></span>
-        </label>
-      </div>
-
-      <div class="m3-list-row">
-        <div class="m3-list-row__label">
-          <span class="m3-list-row__title">Vibration (Haptik)</span>
-          <span class="m3-list-row__hint">Klick-Feedback & Ereignisse</span>
-        </div>
-        <label class="m3-switch">
-          <input type="checkbox" id="vibration-toggle" />
-          <span class="m3-switch__track"></span>
-        </label>
-      </div>
-
-      <div class="m3-list-row">
-        <div class="m3-list-row__label">
-          <span class="m3-list-row__title">App-Cache</span>
-          <span class="m3-list-row__hint">Löscht alle offline gespeicherten Dateien und lädt alles neu vom Server</span>
-        </div>
-        <button type="button" class="m3-button m3-button--danger" id="clear-cache-button" style="height: 40px; padding: 0 16px; font-size: 0.82rem">
-          Cache löschen
-        </button>
-      </div>
-
-      <a href="/rechtliches" class="m3-list-row" style="text-decoration: none; color: inherit">
-        <div class="m3-list-row__label">
-          <span class="m3-list-row__title">Rechtliches</span>
-          <span class="m3-list-row__hint">Impressum &amp; Datenschutzerklärung</span>
-        </div>
-        <svg class="m3-icon" style="width: 18px; height: 18px; color: var(--m3-on-surface-variant)"><use href="#icon-arrow-up-right"></use></svg>
-      </a>
-
-      <div class="m3-modal__actions">
-        <button type="button" class="m3-button m3-button--tonal" id="update-check-button">Nach Updates suchen</button>
-      </div>
-      <p class="m3-body" style="text-align: center; font-size: 10px; font-family: monospace" id="app-version-label">ANNA</p>
-    </div>
   </div>
 
   <script src="/js/version.js"></script>

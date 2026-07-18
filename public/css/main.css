@@ -170,21 +170,6 @@ body.page-transition-out {
   pointer-events: auto;
 }
 
-.app-topbar__settings-icon {
-  position: relative;
-  width: 24px;
-  height: 24px;
-}
-
-.app-topbar__settings-icon span {
-  position: absolute;
-  inset: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity 0.25s var(--m3-easing-standard), transform 0.25s var(--m3-easing-standard);
-}
-
 /* ---------- Filter-Panel ---------- */
 .filter-panel {
   display: none;
