@@ -216,6 +216,19 @@
     updateModeUI();
   });
 
+  // Die Startseite zeigt "Werwolf – Einzelgerät" und "Werwolf – Online" als
+  // getrennte Kacheln (siehe game-registry.js), die beide auf /werwolf
+  // führen, aber mit ?mode=local bzw. ?mode=online - direkt hier vorwählen,
+  // damit man den Umschalter oben nicht nochmal manuell antippen muss.
+  const requestedMode = new URLSearchParams(location.search).get("mode");
+  if (requestedMode === "online" || requestedMode === "local") {
+    mode = requestedMode;
+    modeSelect.querySelectorAll(".m3-segmented__option").forEach((b) => {
+      b.setAttribute("aria-pressed", String(b.dataset.mode === requestedMode));
+    });
+    updateModeUI();
+  }
+
   /* ------------------------------------------------------------------ */
   /* Hilfsfunktionen                                                       */
   /* ------------------------------------------------------------------ */

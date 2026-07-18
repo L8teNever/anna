@@ -79,7 +79,7 @@
 // String mit hochgezählt werden (parallel zu version.js, das weiterhin die
 // in den Einstellungen angezeigte Versionsnummer liefert), sonst bleibt
 // sw.js byte-identisch und das gesamte Update-System bleibt wirkungslos.
-const APP_VERSION = "3.23.0";
+const APP_VERSION = "3.25.0";
 const CACHE_NAME = `anna-cache-${APP_VERSION}`;
 
 // Versionsunabhängige Marker: NICHT umbenennen und NICHT in CACHE_NAME
@@ -135,7 +135,7 @@ const CORE_ASSETS = [
   "/assets/fonts/outfit-variable.woff2",
 ];
 
-const GAME_ASSETS = (self.GAMES || []).flatMap((game) => [`/${game.id}`, ...game.assets]);
+const GAME_ASSETS = (self.GAMES || []).flatMap((game) => [game.href || `/${game.id}`, ...game.assets]);
 
 const PRECACHE_URLS = [...CORE_ASSETS, ...GAME_ASSETS];
 

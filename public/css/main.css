@@ -268,6 +268,24 @@ body.page-transition-out {
   transform: scale(0.99);
 }
 
+.game-card--disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.game-card--disabled:hover {
+  background: var(--m3-surface-container);
+  border-color: var(--m3-outline-variant);
+}
+
+.game-card--disabled:active {
+  transform: none;
+}
+
+.game-card--disabled .game-card__icon {
+  filter: grayscale(1);
+}
+
 .game-card__icon {
   flex-shrink: 0;
   width: 46px;

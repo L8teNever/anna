@@ -7,6 +7,15 @@
  *
  * assets: zusätzliche Dateien des Spiels, die für Offline-Betrieb
  * vorab gecacht werden müssen (die index.html wird automatisch ergänzt).
+ *
+ * href: optional - überschreibt die sonst aus `id` abgeleitete Route
+ * (`/${id}`). Nötig, wenn zwei Kacheln auf dasselbe Spiel-Verzeichnis
+ * zeigen sollen (siehe werwolf-lokal/werwolf-online: beide führen auf
+ * `/werwolf`, aber mit ?mode=..., das werwolf.js beim Laden ausliest und
+ * den Einzelgerät-/Online-Umschalter direkt vorwählt).
+ *
+ * requiresOnline: optional - Kachel wird auf der Startseite ausgegraut
+ * und ist nicht antippbar, solange das Gerät offline ist (siehe app.js).
  */
 (function (root) {
   const GAMES = [
@@ -71,15 +80,30 @@
       assets: ["/games/werbinich/werbinich.js", "/games/werbinich/werbinich.css", "/games/werbinich/categories.json"],
     },
     {
-      id: "werwolf",
-      name: "Werwolf",
+      id: "werwolf-lokal",
+      name: "Werwolf – Einzelgerät",
       tag: "Party",
-      description: "Das Dorf schläft ein – wer sind die Werwölfe?",
-      detail: "Das Dorf schläft ein, die Werwölfe wählen ihr Opfer. Tagsüber diskutiert und stimmt das Dorf ab, wer verdächtig ist. Mit optionaler Seherin, Hexe, Amor und Jäger.",
+      description: "Ein Handy geht reihum – Rollen bleiben geheim am Tisch.",
+      detail: "Das Dorf schläft ein, die Werwölfe wählen ihr Opfer. Tagsüber diskutiert und stimmt das Dorf ab, wer verdächtig ist. Mit optionaler Seherin, Hexe, Amor und Jäger. Ein Gerät wird reihum weitergereicht.",
       icon: "moon",
       color: "indigo",
       minPlayers: 4,
       maxPlayers: 20,
+      href: "/werwolf?mode=local",
+      assets: ["/games/werwolf/werwolf.js", "/games/werwolf/werwolf.css"],
+    },
+    {
+      id: "werwolf-online",
+      name: "Werwolf – Online",
+      tag: "Party",
+      description: "Jede:r auf dem eigenen Handy – gemeinsame Runde per Link.",
+      detail: "Dieselbe Werwolf-Runde, aber jede Person spielt auf ihrem eigenen Gerät. Der Host erstellt einen Raum, alle anderen treten per Link oder QR-Code bei.",
+      icon: "moon",
+      color: "indigo",
+      minPlayers: 4,
+      maxPlayers: 20,
+      href: "/werwolf?mode=online",
+      requiresOnline: true,
       assets: ["/games/werwolf/werwolf.js", "/games/werwolf/werwolf.css"],
     },
   ];

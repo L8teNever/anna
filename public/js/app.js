@@ -30,6 +30,10 @@
     return game.minPlayers <= count && game.maxPlayers >= count;
   }
 
+  function isOffline() {
+    return typeof navigator !== "undefined" && navigator.onLine === false;
+  }
+
   function renderGames(filterText) {
     const query = (filterText || "").trim().toLowerCase();
     const favorites = Storage.getFavorites();
@@ -46,20 +50,22 @@
     grid.innerHTML = "";
     matches.forEach((game) => {
       const isFav = favorites.includes(game.id);
+      const disabled = game.requiresOnline && isOffline();
       const card = document.createElement("a");
-      card.className = "m3-card--interactive game-card";
+      card.className = disabled ? "game-card game-card--disabled" : "m3-card--interactive game-card";
       card.dataset.color = game.color;
-      card.href = `/${game.id}`;
-      card.setAttribute("aria-label", `${game.name} öffnen`);
+      card.href = game.href || `/${game.id}`;
+      card.setAttribute("aria-label", disabled ? `${game.name} – offline nicht verfügbar` : `${game.name} öffnen`);
+      if (disabled) card.setAttribute("aria-disabled", "true");
       card.innerHTML = `
         <div class="game-card__icon"><svg class="m3-icon"><use href="#icon-${game.icon}"></use></svg></div>
         <div class="game-card__meta">
           <span class="game-card__label">${game.tag}</span>
           <h2 class="game-card__title">${game.name}</h2>
-          <span class="game-card__sub">${game.description}</span>
+          <span class="game-card__sub">${disabled ? "Offline nicht verfügbar – braucht Internet" : game.description}</span>
         </div>
         <div class="game-card__actions">
-          <span class="game-card__badge">${game.minPlayers}–${game.maxPlayers} Spieler</span>
+          ${disabled ? "" : `<span class="game-card__badge">${game.minPlayers}–${game.maxPlayers} Spieler</span>`}
           <button type="button" class="game-card__fav" data-fav-id="${game.id}" aria-pressed="${isFav}" aria-label="Favorit" title="Favorit">
             <svg class="m3-icon"><use href="#icon-heart"></use></svg>
           </button>
@@ -67,7 +73,8 @@
       `;
 
       // Klick + flüssiger Übergang übernimmt jetzt router.js zentral für
-      // jeden internen <a>-Link - kein Extra-Handler hier nötig.
+      // jeden internen <a>-Link (siehe grid-Klick-Handler weiter unten für
+      // die Sonderbehandlung ausgegrauter Karten).
       grid.appendChild(card);
     });
 
@@ -169,15 +176,30 @@
   /* ------------------------------------------------------------------ */
   grid.addEventListener("click", (event) => {
     const favButton = event.target.closest("[data-fav-id]");
-    if (!favButton) return;
-    event.stopPropagation();
-    event.preventDefault(); // Verhindert Navigation über den <a>-Eltern-Link
-    const favorites = Storage.toggleFavorite(favButton.dataset.favId);
-    const isFav = favorites.includes(favButton.dataset.favId);
-    favButton.setAttribute("aria-pressed", String(isFav));
-    Toast.show(isFav ? "Zu Favoriten hinzugefügt" : "Von Favoriten entfernt", "heart");
-    if (showOnlyFavorites) renderGames(currentQuery());
+    if (favButton) {
+      event.stopPropagation();
+      event.preventDefault(); // Verhindert Navigation über den <a>-Eltern-Link
+      const favorites = Storage.toggleFavorite(favButton.dataset.favId);
+      const isFav = favorites.includes(favButton.dataset.favId);
+      favButton.setAttribute("aria-pressed", String(isFav));
+      Toast.show(isFav ? "Zu Favoriten hinzugefügt" : "Von Favoriten entfernt", "heart");
+      if (showOnlyFavorites) renderGames(currentQuery());
+      return;
+    }
+
+    const disabledCard = event.target.closest(".game-card--disabled");
+    if (disabledCard) {
+      event.stopPropagation();
+      event.preventDefault();
+      Toast.show("Für den Online-Modus wird eine Internetverbindung benötigt", "alert-triangle");
+    }
   });
+
+  /* ------------------------------------------------------------------ */
+  /* Online-/Offline-Status: ausgegraute Karten live aktualisieren         */
+  /* ------------------------------------------------------------------ */
+  window.addEventListener("online", () => renderGames(currentQuery()), { signal: Router.signal });
+  window.addEventListener("offline", () => renderGames(currentQuery()), { signal: Router.signal });
 
   /* ------------------------------------------------------------------ */
   /* Einstellungen-Modal                                                  */
