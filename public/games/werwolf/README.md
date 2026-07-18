@@ -72,11 +72,10 @@ bleiben unverändert rein clientseitig.
   join/action-Endpunkten.
 - **Datensparsamkeit (DSGVO)**: alles nur im Arbeitsspeicher, kein Logging
   von Namen/Rollen auf Platte, Räume verfallen nach 6h Inaktivität
-  (`ROOM_TTL_SECONDS`) oder wenn der Host beendet. **Kein Ersatz für eine
-  rechtliche Prüfung** – falls diese App über den Freundeskreis hinaus
-  genutzt wird, gehört eine entsprechende Ergänzung auf die externe
-  `legal.kulbarts.com`-Seite dazu, da hier zum ersten Mal Namen über einen
-  Server laufen (wenn auch nur temporär und im Arbeitsspeicher).
+  (`ROOM_TTL_SECONDS`) oder wenn der Host beendet. Dokumentiert in der
+  Datenschutzerklärung unter `/rechtliches` (Abschnitt 5) – dort
+  nachziehen, falls sich an dieser serverseitigen Verarbeitung etwas
+  ändert.
 - **Reconnect**: der Client speichert `{playerToken}` pro Raum in
   `localStorage` (`anna:werwolf:session:<roomToken>`) – Handy aus/an oder
   Tab neu laden wirft niemanden raus, solange der Raum noch existiert.

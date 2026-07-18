@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta name="cf-worker-bypass" content="true" />
+  <meta charset="utf-8" />
+  <meta name="cf-cache-bust" content="true" />
+  <script>
+    (function () {
+      try {
+        var s = JSON.parse(localStorage.getItem("anna:settings") || "{}");
+        if (s.theme === "light" || s.theme === "dark") document.documentElement.dataset.theme = s.theme;
+      } catch (e) {}
+    })();
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f1014" />
+  <title>Rechtliches – Anna</title>
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" href="/assets/icons/icon-192.png" />
+  <link rel="stylesheet" href="/css/material.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+  <link rel="stylesheet" href="/css/main.css" />
+</head>
+<body>
+  <script src="/js/icons.js"></script>
+  <div class="game-shell">
+    <header class="game-topbar">
+      <button class="m3-icon-button" id="back-button" aria-label="Zurück" title="Zurück">
+        <svg class="m3-icon"><use href="#icon-arrow-back"></use></svg>
+      </button>
+      <h1 class="game-topbar__title">
+        <svg class="m3-icon" style="vertical-align: -5px"><use href="#icon-info"></use></svg>
+        Rechtliches
+      </h1>
+    </header>
+
+    <section class="game-view app-view" id="setup-view">
+      <div class="legal-nav">
+        <a href="#impressum" class="m3-chip">Impressum</a>
+        <a href="#datenschutz" class="m3-chip">Datenschutz</a>
+      </div>
+
+      <section class="settings-section" style="margin-top: 12px" id="impressum">
+        <h2 class="m3-title">Impressum</h2>
+        <div class="legal-content">
+          <h3>Angaben gemäß § 5 DDG</h3>
+          <address class="legal-address m3-body">
+            Simon Kulbarts<br />
+            Zeppelinstraße 51<br />
+            73430 Aalen<br />
+            Deutschland
+          </address>
+
+          <h3>Kontakt</h3>
+          <p class="m3-body">E-Mail: <a href="mailto:legal@kulbarts.com">legal@kulbarts.com</a></p>
+
+          <h3>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h3>
+          <p class="m3-body">Simon Kulbarts (Anschrift wie oben)</p>
+
+          <h3>Art des Angebots</h3>
+          <p class="m3-body">
+            Anna ist ein privates, nicht-kommerzielles Hobbyprojekt (kostenlose Sammlung von
+            Partyspielen). Es werden keine Waren oder Dienstleistungen verkauft und keine Verträge
+            mit Nutzer:innen geschlossen – die Hinweise zur Online-Streitbeilegung (Art. 14 Abs. 1
+            ODR-VO) und zum Verbraucherstreitbeilegungsgesetz (VSBG) sind daher nicht einschlägig.
+          </p>
+
+          <h3>Haftung für Inhalte</h3>
+          <p class="m3-body">
+            Als Diensteanbieter bin ich gemäß § 7 Abs. 1 DDG für eigene Inhalte auf diesen Seiten
+            nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 DDG bin ich als
+            Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde
+            Informationen zu überwachen oder nach Umständen zu forschen, die auf eine
+            rechtswidrige Tätigkeit hinweisen. Bei Bekanntwerden entsprechender Rechtsverletzungen
+            werde ich diese Inhalte umgehend entfernen.
+          </p>
+
+          <h3>Haftung für Links</h3>
+          <p class="m3-body">
+            Diese Website enthält ggf. Links zu externen Websites Dritter, auf deren Inhalte ich
+            keinen Einfluss habe. Deshalb kann ich für diese fremden Inhalte auch keine Gewähr
+            übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter
+            verantwortlich.
+          </p>
+
+          <h3>Urheberrecht</h3>
+          <p class="m3-body">
+            Die durch den Betreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem
+            deutschen Urheberrecht. Eingesetzte Schriftarten sind selbst gehostete, lizenzfreie
+            Open-Source-Schriften (siehe Datenschutzerklärung).
+          </p>
+        </div>
+      </section>
+
+      <section class="settings-section" id="datenschutz">
+        <h2 class="m3-title">Datenschutzerklärung</h2>
+        <div class="legal-content">
+          <h3>1. Verantwortlicher</h3>
+          <p class="m3-body">
+            Verantwortlicher im Sinne der Datenschutz-Grundverordnung (DSGVO) ist:<br />
+            Simon Kulbarts, Zeppelinstraße 51, 73430 Aalen, Deutschland<br />
+            E-Mail: <a href="mailto:legal@kulbarts.com">legal@kulbarts.com</a>
+          </p>
+
+          <h3>2. Auf einen Blick</h3>
+          <p class="m3-body">
+            Anna ist eine Sammlung browserbasierter Partyspiele ohne Benutzerkonten, ohne
+            Werbung, ohne Analyse-/Tracking-Dienste und ohne Cookies. Eingaben wie Spielernamen
+            oder Einstellungen bleiben grundsätzlich lokal auf deinem Gerät. Nur wenn du aktiv den
+            Online-Mehrspielermodus von "Werwolf" nutzt, verarbeitet der Server vorübergehend
+            Daten – Details dazu in Abschnitt 5.
+          </p>
+
+          <h3>3. Hosting &amp; Server-Zugriffsdaten (Cloudflare)</h3>
+          <p class="m3-body">
+            Diese Website läuft auf einem selbst betriebenen Server, der über einen
+            Cloudflare-Tunnel erreichbar gemacht wird. Cloudflare (Cloudflare, Inc., San
+            Francisco, USA) fungiert dabei als Reverse-Proxy vor dem eigentlichen Server und
+            verarbeitet dabei zwangsläufig technische Verbindungsdaten (z. B. IP-Adresse,
+            Zeitpunkt der Anfrage, aufgerufene URL, User-Agent), um die Verbindung zu
+            vermitteln und den Dienst gegen Missbrauch (z. B. DDoS-Angriffe) abzusichern.
+            Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einem
+            sicheren und stabilen Betrieb der Website). Da Cloudflare Inc. in den USA sitzt,
+            kann es dabei zu einer Datenübermittlung in ein Drittland kommen; Cloudflare gibt an,
+            hierfür geeignete Garantien (u. a. Standardvertragsklauseln) einzusetzen. Details
+            findest du in der Datenschutzerklärung von Cloudflare.
+          </p>
+
+          <h3>4. Lokale Datenspeicherung im Browser</h3>
+          <p class="m3-body">
+            Spielerlisten/Namen, Favoriten, gewählte Kategorien sowie Design-, Sound- und
+            Vibrationseinstellungen werden ausschließlich lokal im <code>localStorage</code>
+            deines Geräts gespeichert. Diese Daten verlassen dein Gerät nie und werden zu keinem
+            Zeitpunkt an den Server übertragen. Diese Speicherung ist technisch unbedingt
+            erforderlich, um die von dir aktiv genutzte Funktion (z. B. gespeicherte
+            Spielerliste) bereitzustellen, und damit gemäß § 25 Abs. 2 Nr. 2 TDDDG (vormals
+            TTDSG) von der Einwilligungspflicht ausgenommen. Du kannst diese Daten jederzeit
+            selbst löschen: Einstellungen → "App-Cache" → "Cache löschen", oder über die
+            Browser-Einstellungen deines Geräts.
+          </p>
+
+          <h3>5. Werwolf Online-Modus (serverseitige Verarbeitung)</h3>
+          <p class="m3-body">
+            Nutzt du den optionalen "Online"-Mehrspielermodus von Werwolf, werden der von dir
+            eingegebene Name sowie der laufende Spielzustand (Rollen, Lebend/Tot-Status,
+            Abstimmungen) ausschließlich im Arbeitsspeicher (RAM) des Servers gehalten – nichts
+            wird in einer Datenbank oder auf Festplatte gespeichert. Ein Spielraum ist nur über
+            den jeweiligen Beitrittscode/-link erreichbar und wird automatisch endgültig
+            gelöscht, sobald der Host die Runde beendet oder spätestens nach 6 Stunden
+            Inaktivität. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b bzw. lit. f DSGVO (Bereitstellung
+            der von dir aktiv gestarteten Funktion).
+          </p>
+
+          <h3>6. Avatar-Verwaltung (nur Betreiber)</h3>
+          <p class="m3-body">
+            Die App enthält einen separaten, nicht öffentlich verlinkten Administrationsbereich
+            zur Verwaltung von Avatar-Bildern für das Spiel "Wer bin ich?". Dieser wird
+            ausschließlich vom Betreiber selbst genutzt; normale Besucher:innen der Website haben
+            weder Zugriff darauf, noch werden dabei Besucherdaten verarbeitet.
+          </p>
+
+          <h3>7. Schriftarten</h3>
+          <p class="m3-body">
+            Alle verwendeten Schriftarten (Roboto, Plus Jakarta Sans, Outfit – lizenzfreie
+            Open-Source-Schriften) werden lokal von diesem Server ausgeliefert statt von externen
+            Font-Diensten wie Google Fonts nachzuladen. Beim Betrachten dieser Seite findet daher
+            keine Verbindung zu Google-Servern statt und es wird keine IP-Adresse an Google
+            übertragen.
+          </p>
+
+          <h3>8. Cookies</h3>
+          <p class="m3-body">Diese Website verwendet keine Cookies.</p>
+
+          <h3>9. Empfänger</h3>
+          <p class="m3-body">
+            Cloudflare, Inc. als technischer Auftragsverarbeiter (siehe Abschnitt 3). Eine
+            Weitergabe an sonstige Dritte, insbesondere Werbenetzwerke oder Analysedienste,
+            findet nicht statt.
+          </p>
+
+          <h3>10. Speicherdauer</h3>
+          <ul class="m3-body">
+            <li><code>localStorage</code>: bis du sie selbst löschst</li>
+            <li>Werwolf-Online-Räume: automatisch beim Rundenende, spätestens nach 6 Stunden Inaktivität</li>
+            <li>Server-Zugriffsprotokolle bei Cloudflare: gemäß Cloudflares eigenen Aufbewahrungsfristen</li>
+          </ul>
+
+          <h3>11. Deine Rechte</h3>
+          <p class="m3-body">
+            Du hast im Rahmen der geltenden gesetzlichen Bestimmungen jederzeit das Recht auf
+            unentgeltliche Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16), Löschung (Art. 17),
+            Einschränkung der Verarbeitung (Art. 18), Datenübertragbarkeit (Art. 20) sowie
+            Widerspruch (Art. 21) bezüglich deiner personenbezogenen Daten. Da praktisch keine
+            personenbezogenen Daten dauerhaft serverseitig gespeichert werden, laufen die
+            meisten dieser Rechte technisch bereits ins Leere. Für Rückfragen wende dich an
+            <a href="mailto:legal@kulbarts.com">legal@kulbarts.com</a>. Außerdem steht dir ein
+            Beschwerderecht bei einer Datenschutz-Aufsichtsbehörde zu (Art. 77 DSGVO), z. B. dem
+            Landesbeauftragten für den Datenschutz und die Informationsfreiheit
+            Baden-Württemberg.
+          </p>
+
+          <h3>12. Stand</h3>
+          <p class="m3-body">Juli 2026</p>
+        </div>
+      </section>
+    </section>
+  </div>
+
+  <script src="/js/version.js"></script>
+  <script src="/js/storage.js"></script>
+  <script>
+    document.getElementById("back-button").addEventListener("click", () => {
+      window.location.href = "/";
+    });
+  </script>
+  <script src="/js/pwa-helper.js"></script>
+</body>
+</html>

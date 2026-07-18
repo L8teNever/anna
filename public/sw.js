@@ -79,7 +79,7 @@
 // String mit hochgezählt werden (parallel zu version.js, das weiterhin die
 // in den Einstellungen angezeigte Versionsnummer liefert), sonst bleibt
 // sw.js byte-identisch und das gesamte Update-System bleibt wirkungslos.
-const APP_VERSION = "3.19.0";
+const APP_VERSION = "3.20.0";
 const CACHE_NAME = `anna-cache-${APP_VERSION}`;
 
 // Versionsunabhängige Marker: NICHT umbenennen und NICHT in CACHE_NAME
@@ -100,6 +100,7 @@ importScripts("/js/game-registry.js");
 const CORE_ASSETS = [
   "/",
   "/settings",
+  "/rechtliches",
   "/manifest.json",
   "/css/material.css",
   "/css/components.css",
@@ -112,6 +113,7 @@ const CORE_ASSETS = [
   "/js/game-registry.js",
   "/js/app.js",
   "/js/settings.js",
+  "/js/privacy-banner.js",
   "/js/wake-lock.js",
   "/js/audio.js",
   "/js/pwa-helper.js",
@@ -126,6 +128,9 @@ const CORE_ASSETS = [
   "/assets/icons/icon-192-maskable.png",
   "/assets/icons/icon-512.png",
   "/assets/icons/icon-512-maskable.png",
+  "/assets/fonts/roboto-variable.woff2",
+  "/assets/fonts/plus-jakarta-sans-variable.woff2",
+  "/assets/fonts/outfit-variable.woff2",
 ];
 
 const GAME_ASSETS = (self.GAMES || []).flatMap((game) => [`/${game.id}`, ...game.assets]);

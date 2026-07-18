@@ -7,6 +7,38 @@
  * Theme-Wechsel (Light/Dark) passiert dadurch zentral an einer Stelle.
  */
 
+/* ---- Selbst gehostete Schriften ----
+ * Bewusst NICHT von fonts.googleapis.com/fonts.gstatic.com geladen: dabei
+ * würde bei jedem Seitenaufruf die IP-Adresse an Google übertragen, was
+ * laut mehreren deutschen Gerichtsurteilen (u.a. LG München I) ohne
+ * Einwilligung DSGVO-widrig ist. Stattdessen liegen die (variablen)
+ * Font-Dateien lokal unter /assets/fonts/ - ein einziges .woff2 pro
+ * Familie deckt dank Variable-Font-Technik den gesamten genutzten
+ * Gewichtsbereich ab, siehe font-weight-Bereich unten. */
+@font-face {
+  font-family: "Roboto";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("/assets/fonts/roboto-variable.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("/assets/fonts/plus-jakarta-sans-variable.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Outfit";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("/assets/fonts/outfit-variable.woff2") format("woff2");
+}
+
 :root {
   color-scheme: dark;
 

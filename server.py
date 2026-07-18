@@ -49,6 +49,7 @@ NO_CACHE_FILENAMES = {"index.html", "sw.js", "manifest.json"}
 mimetypes.add_type("application/manifest+json", ".webmanifest")
 mimetypes.add_type("application/json", ".json")
 mimetypes.add_type("text/javascript", ".js")
+mimetypes.add_type("font/woff2", ".woff2")
 
 
 def resolve_route(raw_path: str) -> str | None:
@@ -63,6 +64,9 @@ def resolve_route(raw_path: str) -> str | None:
 
     if path == "settings":
         return "settings/index.html"
+
+    if path == "rechtliches":
+        return "rechtliches/index.html"
 
     # Bereits vorhandene Dateien (css/js/json/png/...) unverändert lassen.
     if "." in path.rsplit("/", 1)[-1]:
