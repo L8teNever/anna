@@ -4,7 +4,6 @@ services:
     container_name: anna-game-server
     ports:
       - "8080:8080"
-      - "8081:8081"
     volumes:
       - ./public/assets/reveal_images_import:/app/public/assets/reveal_images_import
       - ./public/assets/reveal_images:/app/public/assets/reveal_images

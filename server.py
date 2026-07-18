@@ -27,8 +27,6 @@ from __future__ import annotations
 import json
 import mimetypes
 import os
-import re
-import threading
 from http import HTTPStatus
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
@@ -53,6 +51,9 @@ mimetypes.add_type("font/woff2", ".woff2")
 
 
 def get_banners_list() -> dict[str, str]:
+    """Spiel-Banner werden nicht mehr über ein Admin-Dashboard hochgeladen,
+    sondern lokal ins Repo gelegt (public/assets/banners/<gameId>.<ext>) und
+    normal per Git committed. Diese Funktion liest nur, was dort liegt."""
     banners = {}
     banners_dir = PUBLIC_DIR / "assets" / "banners"
     if banners_dir.is_dir():
@@ -64,6 +65,8 @@ def get_banners_list() -> dict[str, str]:
 
 
 def get_banners_config() -> dict[str, dict[str, any]]:
+    """Position/Zoom/Sichtbarkeits-Einstellungen pro Banner - liegt als
+    normale, von Hand gepflegte JSON-Datei neben den Bildern."""
     config_file = PUBLIC_DIR / "assets" / "banners" / "config.json"
     if config_file.is_file():
         try:
@@ -71,16 +74,6 @@ def get_banners_config() -> dict[str, dict[str, any]]:
         except Exception:
             pass
     return {}
-
-
-def save_banners_config(config: dict) -> None:
-    banners_dir = PUBLIC_DIR / "assets" / "banners"
-    banners_dir.mkdir(parents=True, exist_ok=True)
-    config_file = banners_dir / "config.json"
-    try:
-        config_file.write_text(json.dumps(config, indent=2, ensure_ascii=False), encoding="utf-8")
-    except Exception as e:
-        print(f"[anna] Error saving banners config: {e}")
 
 
 def resolve_route(raw_path: str) -> str | None:
@@ -254,10 +247,6 @@ def main() -> None:
     except Exception as e:
         print(f"[anna] Error on startup import processing: {e}")
 
-    # Start Admin Dashboard Server on a separate thread (default port 8081)
-    admin_thread = threading.Thread(target=start_admin_server, daemon=True)
-    admin_thread.start()
-
     server = ThreadingHTTPServer((HOST, PORT), AnnaRequestHandler)
     print(f"[anna] serving {PUBLIC_DIR} on http://{HOST}:{PORT}")
     try:
@@ -266,270 +255,6 @@ def main() -> None:
         pass
     finally:
         server.server_close()
-
-
-class AdminRequestHandler(SimpleHTTPRequestHandler):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, directory=str(PUBLIC_DIR), **kwargs)
-
-    def do_GET(self):
-        path = urlsplit(self.path).path
-        if path == "/" or path == "/index.html":
-            admin_file = PUBLIC_DIR / "admin.html"
-            if admin_file.is_file():
-                self.send_response(HTTPStatus.OK)
-                self.send_header("Content-Type", "text/html; charset=utf-8")
-                body = admin_file.read_bytes()
-                self.send_header("Content-Length", str(len(body)))
-                self.end_headers()
-                self.wfile.write(body)
-                return
-            else:
-                self.send_error(HTTPStatus.NOT_FOUND, "admin.html not found")
-                return
-
-        if path == "/api/images":
-            self._send_json(HTTPStatus.OK, {"images": self._get_avatar_list()})
-            return
-
-        if path == "/api/banners":
-            self._send_json(HTTPStatus.OK, {
-                "banners": get_banners_list(),
-                "config": get_banners_config()
-            })
-            return
-
-        # Serve static assets from public/ (CSS, JS, banners, reveal_images, icons etc.)
-        # Check if the file exists under PUBLIC_DIR and does not start with /api/
-        file_path = PUBLIC_DIR / path.lstrip("/")
-        if file_path.is_file() and not path.startswith("/api/"):
-            super().do_GET()
-            return
-
-        self.send_error(HTTPStatus.NOT_FOUND)
-
-    def do_DELETE(self):
-        path = urlsplit(self.path).path
-        if path.startswith("/api/images/"):
-            filename = os.path.basename(unquote(path[len("/api/images/"):]))
-            if filename:
-                target_file = PUBLIC_DIR / "assets" / "reveal_images" / filename
-                if target_file.is_file():
-                    try:
-                        os.remove(target_file)
-                        self._send_json(HTTPStatus.OK, {"success": True})
-                        return
-                    except Exception as e:
-                        self._send_json(HTTPStatus.INTERNAL_SERVER_ERROR, {"error": str(e)})
-                        return
-                else:
-                    self._send_json(HTTPStatus.NOT_FOUND, {"error": "File not found"})
-                    return
-            self._send_json(HTTPStatus.BAD_REQUEST, {"error": "Invalid filename"})
-            return
-
-        if path.startswith("/api/banners/"):
-            game_id = os.path.basename(unquote(path[len("/api/banners/"):]))
-            if game_id:
-                banners_dir = PUBLIC_DIR / "assets" / "banners"
-                deleted = False
-                if banners_dir.is_dir():
-                    for f in os.listdir(banners_dir):
-                        name, ext = os.path.splitext(f)
-                        if name == game_id:
-                            target_file = banners_dir / f
-                            if target_file.is_file():
-                                try:
-                                    os.remove(target_file)
-                                    deleted = True
-                                except Exception as e:
-                                    self._send_json(HTTPStatus.INTERNAL_SERVER_ERROR, {"error": str(e)})
-                                    return
-                if deleted:
-                    config = get_banners_config()
-                    if game_id in config:
-                        del config[game_id]
-                        save_banners_config(config)
-                    self._send_json(HTTPStatus.OK, {"success": True})
-                    return
-                else:
-                    self._send_json(HTTPStatus.NOT_FOUND, {"error": "Banner not found"})
-                    return
-            self._send_json(HTTPStatus.BAD_REQUEST, {"error": "Invalid game ID"})
-            return
-
-        self.send_error(HTTPStatus.NOT_FOUND)
-
-    def do_POST(self):
-        path = urlsplit(self.path).path
-        if path == "/api/upload":
-            files = self._parse_multipart()
-            if not files:
-                self._send_json(HTTPStatus.BAD_REQUEST, {"error": "No files found in upload"})
-                return
-
-            import_dir = PUBLIC_DIR / "assets" / "reveal_images_import"
-            import_dir.mkdir(parents=True, exist_ok=True)
-
-            for filename, data in files:
-                filename = os.path.basename(filename)
-                if filename:
-                    with open(import_dir / filename, "wb") as f:
-                        f.write(data)
-
-            # Trigger processing
-            try:
-                import image_processor
-                image_processor.process_import_folder()
-            except Exception as e:
-                print(f"[anna][admin] Error processing import: {e}")
-
-            self._send_json(HTTPStatus.OK, {"images": self._get_avatar_list()})
-            return
-
-        if path == "/api/banners/position" or path == "/api/banners/config":
-            length = int(self.headers.get("Content-Length") or 0)
-            raw = self.rfile.read(length) if length else b""
-            try:
-                body = json.loads(raw.decode("utf-8")) if raw else {}
-            except Exception:
-                self._send_json(HTTPStatus.BAD_REQUEST, {"error": "Invalid JSON"})
-                return
-
-            game_id = body.get("gameId")
-            if not game_id:
-                self._send_json(HTTPStatus.BAD_REQUEST, {"error": "Missing gameId"})
-                return
-
-            config = get_banners_config()
-            if game_id not in config:
-                config[game_id] = {}
-
-            if "position" in body:
-                config[game_id]["position"] = body["position"]
-            if "zoom" in body:
-                try:
-                    config[game_id]["zoom"] = float(body["zoom"])
-                except (ValueError, TypeError):
-                    pass
-            for field in ("hideName", "hideDescription", "hideCategory"):
-                if field in body:
-                    config[game_id][field] = bool(body[field])
-
-            save_banners_config(config)
-
-            self._send_json(HTTPStatus.OK, {
-                "banners": get_banners_list(),
-                "config": config
-            })
-            return
-
-        if path == "/api/banners/upload":
-            query = parse_qs(urlsplit(self.path).query)
-            game_id = (query.get("gameId") or [""])[0]
-            if not game_id:
-                self._send_json(HTTPStatus.BAD_REQUEST, {"error": "Missing gameId parameter"})
-                return
-
-            files = self._parse_multipart()
-            if not files:
-                self._send_json(HTTPStatus.BAD_REQUEST, {"error": "No files found in upload"})
-                return
-
-            banners_dir = PUBLIC_DIR / "assets" / "banners"
-            banners_dir.mkdir(parents=True, exist_ok=True)
-
-            # Delete any existing banners with this game_id prefix to avoid conflicts
-            for f in os.listdir(banners_dir):
-                name, ext = os.path.splitext(f)
-                if name == game_id:
-                    try:
-                        os.remove(banners_dir / f)
-                    except Exception:
-                        pass
-
-            filename, data = files[0]
-            ext = os.path.splitext(filename)[1].lower()
-            if ext not in (".png", ".webp", ".jpg", ".jpeg"):
-                self._send_json(HTTPStatus.BAD_REQUEST, {"error": "Unsupported image format"})
-                return
-
-            target_filename = f"{game_id}{ext}"
-            with open(banners_dir / target_filename, "wb") as f:
-                f.write(data)
-
-            self._send_json(HTTPStatus.OK, {
-                "banners": get_banners_list(),
-                "config": get_banners_config()
-            })
-            return
-
-        self.send_error(HTTPStatus.NOT_FOUND)
-
-    def _get_avatar_list(self) -> list[str]:
-        avatars = []
-        processed_dir = PUBLIC_DIR / "assets" / "reveal_images"
-        if processed_dir.is_dir():
-            for f in sorted(os.listdir(processed_dir)):
-                if f.lower().endswith((".png", ".webp")):
-                    avatars.append(f"/assets/reveal_images/{f}")
-        return avatars
-
-    def _parse_multipart(self):
-        content_type = self.headers.get('Content-Type', '')
-        if not content_type.startswith('multipart/form-data'):
-            return []
-        try:
-            boundary = content_type.split("boundary=")[1].strip().encode('utf-8')
-        except IndexError:
-            return []
-        
-        content_length = int(self.headers.get('Content-Length', 0))
-        body = self.rfile.read(content_length)
-        
-        parts = body.split(b'--' + boundary)
-        files = []
-        for part in parts:
-            if not part or part.strip() == b'--' or part == b'--\r\n':
-                continue
-            try:
-                head, file_data = part.split(b'\r\n\r\n', 1)
-            except ValueError:
-                continue
-            
-            if file_data.endswith(b'\r\n'):
-                file_data = file_data[:-2]
-                
-            head_str = head.decode('utf-8', errors='ignore')
-            if 'filename=' in head_str:
-                match = re.search(r'filename="([^"]+)"', head_str)
-                if match:
-                    filename = match.group(1)
-                    files.append((filename, file_data))
-        return files
-
-    def _send_json(self, status: int, payload: dict) -> None:
-        data = json.dumps(payload).encode("utf-8")
-        self.send_response(status)
-        self.send_header("Content-Type", "application/json; charset=utf-8")
-        self.send_header("Content-Length", str(len(data)))
-        self.end_headers()
-        self.wfile.write(data)
-
-    def log_message(self, format, *args):
-        print(f"[anna-admin] {self.address_string()} - {format % args}")
-
-
-def start_admin_server():
-    ADMIN_PORT = int(os.environ.get("ADMIN_PORT", "8081"))
-    admin_server = ThreadingHTTPServer((HOST, ADMIN_PORT), AdminRequestHandler)
-    print(f"[anna] Admin Dashboard running on http://{HOST}:{ADMIN_PORT}")
-    try:
-        admin_server.serve_forever()
-    except KeyboardInterrupt:
-        pass
-    finally:
-        admin_server.server_close()
 
 
 if __name__ == "__main__":

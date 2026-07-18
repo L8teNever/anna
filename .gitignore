@@ -23,8 +23,9 @@ Desktop.ini
 .gemini/
 antigravity/
 
-# Game-specific assets
-public/assets/reveal_images/
+# Avatar-/Banner-Bilder werden jetzt lokal verwaltet und normal committed
+# (kein Admin-Dashboard mehr) - nur der transiente "Drop-Ordner" für noch
+# unverarbeitete Avatar-Uploads bleibt ignoriert, der ist nach der
+# Verarbeitung durch image_processor.py ohnehin leer.
 public/assets/reveal_images_import/
-public/assets/banners/
 
