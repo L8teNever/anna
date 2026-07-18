@@ -247,9 +247,6 @@ class AdminRequestHandler(SimpleHTTPRequestHandler):
                 return
 
         if path == "/api/images":
-            self.send_response(HTTPStatus.OK)
-            self.send_header("Content-Type", "application/json; charset=utf-8")
-            self.send_header("Cache-Control", "no-store")
             self._send_json(HTTPStatus.OK, {"images": self._get_avatar_list()})
             return
 
