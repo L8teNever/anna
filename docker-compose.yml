@@ -8,4 +8,5 @@ services:
     volumes:
       - ./public/assets/reveal_images_import:/app/public/assets/reveal_images_import
       - ./public/assets/reveal_images:/app/public/assets/reveal_images
+      - ./public/assets/banners:/app/public/assets/banners
     restart: unless-stopped

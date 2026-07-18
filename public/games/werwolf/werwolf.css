@@ -152,15 +152,6 @@
 }
 
 /* ---------- Online-Modus: Auswahl, Lobby, QR-Code ---------- */
-.werwolf-mode-select {
-  width: 100%;
-  display: flex;
-}
-
-.werwolf-mode-select .m3-segmented__option {
-  flex: 1;
-}
-
 .werwolf-online-stage {
   flex: 1;
   min-height: 0;

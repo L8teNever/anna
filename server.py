@@ -52,6 +52,37 @@ mimetypes.add_type("text/javascript", ".js")
 mimetypes.add_type("font/woff2", ".woff2")
 
 
+def get_banners_list() -> dict[str, str]:
+    banners = {}
+    banners_dir = PUBLIC_DIR / "assets" / "banners"
+    if banners_dir.is_dir():
+        for f in os.listdir(banners_dir):
+            name, ext = os.path.splitext(f)
+            if ext.lower() in (".png", ".webp", ".jpg", ".jpeg"):
+                banners[name] = f"/assets/banners/{f}"
+    return banners
+
+
+def get_banners_config() -> dict[str, dict[str, any]]:
+    config_file = PUBLIC_DIR / "assets" / "banners" / "config.json"
+    if config_file.is_file():
+        try:
+            return json.loads(config_file.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+    return {}
+
+
+def save_banners_config(config: dict) -> None:
+    banners_dir = PUBLIC_DIR / "assets" / "banners"
+    banners_dir.mkdir(parents=True, exist_ok=True)
+    config_file = banners_dir / "config.json"
+    try:
+        config_file.write_text(json.dumps(config, indent=2, ensure_ascii=False), encoding="utf-8")
+    except Exception as e:
+        print(f"[anna] Error saving banners config: {e}")
+
+
 def resolve_route(raw_path: str) -> str | None:
     """Bildet eine sauber Route (z.B. '/bombe/kategorien') auf einen Dateipfad relativ
     zu PUBLIC_DIR ab. Gibt None zurück, wenn die Anfrage als normaler
@@ -112,6 +143,13 @@ class AnnaRequestHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         path = urlsplit(self.path).path
+        if path == "/api/banners":
+            self._send_json(HTTPStatus.OK, {
+                "banners": get_banners_list(),
+                "config": get_banners_config()
+            })
+            return
+
         if path == "/api/reveal-avatars":
             try:
                 import image_processor
@@ -254,7 +292,17 @@ class AdminRequestHandler(SimpleHTTPRequestHandler):
             self._send_json(HTTPStatus.OK, {"images": self._get_avatar_list()})
             return
 
-        if path.startswith("/assets/reveal_images/"):
+        if path == "/api/banners":
+            self._send_json(HTTPStatus.OK, {
+                "banners": get_banners_list(),
+                "config": get_banners_config()
+            })
+            return
+
+        # Serve static assets from public/ (CSS, JS, banners, reveal_images, icons etc.)
+        # Check if the file exists under PUBLIC_DIR and does not start with /api/
+        file_path = PUBLIC_DIR / path.lstrip("/")
+        if file_path.is_file() and not path.startswith("/api/"):
             super().do_GET()
             return
 
@@ -279,6 +327,37 @@ class AdminRequestHandler(SimpleHTTPRequestHandler):
                     return
             self._send_json(HTTPStatus.BAD_REQUEST, {"error": "Invalid filename"})
             return
+
+        if path.startswith("/api/banners/"):
+            game_id = os.path.basename(unquote(path[len("/api/banners/"):]))
+            if game_id:
+                banners_dir = PUBLIC_DIR / "assets" / "banners"
+                deleted = False
+                if banners_dir.is_dir():
+                    for f in os.listdir(banners_dir):
+                        name, ext = os.path.splitext(f)
+                        if name == game_id:
+                            target_file = banners_dir / f
+                            if target_file.is_file():
+                                try:
+                                    os.remove(target_file)
+                                    deleted = True
+                                except Exception as e:
+                                    self._send_json(HTTPStatus.INTERNAL_SERVER_ERROR, {"error": str(e)})
+                                    return
+                if deleted:
+                    config = get_banners_config()
+                    if game_id in config:
+                        del config[game_id]
+                        save_banners_config(config)
+                    self._send_json(HTTPStatus.OK, {"success": True})
+                    return
+                else:
+                    self._send_json(HTTPStatus.NOT_FOUND, {"error": "Banner not found"})
+                    return
+            self._send_json(HTTPStatus.BAD_REQUEST, {"error": "Invalid game ID"})
+            return
+
         self.send_error(HTTPStatus.NOT_FOUND)
 
     def do_POST(self):
@@ -306,6 +385,80 @@ class AdminRequestHandler(SimpleHTTPRequestHandler):
                 print(f"[anna][admin] Error processing import: {e}")
 
             self._send_json(HTTPStatus.OK, {"images": self._get_avatar_list()})
+            return
+
+        if path == "/api/banners/position" or path == "/api/banners/config":
+            length = int(self.headers.get("Content-Length") or 0)
+            raw = self.rfile.read(length) if length else b""
+            try:
+                body = json.loads(raw.decode("utf-8")) if raw else {}
+            except Exception:
+                self._send_json(HTTPStatus.BAD_REQUEST, {"error": "Invalid JSON"})
+                return
+
+            game_id = body.get("gameId")
+            if not game_id:
+                self._send_json(HTTPStatus.BAD_REQUEST, {"error": "Missing gameId"})
+                return
+
+            config = get_banners_config()
+            if game_id not in config:
+                config[game_id] = {}
+
+            if "position" in body:
+                config[game_id]["position"] = body["position"]
+            if "zoom" in body:
+                try:
+                    config[game_id]["zoom"] = float(body["zoom"])
+                except (ValueError, TypeError):
+                    pass
+
+            save_banners_config(config)
+
+            self._send_json(HTTPStatus.OK, {
+                "banners": get_banners_list(),
+                "config": config
+            })
+            return
+
+        if path == "/api/banners/upload":
+            query = parse_qs(urlsplit(self.path).query)
+            game_id = (query.get("gameId") or [""])[0]
+            if not game_id:
+                self._send_json(HTTPStatus.BAD_REQUEST, {"error": "Missing gameId parameter"})
+                return
+
+            files = self._parse_multipart()
+            if not files:
+                self._send_json(HTTPStatus.BAD_REQUEST, {"error": "No files found in upload"})
+                return
+
+            banners_dir = PUBLIC_DIR / "assets" / "banners"
+            banners_dir.mkdir(parents=True, exist_ok=True)
+
+            # Delete any existing banners with this game_id prefix to avoid conflicts
+            for f in os.listdir(banners_dir):
+                name, ext = os.path.splitext(f)
+                if name == game_id:
+                    try:
+                        os.remove(banners_dir / f)
+                    except Exception:
+                        pass
+
+            filename, data = files[0]
+            ext = os.path.splitext(filename)[1].lower()
+            if ext not in (".png", ".webp", ".jpg", ".jpeg"):
+                self._send_json(HTTPStatus.BAD_REQUEST, {"error": "Unsupported image format"})
+                return
+
+            target_filename = f"{game_id}{ext}"
+            with open(banners_dir / target_filename, "wb") as f:
+                f.write(data)
+
+            self._send_json(HTTPStatus.OK, {
+                "banners": get_banners_list(),
+                "config": get_banners_config()
+            })
             return
 
         self.send_error(HTTPStatus.NOT_FOUND)

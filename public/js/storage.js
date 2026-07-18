@@ -72,6 +72,12 @@
       write("favorites", favorites);
       return favorites;
     },
+    getBanners() {
+      return read("banners", {});
+    },
+    setBanners(banners) {
+      write("banners", banners);
+    },
   };
 
   root.Storage = Storage;

@@ -20,6 +20,36 @@
   let showOnlyFavorites = false;
   let activePlayerFilter = "all";
 
+  let banners = {};
+  let bannerConfig = {};
+  try {
+    const cached = Storage.getBanners();
+    if (cached) {
+      if (cached.banners) {
+        banners = cached.banners;
+        bannerConfig = cached.config || {};
+      } else {
+        banners = cached;
+      }
+    }
+  } catch (e) {}
+
+  async function loadBanners() {
+    try {
+      const res = await fetch("/api/banners");
+      if (res.ok) {
+        const data = await res.json();
+        banners = data.banners || {};
+        bannerConfig = data.config || {};
+        Storage.setBanners({ banners, config: bannerConfig });
+        renderGames(currentQuery());
+      }
+    } catch (e) {
+      console.log("[anna] Offline or error loading banners, using cached banners.");
+    }
+  }
+  loadBanners();
+
   /* ------------------------------------------------------------------ */
   /* Rendering                                                            */
   /* ------------------------------------------------------------------ */
@@ -54,6 +84,20 @@
       const card = document.createElement("a");
       card.className = disabled ? "game-card game-card--disabled" : "m3-card--interactive game-card";
       card.dataset.color = game.color;
+      
+      const bannerUrl = banners[game.id];
+      if (bannerUrl) {
+        card.classList.add("game-card--has-banner");
+        const pos = (bannerConfig[game.id] && bannerConfig[game.id].position) || "center 50%";
+        const zoom = (bannerConfig[game.id] && bannerConfig[game.id].zoom) || 1.0;
+        
+        const bgDiv = document.createElement("div");
+        bgDiv.className = "game-card__banner-bg";
+        bgDiv.style.backgroundImage = `url('${bannerUrl}')`;
+        bgDiv.style.backgroundPosition = pos;
+        bgDiv.style.transform = `scale(${zoom})`;
+        card.appendChild(bgDiv);
+      }
       card.href = game.href || `/${game.id}`;
       card.setAttribute("aria-label", disabled ? `${game.name} – offline nicht verfügbar` : `${game.name} öffnen`);
       if (disabled) card.setAttribute("aria-disabled", "true");

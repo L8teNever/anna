@@ -74,7 +74,6 @@
   const exitButton = document.getElementById("exit-button");
 
   // Online-Mehrgeräte-Modus (siehe Abschnitt weiter unten)
-  const modeSelect = document.getElementById("werwolf-mode-select");
   const onlineHostNameRow = document.getElementById("online-host-name-row");
   const onlineHostNameInput = document.getElementById("online-host-name-input");
   const onlineAnnounceRow = document.getElementById("online-announce-row");
@@ -208,26 +207,16 @@
     startButton.disabled = isOnline ? false : !(playerPicker.getActiveCount() >= MIN_PLAYERS && playerPicker.getActiveCount() <= MAX_PLAYERS);
   }
 
-  modeSelect.addEventListener("click", (event) => {
-    const btn = event.target.closest(".m3-segmented__option");
-    if (!btn) return;
-    mode = btn.dataset.mode;
-    modeSelect.querySelectorAll(".m3-segmented__option").forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
-    updateModeUI();
-  });
-
   // Die Startseite zeigt "Werwolf – Einzelgerät" und "Werwolf – Online" als
   // getrennte Kacheln (siehe game-registry.js), die beide auf /werwolf
-  // führen, aber mit ?mode=local bzw. ?mode=online - direkt hier vorwählen,
-  // damit man den Umschalter oben nicht nochmal manuell antippen muss.
+  // führen, aber mit ?mode=local bzw. ?mode=online - der Modus steht damit
+  // schon fest, bevor diese Seite überhaupt lädt. Kein manueller Umschalter
+  // mehr nötig (früher #werwolf-mode-select).
   const requestedMode = new URLSearchParams(location.search).get("mode");
   if (requestedMode === "online" || requestedMode === "local") {
     mode = requestedMode;
-    modeSelect.querySelectorAll(".m3-segmented__option").forEach((b) => {
-      b.setAttribute("aria-pressed", String(b.dataset.mode === requestedMode));
-    });
-    updateModeUI();
   }
+  updateModeUI();
 
   /* ------------------------------------------------------------------ */
   /* Hilfsfunktionen                                                       */
