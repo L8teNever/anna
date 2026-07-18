@@ -86,18 +86,6 @@
       card.dataset.color = game.color;
       
       const bannerUrl = banners[game.id];
-      if (bannerUrl) {
-        card.classList.add("game-card--has-banner");
-        const pos = (bannerConfig[game.id] && bannerConfig[game.id].position) || "center 50%";
-        const zoom = (bannerConfig[game.id] && bannerConfig[game.id].zoom) || 1.0;
-        
-        const bgDiv = document.createElement("div");
-        bgDiv.className = "game-card__banner-bg";
-        bgDiv.style.backgroundImage = `url('${bannerUrl}')`;
-        bgDiv.style.backgroundPosition = pos;
-        bgDiv.style.transform = `scale(${zoom})`;
-        card.appendChild(bgDiv);
-      }
       card.href = game.href || `/${game.id}`;
       card.setAttribute("aria-label", disabled ? `${game.name} – offline nicht verfügbar` : `${game.name} öffnen`);
       if (disabled) card.setAttribute("aria-disabled", "true");
@@ -115,6 +103,22 @@
           </button>
         </div>
       `;
+
+      // Muss NACH card.innerHTML gesetzt werden - innerHTML ersetzt sonst
+      // alle Kind-Elemente und würde diesen Banner-Layer sofort wieder
+      // entfernen (war der Bug: Banner wurde erzeugt, aber nie sichtbar).
+      if (bannerUrl) {
+        card.classList.add("game-card--has-banner");
+        const pos = (bannerConfig[game.id] && bannerConfig[game.id].position) || "center 50%";
+        const zoom = (bannerConfig[game.id] && bannerConfig[game.id].zoom) || 1.0;
+
+        const bgDiv = document.createElement("div");
+        bgDiv.className = "game-card__banner-bg";
+        bgDiv.style.backgroundImage = `url('${bannerUrl}')`;
+        bgDiv.style.backgroundPosition = pos;
+        bgDiv.style.transform = `scale(${zoom})`;
+        card.appendChild(bgDiv);
+      }
 
       // Klick + flüssiger Übergang übernimmt jetzt router.js zentral für
       // jeden internen <a>-Link (siehe grid-Klick-Handler weiter unten für
