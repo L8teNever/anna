@@ -5,10 +5,11 @@
  *
  * checkForUpdate() behauptet NIE pauschal "kein Update gefunden" – es
  * meldet den tatsächlichen Zustand nach dem Update-Check zurück.
- * clearAll() löscht wirklich ALLES: sämtliche Cache-Storage-Einträge und
- * den/die registrierten Service Worker, damit beim nächsten Laden
- * garantiert alles frisch vom Server geholt wird (z.B. wenn die App
- * sichtbar veraltet aussieht, obwohl es schon eine neue Version gibt).
+ * clearAll() löscht wirklich ALLES: sämtliche Cache-Storage-Einträge, den/
+ * die registrierten Service Worker UND localStorage/sessionStorage (Spieler-
+ * liste, Favoriten, Einstellungen, Theme, "Datenschutz-Hinweis gesehen" ...).
+ * Danach ist das Gerät in genau dem Zustand wie beim allerersten Besuch –
+ * das ist der ganze Sinn des Buttons, nicht nur ein Update-Fix.
  */
 (function (root) {
   async function clearAll() {
@@ -20,6 +21,8 @@
       const registrations = await navigator.serviceWorker.getRegistrations();
       await Promise.all(registrations.map((registration) => registration.unregister()));
     }
+    localStorage.clear();
+    sessionStorage.clear();
   }
 
   async function checkForUpdate() {

@@ -71,17 +71,29 @@
     }
   });
 
-  clearCacheButton.addEventListener("click", async () => {
-    clearCacheButton.disabled = true;
-    clearCacheButton.textContent = "Wird geleert…";
-    try {
-      await CacheTools.clearAll();
-      Toast.show("Cache geleert – lädt neu…", "check");
-      setTimeout(() => window.location.reload(), 500);
-    } catch (err) {
-      clearCacheButton.disabled = false;
-      clearCacheButton.textContent = "Cache löschen";
-      Toast.show("Cache konnte nicht geleert werden", "alert-triangle");
-    }
+  clearCacheButton.addEventListener("click", () => {
+    ConfirmDialog.show({
+      title: "Wirklich alles löschen?",
+      message: "Spielerliste, Favoriten und Einstellungen gehen verloren. Die App startet danach wie bei der allerersten Installation.",
+      confirmLabel: "Alles löschen",
+      onConfirm: async () => {
+        clearCacheButton.disabled = true;
+        clearCacheButton.textContent = "Wird geleert…";
+        try {
+          await CacheTools.clearAll();
+          Toast.show("Alles gelöscht – lädt neu…", "check");
+          // Echte harte Navigation zur Startseite (nicht Router.navigate/
+          // reload dieser Unterseite) - simuliert den allerersten Besuch auf
+          // einem neuen Gerät so genau wie möglich, statt auf der Ein-
+          // stellungsseite "neu" zu laden, die es beim echten ersten Besuch
+          // so nie gäbe.
+          setTimeout(() => window.location.assign("/"), 500);
+        } catch (err) {
+          clearCacheButton.disabled = false;
+          clearCacheButton.textContent = "Cache löschen";
+          Toast.show("Cache konnte nicht geleert werden", "alert-triangle");
+        }
+      },
+    });
   });
 })();
