@@ -163,12 +163,17 @@
     <section class="game-view app-view" id="play-view" hidden>
       <div class="game-play game-play--bombe">
 
-        <!-- Start-Reveal: liegt kurz über allem, zeigt groß, wer anfängt,
-             bevor die eigentliche Runde (und der Timer) losgeht. -->
+        <!-- Start-Reveal: liegt kurz über allem, zeigt groß, wer anfängt.
+             Bleibt stehen, bis draufgetippt wird - erst dann startet der
+             eigentliche Timer (siehe bombe.js). -->
         <div class="starter-reveal" id="starter-reveal" hidden>
           <div class="starter-reveal__wave"></div>
           <p class="starter-reveal__hint">Los geht's</p>
           <h2 class="starter-reveal__name" id="starter-reveal-name"></h2>
+          <div class="starter-reveal__tap-hint">
+            <svg class="m3-icon"><use href="#icon-touch"></use></svg>
+            <span>Tippen zum Start</span>
+          </div>
         </div>
 
         <!-- Aktive Kategorie – groß oben -->

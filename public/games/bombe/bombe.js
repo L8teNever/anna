@@ -58,18 +58,17 @@
   // Start-Reveal ("X fängt an"), liegt kurz über dem restlichen Spielfeld
   const starterReveal     = document.getElementById("starter-reveal");
   const starterRevealName = document.getElementById("starter-reveal-name");
-  const STARTER_REVEAL_HOLD_MS = 1400;
   // Muss >= der längsten CSS-Exit-Animation sein (starter-wave-sink läuft
   // 0.32s, siehe bombe.css) - sonst wird das Element per hidden=true schon
   // mitten in der Sink-Bewegung abgeschnitten statt sauber auszulaufen.
-  const STARTER_REVEAL_OUT_MS  = 340;
+  const STARTER_REVEAL_OUT_MS = 340;
 
   const playerPicker = PlayerPicker.create();
   const categoryPicker = CategoryPicker.create("bombe", "/games/bombe/categories.json");
   let tickTimeoutId  = null;
   let roundActive    = false;
-  let starterRevealInTimeoutId  = null;
-  let starterRevealOutTimeoutId = null;
+  let starterRevealOutTimeoutId  = null;
+  let starterRevealDismissHandler = null;
 
   /* ------------------------------------------------------------------ */
   /* Zünddauer aus Mitspielerzahl berechnen                               */
@@ -154,7 +153,8 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* Start-Reveal ("X fängt an") - läuft VOR dem eigentlichen Timer-Start */
+  /* Start-Reveal ("X fängt an") - läuft VOR dem eigentlichen Timer-Start,
+     bleibt stehen bis draufgetippt wird (kein Auto-Timeout mehr).         */
   /* ------------------------------------------------------------------ */
   function showStarterReveal(starter, onDone) {
     starterRevealName.textContent = starter ? `${starter} fängt an!` : "Los geht's!";
@@ -164,14 +164,17 @@
 
     Sound.say(starter ? `${starter} fängt an` : "Los geht's");
 
-    starterRevealInTimeoutId = setTimeout(() => {
+    starterRevealDismissHandler = () => {
+      starterReveal.removeEventListener("click", starterRevealDismissHandler);
+      starterRevealDismissHandler = null;
       starterReveal.classList.add("starter-reveal--out");
       starterRevealOutTimeoutId = setTimeout(() => {
         starterReveal.hidden = true;
         starterReveal.classList.remove("starter-reveal--out");
         onDone();
       }, STARTER_REVEAL_OUT_MS);
-    }, STARTER_REVEAL_HOLD_MS);
+    };
+    starterReveal.addEventListener("click", starterRevealDismissHandler);
   }
 
   /* ------------------------------------------------------------------ */
@@ -257,7 +260,10 @@
   function stopRound() {
     roundActive = false;
     if (tickTimeoutId) clearTimeout(tickTimeoutId);
-    if (starterRevealInTimeoutId) { clearTimeout(starterRevealInTimeoutId); starterRevealInTimeoutId = null; }
+    if (starterRevealDismissHandler) {
+      starterReveal.removeEventListener("click", starterRevealDismissHandler);
+      starterRevealDismissHandler = null;
+    }
     if (starterRevealOutTimeoutId) { clearTimeout(starterRevealOutTimeoutId); starterRevealOutTimeoutId = null; }
     starterReveal.hidden = true;
     starterReveal.classList.remove("starter-reveal--out");

@@ -181,6 +181,7 @@
   justify-content: center;
   gap: 10px;
   overflow: hidden;
+  cursor: pointer;
 }
 
 .starter-reveal[hidden] {
@@ -242,8 +243,28 @@
   animation: starter-pop-in 0.45s var(--m3-easing-emphasized) 0.38s forwards;
 }
 
+.starter-reveal__tap-hint {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+  opacity: 0;
+  animation: starter-fade-in 0.35s var(--m3-easing-standard) 0.55s forwards;
+}
+
+.starter-reveal__tap-hint .m3-icon {
+  width: 16px;
+  height: 16px;
+}
+
 .starter-reveal--out .starter-reveal__hint,
-.starter-reveal--out .starter-reveal__name {
+.starter-reveal--out .starter-reveal__name,
+.starter-reveal--out .starter-reveal__tap-hint {
   animation: starter-fade-out 0.2s var(--m3-easing-standard) forwards;
 }
 
