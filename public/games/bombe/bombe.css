@@ -202,16 +202,18 @@
   animation: starter-wave-rise 0.5s var(--m3-easing-emphasized) forwards;
 }
 
+/* Setzt beim Weggehen dieselbe Richtung fort, in der die Welle gekommen
+   ist (weiter nach oben raus), statt wieder nach unten zurückzusinken. */
 .starter-reveal--out .starter-reveal__wave {
-  animation: starter-wave-sink 0.32s var(--m3-easing-standard) forwards;
+  animation: starter-wave-exit-up 0.35s var(--m3-easing-standard) forwards;
 }
 
 @keyframes starter-wave-rise {
   to { transform: translateY(0); }
 }
 
-@keyframes starter-wave-sink {
-  to { transform: translateY(100%); }
+@keyframes starter-wave-exit-up {
+  to { transform: translateY(-100%); }
 }
 
 .starter-reveal__hint {
@@ -262,10 +264,13 @@
   height: 16px;
 }
 
+/* Text wandert beim Weggehen mit der Welle mit (statt nur an Ort und
+   Stelle auszublenden) - wirkt wie EIN zusammenhängendes Element, das nach
+   oben aus dem Bild rausfliegt und darunter das Spielfeld freigibt. */
 .starter-reveal--out .starter-reveal__hint,
 .starter-reveal--out .starter-reveal__name,
 .starter-reveal--out .starter-reveal__tap-hint {
-  animation: starter-fade-out 0.2s var(--m3-easing-standard) forwards;
+  animation: starter-content-exit-up 0.3s var(--m3-easing-standard) forwards;
 }
 
 @keyframes starter-fade-in {
@@ -276,7 +281,7 @@
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-@keyframes starter-fade-out {
-  to { opacity: 0; }
+@keyframes starter-content-exit-up {
+  to { opacity: 0; transform: translateY(-32px); }
 }
 
