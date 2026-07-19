@@ -38,29 +38,47 @@
     );
   }
 
-  function showUpdateBanner(onConfirm) {
-    if (document.querySelector(".update-banner")) return;
+  function showUpdateModal(onConfirm) {
+    if (document.getElementById("update-modal")) return;
 
-    const banner = document.createElement("div");
-    banner.className = "update-banner";
-    banner.setAttribute("role", "status");
-    banner.innerHTML = `
-      <span class="update-banner__text">Neue Version verfügbar</span>
-      <div class="update-banner__actions">
-        <button type="button" class="update-banner__dismiss" aria-label="Schließen">Später</button>
-        <button type="button" class="update-banner__confirm">Aktualisieren</button>
+    const modal = document.createElement("div");
+    modal.id = "update-modal";
+    modal.className = "m3-modal";
+    modal.setAttribute("role", "dialog");
+    modal.setAttribute("aria-live", "polite");
+    modal.innerHTML = `
+      <div class="m3-modal__backdrop" data-update-backdrop></div>
+      <div class="m3-modal__dialog" style="max-width: 360px">
+        <h3 class="m3-modal__title">
+          <svg class="m3-icon" style="width: 18px; height: 18px; color: var(--m3-primary)"><use href="#icon-info"></use></svg>
+          Neue Version verfügbar
+        </h3>
+        <p class="m3-body" style="margin: 0">
+          Für Anna gibt es ein Update mit neuen Funktionen und Verbesserungen.
+        </p>
+        <div class="m3-modal__actions">
+          <button type="button" class="m3-button m3-button--text" data-update-dismiss>Später</button>
+          <button type="button" class="m3-button m3-button--filled" id="update-modal-confirm-btn">Aktualisieren</button>
+        </div>
       </div>
     `;
-    document.body.prepend(banner);
-    requestAnimationFrame(() => banner.classList.add("update-banner--visible"));
+    document.body.appendChild(modal);
 
-    banner.querySelector(".update-banner__dismiss").addEventListener("click", () => {
-      banner.classList.remove("update-banner--visible");
-      setTimeout(() => banner.remove(), 200);
-    });
+    const backdrop = modal.querySelector("[data-update-backdrop]");
+    const dismissBtn = modal.querySelector("[data-update-dismiss]");
+    const confirmBtn = modal.querySelector("#update-modal-confirm-btn");
 
-    banner.querySelector(".update-banner__confirm").addEventListener("click", () => {
-      banner.querySelector(".update-banner__confirm").textContent = "Wird aktualisiert…";
+    function close() {
+      modal.remove();
+    }
+
+    dismissBtn.addEventListener("click", close);
+    backdrop.addEventListener("click", close);
+
+    confirmBtn.addEventListener("click", () => {
+      confirmBtn.textContent = "Wird aktualisiert…";
+      confirmBtn.disabled = true;
+      dismissBtn.disabled = true;
       onConfirm();
       // Fallback: Falls "SW_ACTIVATED" aus irgendeinem Grund nicht ankommt
       // (Aktivierung hängt fest, alter Worker in einem komischen Zwischen-
@@ -149,7 +167,7 @@
       // Fall 1: Es gibt bereits einen wartenden Worker (Update wurde auf
       // einer anderen Seite/Tab entdeckt, Nutzer hat aber noch nicht bestätigt).
       if (registration.waiting && navigator.serviceWorker.controller) {
-        showUpdateBanner(() => {
+        showUpdateModal(() => {
           registration.waiting.postMessage({ type: "SKIP_WAITING" });
         });
       }
@@ -160,7 +178,7 @@
         if (!installingWorker) return;
         installingWorker.addEventListener("statechange", () => {
           if (installingWorker.state === "installed" && navigator.serviceWorker.controller) {
-            showUpdateBanner(() => {
+            showUpdateModal(() => {
               installingWorker.postMessage({ type: "SKIP_WAITING" });
             });
           }

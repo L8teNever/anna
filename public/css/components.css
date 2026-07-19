@@ -615,65 +615,6 @@
   display: inline-flex;
 }
 
-/* ---------- Update-Banner (von pwa-helper.js eingefügt) ---------- */
-.update-banner {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  /* safe-area-inset-top: sonst schiebt sich der Banner-Text in der PWA
-     teilweise unter die Statusleiste/Notch statt normal darunter zu
-     erscheinen. */
-  padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 12px;
-  background: var(--m3-primary-container);
-  color: var(--m3-on-primary-container);
-  box-shadow: var(--m3-elevation-2);
-  transform: translateY(-100%);
-  transition: transform var(--m3-duration-medium) var(--m3-easing-emphasized);
-}
-
-.update-banner--visible {
-  transform: translateY(0);
-}
-
-.update-banner__text {
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-.update-banner__actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-.update-banner__dismiss,
-.update-banner__confirm {
-  appearance: none;
-  border: none;
-  cursor: pointer;
-  border-radius: var(--m3-shape-full);
-  padding: 8px 16px;
-  font-size: 0.85rem;
-  font-weight: 500;
-}
-
-.update-banner__dismiss {
-  background: transparent;
-  color: var(--m3-on-primary-container);
-}
-
-.update-banner__confirm {
-  background: var(--m3-primary);
-  color: var(--m3-on-primary);
-}
-
 /* ---------- Leerer Zustand (z.B. Suche ohne Treffer) ---------- */
 .m3-empty {
   text-align: center;
