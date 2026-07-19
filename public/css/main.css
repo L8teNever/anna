@@ -73,12 +73,14 @@
 
 /* Von router.js gesetzt, kurz bevor eine Navigation (Link-Klick, Zurück-
    Button, Browser-Vor/Zurück) tatsächlich losgeht, damit der Wechsel nicht
-   hart abbricht, sondern erst sanft in dieselbe Richtung ausschiebt wie der
-   In-Game-Ansichtswechsel beim Verlassen einer Ansicht. */
+   hart abbricht, sondern erst sanft ausblendet. Bewusst NUR opacity (kein
+   transform): würde hier auch transform übergehen, kollidiert das beim
+   Entfernen dieser Klasse in playFadeIn() mit der frisch startenden
+   anna-page-slide-in-Animation (beide würden kurz gleichzeitig um transform
+   "kämpfen") - sichtbar als Doppel-Flackern beim Seitenwechsel. */
 body.page-transition-out {
   opacity: 0;
-  transform: translateX(-16px);
-  transition: opacity 0.14s var(--m3-easing-standard), transform 0.14s var(--m3-easing-standard);
+  transition: opacity 0.14s var(--m3-easing-standard);
 }
 
 /* ---------- Generischer View-Wechsel (view-nav.js) ---------- */
