@@ -59,7 +59,10 @@
   const starterReveal     = document.getElementById("starter-reveal");
   const starterRevealName = document.getElementById("starter-reveal-name");
   const STARTER_REVEAL_HOLD_MS = 1400;
-  const STARTER_REVEAL_OUT_MS  = 260;
+  // Muss >= der längsten CSS-Exit-Animation sein (starter-wave-sink läuft
+  // 0.32s, siehe bombe.css) - sonst wird das Element per hidden=true schon
+  // mitten in der Sink-Bewegung abgeschnitten statt sauber auszulaufen.
+  const STARTER_REVEAL_OUT_MS  = 340;
 
   const playerPicker = PlayerPicker.create();
   const categoryPicker = CategoryPicker.create("bombe", "/games/bombe/categories.json");
