@@ -8,9 +8,15 @@
  *   weiterzugibt. Wer die Bombe hält, wenn sie explodiert, hat verloren.
  */
 (function () {
-  const SETTINGS_KEY = "anna:bombe:settings";
   const MIN_PLAYERS  = 2;
   const MAX_PLAYERS  = 8;
+
+  // Zünddauer wird nicht mehr manuell eingegeben, sondern hängt an der
+  // Mitspielerzahl: je mehr Leute im Kreis sitzen, desto länger dauert eine
+  // Runde von Hand zu Hand - sonst wäre die Bombe bei 8 Leuten oft schon
+  // explodiert, bevor sie überhaupt einmal rum war.
+  const SECONDS_PER_PLAYER_MIN = 7;
+  const SECONDS_PER_PLAYER_MAX = 20;
 
   /* ------------------------------------------------------------------ */
   /* DOM-Referenzen                                                        */
@@ -21,9 +27,8 @@
   const playView           = document.getElementById("play-view");
   const backButton         = document.getElementById("back-button");
 
-  const minSecondsInput = document.getElementById("min-seconds-input");
-  const maxSecondsInput = document.getElementById("max-seconds-input");
-  const startButton     = document.getElementById("start-button");
+  const fuseRangeDisplay = document.getElementById("fuse-range-display");
+  const startButton      = document.getElementById("start-button");
 
   const bombRing        = document.getElementById("bomb-ring");
   const bombIcon        = document.getElementById("bomb-icon");
@@ -56,18 +61,20 @@
   let roundActive    = false;
 
   /* ------------------------------------------------------------------ */
-  /* Einstellungen laden / speichern                                      */
+  /* Zünddauer aus Mitspielerzahl berechnen                               */
   /* ------------------------------------------------------------------ */
-  function loadFuseSettings() {
-    try { return Object.assign({ min: 30, max: 90 }, JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}")); }
-    catch { return { min: 30, max: 90 }; }
+  function computeFuseRange(count) {
+    const players = Math.max(MIN_PLAYERS, count || MIN_PLAYERS);
+    return {
+      min: players * SECONDS_PER_PLAYER_MIN,
+      max: players * SECONDS_PER_PLAYER_MAX,
+    };
   }
-  function saveFuseSettings(s) { localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); }
 
-  const fuseSettings = loadFuseSettings();
-
-  minSecondsInput.value = fuseSettings.min;
-  maxSecondsInput.value = fuseSettings.max;
+  function updateFuseRangeDisplay(count) {
+    const { min, max } = computeFuseRange(count);
+    fuseRangeDisplay.textContent = `${min}–${max} Sek.`;
+  }
 
   /* ------------------------------------------------------------------ */
   /* Ansichten wechseln                                                    */
@@ -80,6 +87,7 @@
     const count = playerPicker.getActiveCount();
     playerSummary.textContent = count === 1 ? "1 Spieler ausgewählt" : `${count} Spieler ausgewählt`;
     updateValidation(count);
+    updateFuseRangeDisplay(count);
   }
 
   function updateValidation(count) {
@@ -115,14 +123,6 @@
   /* ------------------------------------------------------------------ */
   /* Tick-Logik                                                           */
   /* ------------------------------------------------------------------ */
-  function currentFuseRange() {
-    let min = Math.max(5, parseInt(minSecondsInput.value, 10) || 30);
-    let max = Math.max(5, parseInt(maxSecondsInput.value, 10) || 90);
-    if (max < min) [min, max] = [max, min];
-    saveFuseSettings({ min, max });
-    return { min, max };
-  }
-
   function pulse() {
     bombRing.classList.remove("bomb-ring--pulse");
     void bombRing.offsetWidth;
@@ -148,7 +148,7 @@
   function startRound() {
     if (playerPicker.getActiveCount() < MIN_PLAYERS || playerPicker.getActiveCount() > MAX_PLAYERS) return;
 
-    const { min, max } = currentFuseRange();
+    const { min, max } = computeFuseRange(playerPicker.getActiveCount());
     const totalMs = (min + Math.random() * (max - min)) * 1000;
 
     roundActive = true;

@@ -875,30 +875,6 @@ body.page-transition-out {
   display: none;
 }
 
-.player-input-row {
-  display: flex;
-  gap: 8px;
-}
-
-.player-input-row input {
-  flex: 1;
-  min-width: 0;
-  height: 48px;
-  padding: 0 16px;
-  border-radius: var(--m3-shape-sm);
-  border: 1px solid var(--m3-outline-variant);
-  background: var(--m3-surface-container);
-  color: var(--m3-on-surface);
-  font-size: 0.95rem;
-  font-family: inherit;
-  transition: border-color 0.2s;
-}
-
-.player-input-row input:focus {
-  border-color: var(--m3-primary);
-  outline: none;
-}
-
 .game-bottom-bar {
   position: sticky;
   bottom: 0;
