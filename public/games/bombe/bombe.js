@@ -55,10 +55,18 @@
   const activeCatText   = document.getElementById("active-cat-text");
   const activeCatExample = document.getElementById("active-cat-example");
 
+  // Start-Reveal ("X fängt an"), liegt kurz über dem restlichen Spielfeld
+  const starterReveal     = document.getElementById("starter-reveal");
+  const starterRevealName = document.getElementById("starter-reveal-name");
+  const STARTER_REVEAL_HOLD_MS = 1400;
+  const STARTER_REVEAL_OUT_MS  = 260;
+
   const playerPicker = PlayerPicker.create();
   const categoryPicker = CategoryPicker.create("bombe", "/games/bombe/categories.json");
   let tickTimeoutId  = null;
   let roundActive    = false;
+  let starterRevealInTimeoutId  = null;
+  let starterRevealOutTimeoutId = null;
 
   /* ------------------------------------------------------------------ */
   /* Zünddauer aus Mitspielerzahl berechnen                               */
@@ -143,6 +151,27 @@
   }
 
   /* ------------------------------------------------------------------ */
+  /* Start-Reveal ("X fängt an") - läuft VOR dem eigentlichen Timer-Start */
+  /* ------------------------------------------------------------------ */
+  function showStarterReveal(starter, onDone) {
+    starterRevealName.textContent = starter ? `${starter} fängt an!` : "Los geht's!";
+    starterReveal.classList.remove("starter-reveal--out");
+    starterReveal.hidden = false;
+    void starterReveal.offsetWidth; // Reflow, damit Wave/Text-Animationen sicher neu starten
+
+    Sound.say(starter ? `${starter} fängt an` : "Los geht's");
+
+    starterRevealInTimeoutId = setTimeout(() => {
+      starterReveal.classList.add("starter-reveal--out");
+      starterRevealOutTimeoutId = setTimeout(() => {
+        starterReveal.hidden = true;
+        starterReveal.classList.remove("starter-reveal--out");
+        onDone();
+      }, STARTER_REVEAL_OUT_MS);
+    }, STARTER_REVEAL_HOLD_MS);
+  }
+
+  /* ------------------------------------------------------------------ */
   /* Runden-Steuerung                                                     */
   /* ------------------------------------------------------------------ */
   function startRound() {
@@ -181,15 +210,18 @@
     WakeLock.enable();
 
     const selectedNames = playerPicker.getSelectedNames();
-    if (selectedNames.length > 0) {
-      const starter = selectedNames[Math.floor(Math.random() * selectedNames.length)];
-      playStatus.textContent = `${starter} fängt an – nenn einen Begriff, dann weiterreichen!`;
-      Sound.say(`${starter} fängt an`);
-    } else {
-      playStatus.textContent = "Nenn einen Begriff aus der Kategorie, dann weiterreichen!";
-    }
+    const starter = selectedNames.length > 0
+      ? selectedNames[Math.floor(Math.random() * selectedNames.length)]
+      : null;
 
-    scheduleTick(totalMs, performance.now());
+    playStatus.textContent = starter
+      ? `${starter} fängt an – nenn einen Begriff, dann weiterreichen!`
+      : "Nenn einen Begriff aus der Kategorie, dann weiterreichen!";
+
+    // Timer startet erst NACH dem Start-Reveal, nicht schon währenddessen -
+    // sonst könnte die Bombe theoretisch schon hochgehen, bevor überhaupt
+    // klar ist, wer anfängt.
+    showStarterReveal(starter, () => scheduleTick(totalMs, performance.now()));
   }
 
   function explode() {
@@ -222,6 +254,10 @@
   function stopRound() {
     roundActive = false;
     if (tickTimeoutId) clearTimeout(tickTimeoutId);
+    if (starterRevealInTimeoutId) { clearTimeout(starterRevealInTimeoutId); starterRevealInTimeoutId = null; }
+    if (starterRevealOutTimeoutId) { clearTimeout(starterRevealOutTimeoutId); starterRevealOutTimeoutId = null; }
+    starterReveal.hidden = true;
+    starterReveal.classList.remove("starter-reveal--out");
     WakeLock.disable();
   }
 

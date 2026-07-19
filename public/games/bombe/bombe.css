@@ -152,31 +152,111 @@
   color: var(--m3-on-surface-variant);
 }
 
-/* ---------- Grid-Zentrierung für Spielfeld ---------- */
+/* ---------- Zentrierung für Spielfeld ----------
+   Vorher ein 1fr/auto/1fr-Grid, das Kategorie und Status an den Rand
+   gedrückt hat - auf hohen Bildschirmen blieb dadurch oben und unten viel
+   toter, leerer Raum. Jetzt eine kompakt zentrierte Gruppe (wie bei den
+   anderen Spielen auch, siehe .game-play in main.css), mit position:relative
+   als Anker für den Start-Reveal (siehe unten), der genau diesen Bereich
+   überdeckt. */
 .game-play--bombe {
-  display: grid !important;
-  grid-template-rows: 1fr auto 1fr;
+  display: flex !important;
+  flex-direction: column;
   align-items: center;
-  justify-items: center;
+  justify-content: center;
+  gap: 32px;
   height: 100%;
   width: 100%;
+  position: relative;
 }
 
-.game-play--bombe .active-cat {
-  grid-row: 1;
-  align-self: end;
-  margin-bottom: 8px;
+/* ---------- Start-Reveal: "X fängt an", bevor der Timer losläuft ---------- */
+.starter-reveal {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  overflow: hidden;
+  border-radius: var(--m3-shape-xl);
 }
 
-.game-play--bombe .bomb-ring {
-  grid-row: 2;
-  align-self: center;
-  justify-self: center;
+.starter-reveal[hidden] {
+  display: none;
 }
 
-.game-play--bombe #play-status {
-  grid-row: 3;
-  align-self: start;
-  margin-top: 16px;
+.starter-reveal__wave {
+  position: absolute;
+  left: -15%;
+  right: -15%;
+  bottom: 0;
+  height: 160%;
+  background: radial-gradient(circle at 50% 25%, #ff5252, #b3261e 55%, #500e0b 100%);
+  /* Elliptischer oberer Rand statt gerader Kante -> wirkt wie eine
+     Welle/ein Schwall, der von unten hochsteigt, statt wie ein Vorhang. */
+  border-radius: 50% 50% 0 0 / 14% 14% 0 0;
+  transform: translateY(100%);
+  animation: starter-wave-rise 0.5s var(--m3-easing-emphasized) forwards;
+}
+
+.starter-reveal--out .starter-reveal__wave {
+  animation: starter-wave-sink 0.32s var(--m3-easing-standard) forwards;
+}
+
+@keyframes starter-wave-rise {
+  to { transform: translateY(0); }
+}
+
+@keyframes starter-wave-sink {
+  to { transform: translateY(100%); }
+}
+
+.starter-reveal__hint {
+  position: relative;
+  z-index: 1;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0;
+  opacity: 0;
+  animation: starter-fade-in 0.35s var(--m3-easing-standard) 0.3s forwards;
+}
+
+.starter-reveal__name {
+  position: relative;
+  z-index: 1;
+  font-family: var(--m3-font-display);
+  font-size: clamp(1.8rem, 9vw, 3rem);
+  font-weight: 800;
+  color: #ffffff;
+  text-align: center;
+  margin: 0;
+  padding: 0 28px;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  transform: translateY(10px) scale(0.92);
+  animation: starter-pop-in 0.45s var(--m3-easing-emphasized) 0.38s forwards;
+}
+
+.starter-reveal--out .starter-reveal__hint,
+.starter-reveal--out .starter-reveal__name {
+  animation: starter-fade-out 0.2s var(--m3-easing-standard) forwards;
+}
+
+@keyframes starter-fade-in {
+  to { opacity: 1; }
+}
+
+@keyframes starter-pop-in {
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes starter-fade-out {
+  to { opacity: 0; }
 }
 

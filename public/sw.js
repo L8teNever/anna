@@ -79,7 +79,7 @@
 // String mit hochgezählt werden (parallel zu version.js, das weiterhin die
 // in den Einstellungen angezeigte Versionsnummer liefert), sonst bleibt
 // sw.js byte-identisch und das gesamte Update-System bleibt wirkungslos.
-const APP_VERSION = "3.39.0";
+const APP_VERSION = "3.40.0";
 const CACHE_NAME = `anna-cache-${APP_VERSION}`;
 
 // Versionsunabhängige Marker: NICHT umbenennen und NICHT in CACHE_NAME
