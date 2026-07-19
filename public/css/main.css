@@ -888,6 +888,12 @@ body.page-transition-out {
 .game-bottom-bar {
   position: sticky;
   bottom: 0;
+  /* Schiebt die Leiste in .game-view (flex column, überlaufend-scrollbar)
+     ganz nach unten, wenn der Inhalt darüber die Höhe nicht ausfüllt -
+     ohne das würde "sticky" hier nichts tun, da nie gescrollt werden muss
+     (z.B. kurze Setup-Ansichten wie bei der Bombe). Läuft der Inhalt doch
+     über, übernimmt "sticky" beim Scrollen nahtlos das Anheften. */
+  margin-top: auto;
   padding: 16px 0 calc(16px + env(safe-area-inset-bottom, 0px));
   background: var(--m3-background);
   z-index: 10;
