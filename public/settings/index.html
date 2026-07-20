@@ -25,6 +25,7 @@
   <script src="/js/router.js"></script>
   <script src="/js/page-transition.js"></script>
   <script src="/js/pwa-helper.js"></script>
+  <script src="/js/pwa-install.js"></script>
 </head>
 <body>
   <div class="game-shell">
@@ -80,6 +81,13 @@
 
       <section class="settings-section">
         <h2 class="m3-title">App</h2>
+        <div class="settings-row" id="pwa-install-row" hidden>
+          <div class="settings-row__label">
+            <span class="settings-row__title">App installieren</span>
+            <span class="settings-row__hint">Schnellerer Start vom Startbildschirm, auch offline nutzbar</span>
+          </div>
+          <button type="button" class="m3-button m3-button--tonal" id="pwa-install-button">Installieren</button>
+        </div>
         <div class="settings-row">
           <div class="settings-row__label">
             <span class="settings-row__title">Nach Updates suchen</span>

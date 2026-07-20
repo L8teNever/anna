@@ -701,6 +701,45 @@ body.page-transition-out {
   gap: 8px;
 }
 
+/* ---------- Einmaliger Hinweis-Banner (PWA-Installation) ----------
+   Bewusst dieselbe Optik wie .privacy-banner - beide sind gleichrangige,
+   nicht-blockierende, einmal wegklickbare Hinweise. */
+.pwa-install-banner {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index: 200;
+  max-width: 560px;
+  margin: 0 auto;
+  background: var(--m3-surface-container-high);
+  border: 1px solid var(--m3-outline-variant);
+  border-radius: var(--m3-shape-lg);
+  padding: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.25s var(--m3-easing-standard), transform 0.25s var(--m3-easing-standard);
+}
+
+.pwa-install-banner[hidden] {
+  display: none;
+}
+
+.pwa-install-banner--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.pwa-install-banner__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 /* ---------- Einstellungsseite ---------- */
 .settings-section {
   margin-top: 24px;

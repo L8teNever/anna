@@ -34,5 +34,8 @@
     localStorage.setItem(KEY, "1");
     banner.classList.remove("privacy-banner--visible");
     setTimeout(() => banner.remove(), 250);
+    // Signal für pwa-install-banner.js: darf jetzt (mit kurzem Versatz)
+    // den Installations-Hinweis zeigen, statt beide Banner zu überlappen.
+    window.dispatchEvent(new CustomEvent("anna:privacyAcked"));
   });
 })();

@@ -10,6 +10,8 @@
   const updateCheckButton = document.getElementById("update-check-button");
   const clearCacheButton = document.getElementById("clear-cache-button");
   const appVersionLabel = document.getElementById("app-version-label");
+  const pwaInstallRow = document.getElementById("pwa-install-row");
+  const pwaInstallButton = document.getElementById("pwa-install-button");
 
   if (appVersionLabel) {
     appVersionLabel.textContent = window.APP_VERSION ? `v${window.APP_VERSION}` : "unbekannt";
@@ -96,4 +98,30 @@
       },
     });
   });
+
+  // Nur auf Browsern sichtbar, die einen echten nativen Installieren-Dialog
+  // anbieten (siehe pwa-install.js) - auf Safari/Firefox bleibt die Zeile
+  // ausgeblendet statt einen Button zu zeigen, der nichts tun könnte.
+  function syncPwaInstallRow() {
+    if (!pwaInstallRow) return;
+    pwaInstallRow.hidden = !(window.PwaInstall && window.PwaInstall.isAvailable());
+  }
+
+  if (window.PwaInstall) {
+    syncPwaInstallRow();
+    window.PwaInstall.onChange(syncPwaInstallRow);
+  }
+
+  if (pwaInstallButton) {
+    pwaInstallButton.addEventListener("click", async () => {
+      if (!window.PwaInstall) return;
+      pwaInstallButton.disabled = true;
+      const choice = await window.PwaInstall.promptInstall();
+      pwaInstallButton.disabled = false;
+      if (choice && choice.outcome === "accepted") {
+        Toast.show("Wird installiert…", "check");
+      }
+      syncPwaInstallRow();
+    });
+  }
 })();
