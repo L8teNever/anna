@@ -39,10 +39,20 @@
       const res = await fetch("/api/banners");
       if (res.ok) {
         const data = await res.json();
-        banners = data.banners || {};
-        bannerConfig = data.config || {};
+        const newBanners = data.banners || {};
+        const newConfig = data.config || {};
+        // Nur neu rendern, wenn sich wirklich etwas geändert hat - sonst
+        // baut renderGames() das komplette Grid ein zweites Mal identisch
+        // neu auf (einmal sofort mit den gecachten Bannern, kurz danach
+        // nochmal hiermit), was wie ein doppeltes Aufflackern der Startseite
+        // aussieht.
+        const changed =
+          JSON.stringify(newBanners) !== JSON.stringify(banners) ||
+          JSON.stringify(newConfig) !== JSON.stringify(bannerConfig);
+        banners = newBanners;
+        bannerConfig = newConfig;
         Storage.setBanners({ banners, config: bannerConfig });
-        renderGames(currentQuery());
+        if (changed) renderGames(currentQuery());
       }
     } catch (e) {
       console.log("[anna] Offline or error loading banners, using cached banners.");
