@@ -93,10 +93,19 @@
   }
 
   function playFadeIn() {
-    document.body.classList.remove("page-transition-out");
     document.body.classList.remove("page-transition-in");
     void document.body.offsetWidth; // Reflow erzwingen, damit die Animation neu startet
     document.body.classList.add("page-transition-in");
+    // Erst JETZT page-transition-out entfernen, NICHT davor: Solange beide
+    // Klassen kurz gleichzeitig da sind, gewinnt laut CSS-Kaskade ohnehin
+    // die Animation (page-transition-in) gegen die Transition
+    // (page-transition-out) für dieselbe opacity-Eigenschaft - nahtlos.
+    // Andersrum (erst -out entfernen, DANN -in setzen) gab es dazwischen
+    // einen Moment ganz ohne beide Klassen, in dem body auf seinen
+    // ungestylten Default (opacity:1, voll sichtbar) zurückfiel, bevor die
+    // Einblend-Animation gleich wieder bei opacity:0 neu startete - das war
+    // das doppelte Aufflackern bei jedem Seitenwechsel.
+    document.body.classList.remove("page-transition-out");
     document.body.addEventListener(
       "animationend",
       () => document.body.classList.remove("page-transition-in"),
