@@ -50,6 +50,72 @@
     }
   }
 
+  function bugGamesOptions() {
+    return [
+      { value: "general", label: "📱 App allgemein / Sonstiges" }
+    ].concat(
+      window.GAMES.map((g) => ({ value: g.id, label: g.name }))
+    );
+  }
+
+  function setupWizard(modalElement, totalSteps, onValidateStep, onSubmit) {
+    let currentStep = 0;
+    const steps = modalElement.querySelectorAll("[data-step]");
+    const backBtn = modalElement.querySelector("[data-wizard-back]");
+    const nextBtn = modalElement.querySelector("[data-wizard-next]");
+
+    function updateUI() {
+      steps.forEach((step, idx) => {
+        step.hidden = idx !== currentStep;
+      });
+
+      backBtn.style.display = currentStep === 0 ? "none" : "block";
+      if (currentStep === totalSteps - 1) {
+        nextBtn.textContent = "Auf GitHub öffnen";
+        nextBtn.className = "m3-button m3-button--filled";
+      } else {
+        nextBtn.textContent = "Weiter";
+        nextBtn.className = "m3-button m3-button--filled";
+      }
+
+      validate();
+    }
+
+    function validate() {
+      const isValid = onValidateStep(currentStep);
+      nextBtn.disabled = !isValid;
+    }
+
+    backBtn.addEventListener("click", () => {
+      if (currentStep > 0) {
+        CustomSelect.closeAll();
+        currentStep--;
+        updateUI();
+      }
+    });
+
+    nextBtn.addEventListener("click", () => {
+      if (currentStep < totalSteps - 1) {
+        CustomSelect.closeAll();
+        currentStep++;
+        updateUI();
+      } else {
+        onSubmit();
+      }
+    });
+
+    updateUI();
+
+    return {
+      updateUI,
+      validate,
+      reset: () => {
+        currentStep = 0;
+        updateUI();
+      }
+    };
+  }
+
   /* ------------------------------------------------------------------ */
   /* Modal-Grundgerüst                                                    */
   /* ------------------------------------------------------------------ */
@@ -85,6 +151,7 @@
 
     function open() {
       modal.hidden = false;
+      if (modal.wizard) modal.wizard.reset();
     }
 
     return { modal, open, close };
@@ -104,47 +171,96 @@
 
   function ensureBugModal() {
     if (bugModal) return bugModal;
+    
+    const bodyHtml = `
+      <div class="m3-modal__wizard-steps">
+        <!-- Step 1: Spiel -->
+        <div data-step="0" class="m3-modal__step">
+          <span class="m3-body-small" style="font-weight: bold; color: var(--m3-on-surface-variant)">Schritt 1 von 3</span>
+          <div style="margin-top: 12px">
+            <label class="m3-field-label">Welches Spiel betrifft es?</label>
+            <div id="feedback-bug-game-select"></div>
+          </div>
+        </div>
+        
+        <!-- Step 2: Bereich -->
+        <div data-step="1" class="m3-modal__step" hidden>
+          <span class="m3-body-small" style="font-weight: bold; color: var(--m3-on-surface-variant)">Schritt 2 von 3</span>
+          <div style="margin-top: 12px">
+            <label class="m3-field-label">Worum geht's ungefähr?</label>
+            <div id="feedback-bug-category-select"></div>
+          </div>
+        </div>
+        
+        <!-- Step 3: Beschreibung -->
+        <div data-step="2" class="m3-modal__step" hidden>
+          <span class="m3-body-small" style="font-weight: bold; color: var(--m3-on-surface-variant)">Schritt 3 von 3</span>
+          <div style="margin-top: 12px">
+            <label class="m3-field-label">Was ist passiert?</label>
+            <textarea class="m3-textarea" id="feedback-bug-textarea" placeholder="Beschreibe den Fehler und wie wir ihn nachstellen können..."></textarea>
+          </div>
+        </div>
+      </div>
+      
+      <div class="m3-modal__actions" style="margin-top: 8px">
+        <button type="button" class="m3-button m3-button--text" data-wizard-back style="margin-right: auto;">Zurück</button>
+        <button type="button" class="m3-button m3-button--filled" data-wizard-next>Weiter</button>
+      </div>
+    `;
+
     bugModal = buildModal(
       "feedback-bug-modal",
       "icon-alert-triangle",
       "var(--m3-error)",
       "Bug melden",
-      `
-        <p class="m3-body" style="margin: 0">
-          Kurz einordnen, den Rest (Beschreibung, Schritte) füllst du direkt im GitHub-Formular aus.
-        </p>
-        <div>
-          <label class="m3-field-label">Worum geht's ungefähr?</label>
-          <div id="feedback-bug-category-select"></div>
-        </div>
-        <div class="m3-modal__actions">
-          <button type="button" class="m3-button m3-button--filled" id="feedback-bug-submit" style="width: 100%">
-            Auf GitHub öffnen
-          </button>
-        </div>
-      `
+      bodyHtml
     );
+
+    const gameSelect = CustomSelect.create(document.getElementById("feedback-bug-game-select"), {
+      options: bugGamesOptions(),
+      value: "general",
+    });
 
     const categorySelect = CustomSelect.create(document.getElementById("feedback-bug-category-select"), {
       options: BUG_CATEGORIES,
       value: "ui",
     });
 
-    document.getElementById("feedback-bug-submit").addEventListener("click", () => {
-      const catValue = categorySelect.getValue();
-      const catLabel = (BUG_CATEGORIES.find((c) => c.value === catValue) || {}).label || catValue;
-      GithubFeedback.openIssue({
-        title: "Bugreport: ",
-        body:
-          `**Bereich:** ${catLabel}\n\n` +
-          `**Beschreibung**\nBitte beschreibe hier das Problem...\n\n` +
-          `**Schritte zum Reproduzieren**\n1. \n\n` +
-          `**Erwartetes Verhalten**\n\n\n` +
-          `**Tatsächliches Verhalten**\n`,
-        labels: ["bug", catValue],
-      });
-      bugModal.close();
-    });
+    const textarea = document.getElementById("feedback-bug-textarea");
+    
+    const wizard = setupWizard(
+      bugModal.modal,
+      3,
+      (step) => {
+        if (step === 2) return !!textarea.value.trim();
+        return true;
+      },
+      () => {
+        const gameId = gameSelect.getValue();
+        const game = window.GAMES.find((g) => g.id === gameId);
+        const catValue = categorySelect.getValue();
+        const catLabel = (BUG_CATEGORIES.find((c) => c.value === catValue) || {}).label || catValue;
+        const text = textarea.value.trim();
+        
+        const labels = ["bug", catValue];
+        if (gameId && gameId !== "general") {
+          labels.push(`game:${gameId}`);
+        }
+
+        GithubFeedback.openIssue({
+          title: `Bugreport: ${game ? game.name : "App allgemein"}`,
+          body:
+            `**Bereich:** ${catLabel}\n` +
+            `**Spiel/Kontext:** ${game ? game.name : "Allgemein / System"}\n\n` +
+            `**Beschreibung**\n${text}\n`,
+          labels: labels,
+        });
+        bugModal.close();
+      }
+    );
+
+    textarea.addEventListener("input", () => wizard.validate());
+    bugModal.modal.wizard = wizard;
 
     return bugModal;
   }
@@ -156,79 +272,107 @@
 
   function ensureSuggestModal() {
     if (suggestModal) return suggestModal;
+    
+    const bodyHtml = `
+      <div class="m3-modal__wizard-steps">
+        <!-- Step 1: Spiel -->
+        <div data-step="0" class="m3-modal__step">
+          <span class="m3-body-small" style="font-weight: bold; color: var(--m3-on-surface-variant)">Schritt 1 von 3</span>
+          <div style="margin-top: 12px">
+            <label class="m3-field-label">Für welches Spiel?</label>
+            <div id="feedback-suggest-game-select"></div>
+          </div>
+        </div>
+        
+        <!-- Step 2: Kategorie -->
+        <div data-step="1" class="m3-modal__step" hidden>
+          <span class="m3-body-small" style="font-weight: bold; color: var(--m3-on-surface-variant)">Schritt 2 von 3</span>
+          <div style="margin-top: 12px">
+            <label class="m3-field-label">In welcher Kategorie?</label>
+            <div id="feedback-suggest-category-select"></div>
+          </div>
+        </div>
+        
+        <!-- Step 3: Vorschlag -->
+        <div data-step="2" class="m3-modal__step" hidden>
+          <span class="m3-body-small" style="font-weight: bold; color: var(--m3-on-surface-variant)">Schritt 3 von 3</span>
+          <div style="margin-top: 12px">
+            <label class="m3-field-label">Dein Vorschlag</label>
+            <textarea class="m3-textarea" id="feedback-suggest-text-input" placeholder="z. B. neues Wort, neue Frage oder neuer Prompt…"></textarea>
+          </div>
+        </div>
+      </div>
+      
+      <div class="m3-modal__actions" style="margin-top: 8px">
+        <button type="button" class="m3-button m3-button--text" data-wizard-back style="margin-right: auto;">Zurück</button>
+        <button type="button" class="m3-button m3-button--filled" data-wizard-next>Weiter</button>
+      </div>
+    `;
+
     suggestModal = buildModal(
       "feedback-suggest-modal",
       "icon-add",
       "var(--m3-primary)",
       "Neues Wort vorschlagen",
-      `
-        <p class="m3-body" style="margin: 0">
-          Spiel und Kategorie auswählen, Vorschlag eintippen – der fertige Link wird direkt gebaut.
-        </p>
-        <div>
-          <label class="m3-field-label">Spiel</label>
-          <div id="feedback-suggest-game-select"></div>
-        </div>
-        <div>
-          <label class="m3-field-label">Kategorie</label>
-          <div id="feedback-suggest-category-select"></div>
-        </div>
-        <div>
-          <label class="m3-field-label">Dein Vorschlag</label>
-          <textarea class="m3-textarea" id="feedback-suggest-text-input" placeholder="z. B. neues Wort, neue Frage oder neuer Prompt…"></textarea>
-        </div>
-        <div class="m3-modal__actions">
-          <button type="button" class="m3-button m3-button--filled" id="feedback-suggest-submit" style="width: 100%" disabled>
-            Auf GitHub öffnen
-          </button>
-        </div>
-      `
+      bodyHtml
     );
 
     const textInput = document.getElementById("feedback-suggest-text-input");
-    const submitButton = document.getElementById("feedback-suggest-submit");
     let categories = [];
-
-    function updateSubmitState() {
-      submitButton.disabled = !textInput.value.trim();
-    }
 
     const categorySelect = CustomSelect.create(document.getElementById("feedback-suggest-category-select"), {
       placeholder: "Kategorien werden geladen…",
+      onChange: () => wizard && wizard.validate(),
     });
 
     async function loadCategories(gameId) {
       categorySelect.setOptions([{ value: "", label: "Kategorien werden geladen…" }], "");
+      if (wizard) wizard.validate();
       categories = await fetchCategories(gameId);
       const options = categories
         .map((c) => ({ value: c.id, label: `${c.icon || ""} ${c.label}`.trim() }))
         .concat([{ value: "__new__", label: "✨ Neue Kategorie vorschlagen" }]);
       categorySelect.setOptions(options);
+      if (wizard) wizard.validate();
     }
 
     const gameSelect = CustomSelect.create(document.getElementById("feedback-suggest-game-select"), {
       options: gamesWithCategories(),
-      onChange: (gameId) => loadCategories(gameId),
+      onChange: (gameId) => {
+        loadCategories(gameId);
+        if (wizard) wizard.validate();
+      },
     });
 
-    textInput.addEventListener("input", updateSubmitState);
+    const wizard = setupWizard(
+      suggestModal.modal,
+      3,
+      (step) => {
+        if (step === 0) return !!gameSelect.getValue();
+        if (step === 1) return !!categorySelect.getValue();
+        if (step === 2) return !!textInput.value.trim();
+        return true;
+      },
+      () => {
+        const gameId = gameSelect.getValue();
+        const game = window.GAMES.find((g) => g.id === gameId);
+        const text = textInput.value.trim();
+        if (!game || !text) return;
+        const catId = categorySelect.getValue();
+        const cat = categories.find((c) => c.id === catId);
+        const catLabel = catId === "__new__" ? "Neue Kategorie" : cat ? cat.label : catId;
 
-    submitButton.addEventListener("click", () => {
-      const gameId = gameSelect.getValue();
-      const game = window.GAMES.find((g) => g.id === gameId);
-      const text = textInput.value.trim();
-      if (!game || !text) return;
-      const catId = categorySelect.getValue();
-      const cat = categories.find((c) => c.id === catId);
-      const catLabel = catId === "__new__" ? "Neue Kategorie" : cat ? cat.label : catId;
+        GithubFeedback.openIssue({
+          title: `Wortvorschlag: ${game.name}`,
+          body: `**Spiel:** ${game.name}\n**Kategorie:** ${catLabel}\n\n**Vorschlag**\n${text}`,
+          labels: ["word-suggestion", `game:${game.id}`],
+        });
+        suggestModal.close();
+      }
+    );
 
-      GithubFeedback.openIssue({
-        title: `Wortvorschlag: ${game.name}`,
-        body: `**Spiel:** ${game.name}\n**Kategorie:** ${catLabel}\n\n**Vorschlag**\n${text}`,
-        labels: ["word-suggestion", `game:${game.id}`],
-      });
-      suggestModal.close();
-    });
+    textInput.addEventListener("input", () => wizard.validate());
+    suggestModal.modal.wizard = wizard;
 
     loadCategories(gameSelect.getValue());
 
@@ -242,45 +386,66 @@
 
   function ensureReportModal() {
     if (reportModal) return reportModal;
+    
+    const bodyHtml = `
+      <div class="m3-modal__wizard-steps">
+        <!-- Step 1: Spiel -->
+        <div data-step="0" class="m3-modal__step">
+          <span class="m3-body-small" style="font-weight: bold; color: var(--m3-on-surface-variant)">Schritt 1 von 4</span>
+          <div style="margin-top: 12px">
+            <label class="m3-field-label">Aus welchem Spiel?</label>
+            <div id="feedback-report-game-select"></div>
+          </div>
+        </div>
+        
+        <!-- Step 2: Kategorie -->
+        <div data-step="1" class="m3-modal__step" hidden>
+          <span class="m3-body-small" style="font-weight: bold; color: var(--m3-on-surface-variant)">Schritt 2 von 4</span>
+          <div style="margin-top: 12px">
+            <label class="m3-field-label">Aus welcher Kategorie?</label>
+            <div id="feedback-report-category-select"></div>
+          </div>
+        </div>
+        
+        <!-- Step 3: Wort -->
+        <div data-step="2" class="m3-modal__step" hidden>
+          <span class="m3-body-small" style="font-weight: bold; color: var(--m3-on-surface-variant)">Schritt 3 von 4</span>
+          <div style="margin-top: 12px">
+            <label class="m3-field-label">Welches Wort / welche Frage?</label>
+            <div id="feedback-report-word-select"></div>
+          </div>
+        </div>
+        
+        <!-- Step 4: Grund -->
+        <div data-step="3" class="m3-modal__step" hidden>
+          <span class="m3-body-small" style="font-weight: bold; color: var(--m3-on-surface-variant)">Schritt 4 von 4</span>
+          <div style="margin-top: 12px">
+            <label class="m3-field-label">Warum? (optional)</label>
+            <textarea class="m3-textarea" id="feedback-report-reason-input" placeholder="Was stimmt damit nicht?"></textarea>
+          </div>
+        </div>
+      </div>
+      
+      <div class="m3-modal__actions" style="margin-top: 8px">
+        <button type="button" class="m3-button m3-button--text" data-wizard-back style="margin-right: auto;">Zurück</button>
+        <button type="button" class="m3-button m3-button--filled" data-wizard-next>Weiter</button>
+      </div>
+    `;
+
     reportModal = buildModal(
       "feedback-report-modal",
       "icon-close",
       "var(--m3-on-surface-variant)",
       "Wort melden",
-      `
-        <p class="m3-body" style="margin: 0">
-          Für ein Wort/eine Frage, das/die dir nicht gefällt oder nicht passt.
-        </p>
-        <div>
-          <label class="m3-field-label">Spiel</label>
-          <div id="feedback-report-game-select"></div>
-        </div>
-        <div>
-          <label class="m3-field-label">Kategorie</label>
-          <div id="feedback-report-category-select"></div>
-        </div>
-        <div>
-          <label class="m3-field-label">Wort / Frage</label>
-          <div id="feedback-report-word-select"></div>
-        </div>
-        <div>
-          <label class="m3-field-label">Warum? (optional)</label>
-          <textarea class="m3-textarea" id="feedback-report-reason-input" placeholder="Was stimmt damit nicht?"></textarea>
-        </div>
-        <div class="m3-modal__actions">
-          <button type="button" class="m3-button m3-button--filled" id="feedback-report-submit" style="width: 100%" disabled>
-            Auf GitHub öffnen
-          </button>
-        </div>
-      `
+      bodyHtml
     );
 
     const reasonInput = document.getElementById("feedback-report-reason-input");
-    const submitButton = document.getElementById("feedback-report-submit");
     let categories = [];
 
     const wordSelect = CustomSelect.create(document.getElementById("feedback-report-word-select"), {
       placeholder: "Erst Kategorie wählen…",
+      onChange: () => wizard && wizard.validate(),
     });
 
     function loadWords() {
@@ -288,46 +453,65 @@
       const cat = categories.find((c) => c.id === catId);
       const words = cat && Array.isArray(cat.words) ? cat.words.map(normalizeWordEntry) : [];
       wordSelect.setOptions(words.map((w) => ({ value: w.word, label: w.word })));
-      submitButton.disabled = words.length === 0;
+      if (wizard) wizard.validate();
     }
 
     const categorySelect = CustomSelect.create(document.getElementById("feedback-report-category-select"), {
       placeholder: "Kategorien werden geladen…",
-      onChange: loadWords,
+      onChange: () => {
+        loadWords();
+        if (wizard) wizard.validate();
+      },
     });
 
     async function loadCategories(gameId) {
       categorySelect.setOptions([], "");
       wordSelect.setOptions([]);
-      submitButton.disabled = true;
+      if (wizard) wizard.validate();
       categories = await fetchCategories(gameId);
       categorySelect.setOptions(categories.map((c) => ({ value: c.id, label: `${c.icon || ""} ${c.label}`.trim() })));
       loadWords();
+      if (wizard) wizard.validate();
     }
 
     const gameSelect = CustomSelect.create(document.getElementById("feedback-report-game-select"), {
       options: gamesWithCategories(),
-      onChange: (gameId) => loadCategories(gameId),
+      onChange: (gameId) => {
+        loadCategories(gameId);
+        if (wizard) wizard.validate();
+      },
     });
 
-    submitButton.addEventListener("click", () => {
-      const gameId = gameSelect.getValue();
-      const game = window.GAMES.find((g) => g.id === gameId);
-      const word = wordSelect.getValue();
-      if (!game || !word) return;
-      const catId = categorySelect.getValue();
-      const cat = categories.find((c) => c.id === catId);
-      const reason = reasonInput.value.trim();
+    const wizard = setupWizard(
+      reportModal.modal,
+      4,
+      (step) => {
+        if (step === 0) return !!gameSelect.getValue();
+        if (step === 1) return !!categorySelect.getValue();
+        if (step === 2) return !!wordSelect.getValue();
+        return true;
+      },
+      () => {
+        const gameId = gameSelect.getValue();
+        const game = window.GAMES.find((g) => g.id === gameId);
+        const word = wordSelect.getValue();
+        if (!game || !word) return;
+        const catId = categorySelect.getValue();
+        const cat = categories.find((c) => c.id === catId);
+        const reason = reasonInput.value.trim();
 
-      GithubFeedback.openIssue({
-        title: `Wort-Feedback: ${game.name} – ${word}`,
-        body:
-          `**Spiel:** ${game.name}\n**Kategorie:** ${cat ? cat.label : catId}\n**Wort/Frage:** ${word}\n\n` +
-          `**Warum?**\n${reason || "(kein Grund angegeben)"}`,
-        labels: ["word-feedback", `game:${game.id}`, "dislike"],
-      });
-      reportModal.close();
-    });
+        GithubFeedback.openIssue({
+          title: `Wort-Feedback: ${game.name} – ${word}`,
+          body:
+            `**Spiel:** ${game.name}\n**Kategorie:** ${cat ? cat.label : catId}\n**Wort/Frage:** ${word}\n\n` +
+            `**Warum?**\n${reason || "(kein Grund angegeben)"}`,
+          labels: ["word-feedback", `game:${game.id}`, "dislike"],
+        });
+        reportModal.close();
+      }
+    );
+
+    reportModal.modal.wizard = wizard;
 
     loadCategories(gameSelect.getValue());
 
