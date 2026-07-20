@@ -26,7 +26,7 @@
       "Gründe für schlechte Laune",
       "Dinge, die man im Bett verliert",
       "Sachen, die man im Hotel klaut",
-      "WLAN weg – Was tun?",
+      "Was man ohne Internet tut",
       "Sachen, die man ständig verliert",
       "Warum man die Tür nicht aufmacht",
       "Warum man nicht ans Handy geht",
@@ -115,7 +115,7 @@
       "Betrunken nachts um 3 Uhr",
       "Warum man nicht in den Club kommt",
       "Sachen, die man am Strand tut",
-      "Typische Malle-Schlager-Themen"
+      "Peinliche Urlaubsbekanntschaften"
     ]
   },
   {
@@ -148,7 +148,7 @@
       "Typische Sätze von Krypto-Bros",
       "Sachen, die man gebraucht kauft",
       "Dinge, die man sich nicht leisten kann",
-      "Wo man zu Hause Kleingeld sammelt",
+      "Ausreden, um nicht bezahlen zu müssen",
       "Ausgefallene Spar-Methoden"
     ]
   },
@@ -177,7 +177,7 @@
       "Typische Trash-TV-Sendungen",
       "Wie Promis Aufmerksamkeit suchen",
       "Warum Influencer gecancelt werden",
-      "Essen im Dschungelcamp",
+      "Warum man Trash-TV heimlich guckt",
       "Typische Reality-TV-Sätze",
       "Gründe, warum jemand die Show verlässt",
       "Peinliche Reality-TV-Challenges",
@@ -228,7 +228,7 @@
       "Sex in der Öffentlichkeit",
       "Bekannte Rollenspiele fürs Bett",
       "Bekannte Fetische",
-      "Zweckentfremdete Sex-Spielzeuge",
+      "Sachen, die man heimlich im Nachttisch hat",
       "Körperstellen, die man gerne küsst",
       "Sachen, die man beim Fesseln benutzt",
       "Spicy Kleidung und Outfits",
@@ -269,6 +269,40 @@
       "Was man beim Flirten am Körper macht",
       "Typische Blicke beim Flirten",
       "Was man beim ersten Kuss denkt"
+    ]
+  },
+  {
+    "id": "wg_chaos",
+    "label": "WG- & Mitbewohner-Chaos",
+    "icon": "🧻",
+    "words": [
+      "Sachen, die im WG-Kühlschrank verschwinden",
+      "Nervige Mitbewohner-Angewohnheiten",
+      "Ausreden, warum man nicht geputzt hat",
+      "Regeln, die in jeder WG gebrochen werden",
+      "Streitthemen in einer WG",
+      "Was im Bad rumliegt, das keinem gehört",
+      "Gründe für eine WG-Konferenz",
+      "Typische WG-Casting-Fragen",
+      "Dinge, die man sich in der WG nie zurückholt",
+      "Laute Geräusche durch die Wand"
+    ]
+  },
+  {
+    "id": "nostalgie_90er",
+    "label": "Kindheit-Nostalgie: 90er & 2000er",
+    "icon": "📼",
+    "words": [
+      "Kult-Spielzeuge der 90er/2000er",
+      "Pausenhof-Spiele von früher",
+      "Sachen aus der Schultüte",
+      "Kindersendungen, die jeder kannte",
+      "Handys, die jeder mal hatte",
+      "Snacks aus der Kindheit",
+      "Klingeltöne von früher",
+      "Sammelkarten- und Sticker-Trends",
+      "Dinge, die es nur früher gab",
+      "Ausreden gegenüber den Eltern als Kind"
     ]
   }
 ]
