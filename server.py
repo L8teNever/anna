@@ -27,6 +27,7 @@ from __future__ import annotations
 import json
 import mimetypes
 import os
+import time
 from http import HTTPStatus
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
@@ -48,6 +49,24 @@ mimetypes.add_type("application/manifest+json", ".webmanifest")
 mimetypes.add_type("application/json", ".json")
 mimetypes.add_type("text/javascript", ".js")
 mimetypes.add_type("font/woff2", ".woff2")
+
+# Einfaches In-Memory-Rate-Limiting pro IP für ALLE /api/-GET-Endpunkte
+# (banners, reveal-avatars, und automatisch auch künftige) - dieselbe
+# Sliding-Window-Idee wie in werwolf_backend.py, hier nur global statt pro
+# Raum. Bewusst rein im Arbeitsspeicher (keine Datei/Datenbank).
+_RATE_BUCKETS: dict[str, list[float]] = {}
+RATE_LIMIT_WINDOW = 10.0
+RATE_LIMIT_MAX_REQUESTS = 30
+
+
+def _rate_limited(client_ip: str) -> bool:
+    now = time.time()
+    bucket = _RATE_BUCKETS.setdefault(client_ip, [])
+    bucket[:] = [t for t in bucket if now - t < RATE_LIMIT_WINDOW]
+    if len(bucket) >= RATE_LIMIT_MAX_REQUESTS:
+        return True
+    bucket.append(now)
+    return False
 
 
 def get_banners_list() -> dict[str, str]:
@@ -136,6 +155,9 @@ class AnnaRequestHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         path = urlsplit(self.path).path
+        if path.startswith("/api/") and _rate_limited(self.client_address[0]):
+            self._send_json(HTTPStatus.TOO_MANY_REQUESTS, {"error": "Zu viele Anfragen - bitte kurz warten"})
+            return
         if path == "/api/banners":
             self._send_json(HTTPStatus.OK, {
                 "banners": get_banners_list(),
@@ -199,7 +221,10 @@ class AnnaRequestHandler(SimpleHTTPRequestHandler):
             result = werwolf_backend.handle_post(segments, body, self.client_address[0])
             self._send_json(HTTPStatus.OK, result)
         except werwolf_backend.ApiError as exc:
-            print(f"[anna][werwolf] {exc.status} '{exc.message}' for /{'/'.join(segments)} body={body}")
+            # Bewusst OHNE den Request-Body im Log: der kann Spielernamen
+            # enthalten (hostName/name-Felder) - DSGVO-Datensparsamkeit,
+            # keine personenbezogenen Daten in Server-Logs.
+            print(f"[anna][werwolf] {exc.status} '{exc.message}' for /{'/'.join(segments)}")
             self._send_json(exc.status, {"error": exc.message})
 
     def _handle_werwolf_stream(self, token: str) -> None:
@@ -237,7 +262,11 @@ class AnnaRequestHandler(SimpleHTTPRequestHandler):
         super().send_error(code, message, explain)
 
     def log_message(self, format, *args):  # noqa: A002 - stdlib signature
-        print(f"[anna] {self.address_string()} - {format % args}")
+        # Bewusst OHNE Client-IP (self.address_string()) - DSGVO-
+        # Datensparsamkeit: der Server soll keine personenbezogenen Daten
+        # in seinen eigenen Logs halten. Anfrage selbst (Methode/Pfad/
+        # Status) bleibt fürs Debugging sichtbar.
+        print(f"[anna] {format % args}")
 
 
 def main() -> None:

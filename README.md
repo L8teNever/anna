@@ -1,5 +1,11 @@
 # Anna – Partyspiele
 
+## Lizenz
+
+Dieses Projekt steht unter der [MIT-Lizenz](LICENSE) – frei nutzbar, veränderbar
+und weiterverbreitbar, auch kommerziell, solange der Lizenz-/Copyright-Hinweis
+erhalten bleibt.
+
 ## Client-seitige Update-Architektur (Service Worker)
 
 Kurzfassung: Die Versionsnummer steht an **zwei** Stellen, die **beide**

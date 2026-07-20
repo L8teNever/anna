@@ -33,6 +33,10 @@ from dataclasses import dataclass, field
 ROOM_TTL_SECONDS = 6 * 60 * 60  # 6h Inaktivität -> Raum verfällt
 RATE_LIMIT_WINDOW = 10.0
 RATE_LIMIT_MAX_REQUESTS = 20
+# Deckel gegen einen langsamen, unter dem Rate-Limit bleibenden Angriff, der
+# über Stunden hinweg immer neue Räume anlegt (jeder Raum lebt bis zu
+# ROOM_TTL_SECONDS) - normale Nutzung dieser App liegt weit darunter.
+MAX_ACTIVE_ROOMS = 500
 STREAM_POLL_INTERVAL = 1.0
 STREAM_HEARTBEAT_INTERVAL = 20.0
 
@@ -387,8 +391,12 @@ def _get_room(token: str) -> Room:
 
 
 def create_room(body: dict, client_ip: str) -> dict:
+    if _rate_limited(client_ip):
+        raise ApiError(429, "Zu viele Anfragen - bitte kurz warten")
     with LOCK:
         _cleanup_expired_locked()
+        if len(ROOMS) >= MAX_ACTIVE_ROOMS:
+            raise ApiError(503, "Gerade sind zu viele Räume aktiv - bitte gleich nochmal versuchen")
         token = _make_token()
         while token in ROOMS:
             token = _make_token()
@@ -449,6 +457,8 @@ def join_room_by_code(body: dict, client_ip: str) -> dict:
 
 
 def rejoin_room(token: str, body: dict, client_ip: str) -> dict:
+    if _rate_limited(client_ip):
+        raise ApiError(429, "Zu viele Anfragen - bitte kurz warten")
     with LOCK:
         room = _get_room(token)
         player_token = str(body.get("playerToken") or "")
@@ -461,6 +471,8 @@ def rejoin_room(token: str, body: dict, client_ip: str) -> dict:
 
 
 def configure_room(token: str, body: dict, client_ip: str) -> dict:
+    if _rate_limited(client_ip):
+        raise ApiError(429, "Zu viele Anfragen - bitte kurz warten")
     with LOCK:
         room = _get_room(token)
         _require_host(room, body)
@@ -481,6 +493,8 @@ def configure_room(token: str, body: dict, client_ip: str) -> dict:
 
 
 def start_room(token: str, body: dict, client_ip: str) -> dict:
+    if _rate_limited(client_ip):
+        raise ApiError(429, "Zu viele Anfragen - bitte kurz warten")
     with LOCK:
         room = _get_room(token)
         _require_host(room, body)
@@ -550,6 +564,8 @@ def ack_role(token: str, body: dict, client_ip: str) -> dict:
     ALLE bestätigt haben, beginnt für alle gleichzeitig die erste Nacht -
     sonst könnte jemand mitten in der eigenen Rollen-Enthüllung von einer
     schon laufenden Nacht überrascht werden."""
+    if _rate_limited(client_ip):
+        raise ApiError(429, "Zu viele Anfragen - bitte kurz warten")
     with LOCK:
         room = _get_room(token)
         player = _require_player(room, body)
@@ -566,6 +582,8 @@ def discussion_ready(token: str, body: dict, client_ip: str) -> dict:
     """Jede lebende Person bestätigt, dass sie mit der Diskussion fertig
     ist. Erst wenn ALLE bereit sind, öffnet die Abstimmung für alle
     gleichzeitig - kein einzelnes Gerät bestimmt das Tempo der anderen."""
+    if _rate_limited(client_ip):
+        raise ApiError(429, "Zu viele Anfragen - bitte kurz warten")
     with LOCK:
         room = _get_room(token)
         player = _require_player(room, body)
@@ -586,6 +604,8 @@ def force_advance(token: str, body: dict, client_ip: str) -> dict:
     """Host-Override: aktuellen Schritt auch ohne alle Bestätigungen/Stimmen
     weiterschieben (z.B. wenn ein Gerät ausgefallen ist und die Gruppe sonst
     ewig auf eine Bestätigung wartet, die nie kommt)."""
+    if _rate_limited(client_ip):
+        raise ApiError(429, "Zu viele Anfragen - bitte kurz warten")
     with LOCK:
         room = _get_room(token)
         _require_host(room, body)
@@ -618,6 +638,8 @@ def force_advance(token: str, body: dict, client_ip: str) -> dict:
 
 
 def end_room(token: str, body: dict, client_ip: str) -> dict:
+    if _rate_limited(client_ip):
+        raise ApiError(429, "Zu viele Anfragen - bitte kurz warten")
     with LOCK:
         room = _get_room(token)
         _require_host(room, body)
@@ -631,6 +653,8 @@ def leave_room(token: str, body: dict, client_ip: str) -> dict:
     (Bestätigungen, Stimmen, Sieg-Bedingung), damit die Gruppe nie auf eine
     Aktion warten muss, die nie mehr kommt. Der Host beendet die Runde
     stattdessen komplett (siehe end_room)."""
+    if _rate_limited(client_ip):
+        raise ApiError(429, "Zu viele Anfragen - bitte kurz warten")
     with LOCK:
         room = _get_room(token)
         player = _require_player(room, body)
@@ -651,6 +675,8 @@ def kick_player(token: str, body: dict, client_ip: str) -> dict:
     """Host-Aktion: eine bestimmte Person aus der Runde werfen - technisch
     dasselbe wie ein freiwilliges Verlassen (siehe leave_room), nur vom
     Host für jemand anderen ausgelöst."""
+    if _rate_limited(client_ip):
+        raise ApiError(429, "Zu viele Anfragen - bitte kurz warten")
     with LOCK:
         room = _get_room(token)
         _require_host(room, body)
@@ -676,6 +702,8 @@ def reset_room(token: str, body: dict, client_ip: str) -> dict:
     und Rollen-Konfiguration, damit man für eine neue Runde nicht erneut per
     QR-Code/Link beitreten muss. Wer die vorherige Runde verlassen hatte,
     wird dabei ganz entfernt (müsste über den Link neu beitreten)."""
+    if _rate_limited(client_ip):
+        raise ApiError(429, "Zu viele Anfragen - bitte kurz warten")
     with LOCK:
         room = _get_room(token)
         _require_host(room, body)
