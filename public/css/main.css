@@ -58,22 +58,24 @@
      (view-transition-in, siehe view-nav.js) - z.B. beim Öffnen der
      Kategorie-/Mitspieler-Auswahl, nicht mehr nur beim ersten Laden der
      Seite. :is() bündelt die drei body-Auslöser, statt jede Zeile dreifach
-     auszuschreiben. */
+     auszuschreiben.
+     Bewusst ".game-view > *" statt einzelner Komponentenklassen: JEDE
+     Seite außer der Startseite (jedes Spiel, Einstellungen, Rechtliches -
+     auch alle, die es künftig noch geben wird) nutzt dieselbe .game-view-
+     Ansichtenhülle. Damit deckt eine einzige generische Regel automatisch
+     auch neue Seiten/Ansichten ab, ohne dass hier jedes Mal eine weitere
+     Klasse ergänzt werden muss.
+     AUSGENOMMEN: #play-view (die ID, die JEDES Spiel für seine laufende
+     Runde nutzt - Werwolf-Bühne, Bombe-Timer, Impostor-Diskussion, ...).
+     Deren Inhalt ändert sich WÄHREND der Runde live (Phasenwechsel,
+     Countdown, Abstimmung) - ein Pop-in bei jeder dieser Änderungen wäre
+     störend statt hilfreich, anders als bei den eher listenartigen
+     Auswahl-/Setup-Ansichten. */
   body:is(.page-transition-in, .view-transition-in, :not(.router-navigated)) :is(
     .game-card,
-    .game-detail-card,
-    .game-options-card,
-    .picker-launch-btn,
-    .settings-section,
-    .legal-content,
-    .game-bottom-bar,
+    .game-view:not(#play-view) > *,
     .game-topbar,
-    .app-topbar,
-    .picker-view-header,
-    #categories-pool,
-    .picker-search-create,
-    .picker-list-toolbar,
-    .player-picker__list
+    .app-topbar
   ) {
     animation: anna-element-pop 0.22s var(--m3-easing-emphasized) both;
   }
