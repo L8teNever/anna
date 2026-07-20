@@ -47,7 +47,7 @@
    bereits einmal gelaufene Element-Animation sich nicht von selbst neu
    startet, nur weil sich body.innerHTML ändert. */
 @media (prefers-reduced-motion: no-preference) {
-  body {
+  body:not(.router-navigated) {
     animation: anna-page-fade-in 0.22s var(--m3-easing-standard) both;
   }
 

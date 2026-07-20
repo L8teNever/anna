@@ -93,6 +93,7 @@
   }
 
   function playFadeIn() {
+    document.body.classList.add("router-navigated");
     document.body.classList.remove("page-transition-in");
     void document.body.offsetWidth; // Reflow erzwingen, damit die Animation neu startet
     document.body.classList.add("page-transition-in");
