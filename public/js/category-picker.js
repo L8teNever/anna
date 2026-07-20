@@ -16,6 +16,18 @@
  *          picker.getSelectedCategories() // -> [{id, label, icon, desc, words}, ...]
  */
 (function (root) {
+  // Bezeichnung für die Mengenangabe in der Kategorie-Übersicht
+  // ("12 Wörter" / "12 Fragen" / ...) - je nachdem, was ein Eintrag in der
+  // categories.json des jeweiligen Spiels tatsächlich ist. Fehlt ein Spiel
+  // hier, greift der Fallback "Wörter" (siehe render()).
+  const UNIT_LABELS = {
+    bombe: "Themen",
+    eher: "Fragen",
+    nie: "Aussagen",
+    impostor: "Wörter",
+    werbinich: "Wörter",
+  };
+
   function escapeHtml(value) {
     return String(value).replace(/[&<>"']/g, (ch) => ({
       "&": "&amp;",
@@ -139,7 +151,11 @@
           const checked = selectedIds.has(cat.id) ? "checked" : "";
           let descText = cat.desc ? escapeHtml(cat.desc) : "";
           if (wordCount > 0) {
-            const unit = gameId === "bombe" ? "Themen" : "Wörter";
+            // Nicht jedes Spiel speichert wirklich einzelne "Wörter" - bei
+            // Bombe/Wer würde eher/Ich hab noch nie steht in categories.json
+            // pro Eintrag ein ganzer Themen-/Frage-/Aussage-Prompt, kein
+            // einzelnes Wort (siehe jeweilige categories.json).
+            const unit = UNIT_LABELS[gameId] || "Wörter";
             descText = descText ? `${descText} · ${wordCount} ${unit}` : `${wordCount} ${unit}`;
           }
           const customBadge = cat.custom ? '<span class="category-row__custom-tag">eigene</span>' : "";

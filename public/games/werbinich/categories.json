@@ -23,7 +23,12 @@
       "Julius Caesar",
       "Aschenputtel",
       "Frankensteins Monster",
-      "Superman"
+      "Superman",
+      "Gandalf",
+      "Willy Wonka",
+      "Indiana Jones",
+      "Elvis Presley",
+      "Marilyn Monroe"
     ]
   },
   {
@@ -88,6 +93,27 @@
       "Geheimagentin",
       "Lehrer",
       "Königin"
+    ]
+  },
+  {
+    "id": "boesewichte",
+    "label": "Bösewichte & Fiese Gestalten",
+    "icon": "😈",
+    "words": [
+      "Joker",
+      "Voldemort",
+      "Thanos",
+      "Cruella de Vil",
+      "Loki",
+      "Ursula",
+      "Sauron",
+      "Maleficent",
+      "Scar",
+      "Freddy Krueger",
+      "Jafar",
+      "Captain Hook",
+      "Pennywise",
+      "Palpatine"
     ]
   }
 ]
