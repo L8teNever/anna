@@ -205,7 +205,7 @@
 /* Setzt beim Weggehen dieselbe Richtung fort, in der die Welle gekommen
    ist (weiter nach oben raus), statt wieder nach unten zurückzusinken. */
 .starter-reveal--out .starter-reveal__wave {
-  animation: starter-wave-exit-up 0.35s var(--m3-easing-standard) forwards;
+  animation: starter-wave-exit-up 1.8s var(--m3-easing-standard) forwards;
 }
 
 @keyframes starter-wave-rise {
@@ -270,7 +270,7 @@
 .starter-reveal--out .starter-reveal__hint,
 .starter-reveal--out .starter-reveal__name,
 .starter-reveal--out .starter-reveal__tap-hint {
-  animation: starter-content-exit-up 0.3s var(--m3-easing-standard) forwards;
+  animation: starter-content-exit-up 1.6s var(--m3-easing-standard) forwards;
 }
 
 @keyframes starter-fade-in {
