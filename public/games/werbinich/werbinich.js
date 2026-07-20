@@ -42,6 +42,7 @@
   const revealCardBack = document.getElementById("reveal-card-back");
   const revealIdentityList = document.getElementById("reveal-identity-list");
   const revealNextButton = document.getElementById("reveal-next-button");
+  const quickRatingEl = document.getElementById("quick-rating");
 
   const restartButton = document.getElementById("restart-button");
   const exitButton = document.getElementById("exit-button");
@@ -174,7 +175,7 @@
     const pool = [];
     categoryPicker.getSelectedCategories().forEach((cat) => {
       if (!Array.isArray(cat.words)) return;
-      cat.words.forEach((text) => pool.push({ text, icon: cat.icon }));
+      cat.words.forEach((text) => pool.push({ text, icon: cat.icon, categoryLabel: cat.label }));
     });
     if (pool.length < playerCount) return null;
     return shuffle(pool).slice(0, playerCount);
@@ -257,6 +258,16 @@
       showRevealForCurrentPlayer();
     } else {
       ViewNav.transition(revealView, playView);
+      if (quickRatingEl) {
+        quickRatingEl.hidden = true;
+        const usedLabels = [...new Set(roundIdentities.map((i) => i.categoryLabel).filter(Boolean))];
+        GithubFeedback.renderQuickRating(quickRatingEl, {
+          gameId: "werbinich",
+          gameName: "Wer bin ich?",
+          categoryLabel: usedLabels.join(", "),
+          word: roundIdentities.map((i) => i.text).join(", "),
+        });
+      }
     }
   });
 
