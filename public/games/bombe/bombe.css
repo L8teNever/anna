@@ -153,20 +153,41 @@
   color: var(--m3-on-surface-variant);
 }
 
-/* ---------- Zentrierung für Spielfeld ----------
-   Vorher ein 1fr/auto/1fr-Grid, das Kategorie und Status an den Rand
-   gedrückt hat - auf hohen Bildschirmen blieb dadurch oben und unten viel
-   toter, leerer Raum. Jetzt eine kompakt zentrierte Gruppe (wie bei den
-   anderen Spielen auch, siehe .game-play in main.css). Bewusst OHNE eigenes
-   height/width: das käme mit dem geerbten flex:1/max-width/margin:auto aus
-   .game-play in Konflikt und war der Grund, warum die Gruppe zuvor nicht
-   sauber mittig saß, sondern nach oben verschoben wirkte. */
+/* ---------- Grid-Zentrierung für Spielfeld ----------
+   1fr/auto/1fr sorgt dafür, dass der Bombe-Ring IMMER exakt mittig auf der
+   kompletten Höhe sitzt - die beiden äußeren Reihen sind per Definition
+   gleich groß, der Ring liegt in der schmalen auto-Reihe genau dazwischen.
+   (Eine als Gruppe zentrierte Flex-Spalte, wie kurz zuvor probiert, zentriert
+   nur die GRUPPE - weil oberhalb des Rings mehr Inhalt hängt [Kategorie-
+   Karte] als unterhalb [nur der Status-Text], sitzt der Ring dabei sichtbar
+   unterhalb der wahren Bildschirmmitte. Das Grid vermeidet das strukturell.)
+   Die Kategorie-Karte hängt bewusst OBEN in ihrer Reihe (align-self:start),
+   nicht unten - sonst würde sie Richtung Ring rutschen statt nah am Header
+   zu bleiben. */
 .game-play--bombe {
-  display: flex !important;
-  flex-direction: column;
+  display: grid !important;
+  grid-template-rows: 1fr auto 1fr;
   align-items: center;
-  justify-content: center;
-  gap: 32px;
+  justify-items: center;
+  height: 100%;
+  width: 100%;
+}
+
+.game-play--bombe .active-cat {
+  grid-row: 1;
+  align-self: start;
+}
+
+.game-play--bombe .bomb-ring {
+  grid-row: 2;
+  align-self: center;
+  justify-self: center;
+}
+
+.game-play--bombe #play-status {
+  grid-row: 3;
+  align-self: start;
+  margin-top: 16px;
 }
 
 /* ---------- Start-Reveal: "X fängt an", bevor der Timer losläuft ----------
