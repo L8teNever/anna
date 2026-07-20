@@ -74,12 +74,26 @@
 
     function positionMenu() {
       const rect = trigger.getBoundingClientRect();
-      const maxHeight = Math.max(120, window.innerHeight - rect.bottom - 24);
+      const spaceBelow = window.innerHeight - rect.bottom - 24;
+      const spaceAbove = rect.top - 24;
+
       menu.style.position = "fixed";
       menu.style.left = `${rect.left}px`;
-      menu.style.top = `${rect.bottom + 4}px`;
       menu.style.width = `${rect.width}px`;
-      menu.style.maxHeight = `${maxHeight}px`;
+
+      if (spaceBelow < 160 && spaceAbove > spaceBelow) {
+        // Nach oben öffnen
+        const maxHeight = Math.max(120, spaceAbove);
+        menu.style.maxHeight = `${maxHeight}px`;
+        menu.style.top = "auto";
+        menu.style.bottom = `${window.innerHeight - rect.top + 4}px`;
+      } else {
+        // Nach unten öffnen
+        const maxHeight = Math.max(120, spaceBelow);
+        menu.style.maxHeight = `${maxHeight}px`;
+        menu.style.bottom = "auto";
+        menu.style.top = `${rect.bottom + 4}px`;
+      }
     }
 
     function close() {

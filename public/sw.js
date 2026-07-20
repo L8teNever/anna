@@ -79,7 +79,7 @@
 // String mit hochgezählt werden (parallel zu version.js, das weiterhin die
 // in den Einstellungen angezeigte Versionsnummer liefert), sonst bleibt
 // sw.js byte-identisch und das gesamte Update-System bleibt wirkungslos.
-const APP_VERSION = "3.56.0";
+const APP_VERSION = "3.56.2";
 const CACHE_NAME = `anna-cache-${APP_VERSION}`;
 
 // Versionsunabhängige Marker: NICHT umbenennen und NICHT in CACHE_NAME
@@ -277,7 +277,11 @@ self.addEventListener("fetch", (event) => {
       try {
         const response = await fetch(request);
         if (response && response.ok) {
-          await cache.put(request, response.clone());
+          try {
+            await cache.put(request, response.clone());
+          } catch (cacheError) {
+            // Ignorieren (z.B. bei Request/Response mit "no-store", was in Chrome TypeError wirft)
+          }
         }
         return response;
       } catch (err) {

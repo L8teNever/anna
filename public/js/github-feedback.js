@@ -81,7 +81,7 @@
           body:
             `**Spiel:** ${gameName}\n**Kategorie:** ${categoryLabel || "-"}\n` +
             `**Wort/Frage:** ${word}\n**Bewertung:** ${isGood ? "Gut 👍" : "Nicht so gut 👎"}`,
-          labels: ["word-feedback", `game:${gameId}`],
+          labels: ["word-feedback", `game:${gameId}`, isGood ? "like" : "dislike"],
         });
         container.innerHTML = `<span class="quick-rating__thanks">Danke fürs Feedback! 🙌</span>`;
       });

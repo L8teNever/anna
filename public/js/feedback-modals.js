@@ -324,7 +324,7 @@
         body:
           `**Spiel:** ${game.name}\n**Kategorie:** ${cat ? cat.label : catId}\n**Wort/Frage:** ${word}\n\n` +
           `**Warum?**\n${reason || "(kein Grund angegeben)"}`,
-        labels: ["word-feedback", `game:${game.id}`],
+        labels: ["word-feedback", `game:${game.id}`, "dislike"],
       });
       reportModal.close();
     });
