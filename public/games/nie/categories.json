@@ -11,7 +11,7 @@
       "einen Strafzettel bekommen",
       "in der Öffentlichkeit laut gefurzt",
       "gelogen, um pünktlich zu wirken",
-      "mich verlaufen, obwohl ich wusste, wo ich bin",
+      "mich in meiner eigenen Stadt verlaufen",
       "vergessen, warum ich einen Raum betreten habe",
       "heimlich vom Teller anderer probiert",
       "einen Spitznamen bekommen, den ich hasse",
@@ -179,6 +179,44 @@
       "Sex im Auto gehabt",
       "einen Striptease hingelegt",
       "eine Fantasie laut ausgesprochen, die ich vorher nie erwähnt hatte"
+    ]
+  },
+  {
+    "id": "essen_trinken",
+    "label": "Essen & Trinken",
+    "icon": "🍔",
+    "words": [
+      "mehr als eine ganze Pizza allein gegessen",
+      "Essen vom Boden aufgehoben und trotzdem gegessen",
+      "kaltes Essen direkt aus dem Kühlschrank gegessen, ohne es aufzuwärmen",
+      "so viel gegessen, dass mir schlecht wurde",
+      "ein Gericht bestellt, nur um cool zu wirken, und es dann nicht gemocht",
+      "beim Kochen etwas komplett verbrannt",
+      "Essen heimlich vor anderen versteckt, um es nicht teilen zu müssen",
+      "eine ganze Tüte Chips allein gegessen",
+      "in einem Restaurant gemerkt, dass ich kein Geld dabeihabe",
+      "etwas gegessen, obwohl das Verfallsdatum abgelaufen war",
+      "mitten in der Nacht nur wegen Heißhunger aufgestanden",
+      "vergessen zu bezahlen und es erst später gemerkt"
+    ]
+  },
+  {
+    "id": "kindheit_jugend",
+    "label": "Kindheit & Jugend",
+    "icon": "🧸",
+    "words": [
+      "als Kind etwas kaputt gemacht und die Schuld jemand anderem gegeben",
+      "als Teenager heimlich die Zigaretten meiner Eltern probiert",
+      "eine Fernsehsendung geschaut, für die ich eigentlich zu jung war",
+      "als Kind meine Eltern angelogen, und es hat funktioniert",
+      "eine Mutprobe abgelehnt, weil ich zu viel Angst hatte",
+      "in der Schule abgeschrieben",
+      "als Kind gedacht, ich könnte fliegen, und es ausprobiert",
+      "einen Schwarm angeschrieben und nie eine Antwort bekommen",
+      "als Kind im Bett geweint, weil ein Film zu traurig war",
+      "meinen ersten Kuss komplett vermasselt",
+      "als Teenager heimlich eine Party gefeiert, während die Eltern weg waren",
+      "als Kind so getan, als wäre ich krank, um nicht zur Schule zu müssen"
     ]
   }
 ]
