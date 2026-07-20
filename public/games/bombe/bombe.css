@@ -15,23 +15,24 @@
 .bomb-ring {
   /* min() statt fixer Größe: schrumpft von selbst auf kurzen Bildschirmen/
      PWA-Fenstern, ohne strikt auf die Media-Query-Schwelle unten angewiesen
-     zu sein. */
-  width: min(220px, 34dvh);
-  height: min(220px, 34dvh);
+     zu sein. Etwas größer als vorher (220px -> 250px) - jetzt der klare,
+     einzige Blickfang in der Mitte, statt nur ein Element unter mehreren. */
+  width: min(250px, 38dvh);
+  height: min(250px, 38dvh);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   background: radial-gradient(circle at 35% 30%, #ff5252, #b3261e 70%, #500e0b 100%);
-  box-shadow: 0 0 40px rgba(179, 38, 30, 0.4), var(--m3-elevation-3);
+  box-shadow: 0 0 60px rgba(179, 38, 30, 0.55), 0 0 110px rgba(179, 38, 30, 0.25), var(--m3-elevation-3);
   border: 4px solid rgba(255, 255, 255, 0.15);
   transition: transform 120ms var(--m3-easing-emphasized);
   position: relative;
 }
 
 .bomb-ring__icon {
-  width: 96px;
-  height: 96px;
+  width: 108px;
+  height: 108px;
   color: #ffffff;
   stroke-width: 1.5;
   filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
@@ -156,15 +157,16 @@
    Vorher ein 1fr/auto/1fr-Grid, das Kategorie und Status an den Rand
    gedrückt hat - auf hohen Bildschirmen blieb dadurch oben und unten viel
    toter, leerer Raum. Jetzt eine kompakt zentrierte Gruppe (wie bei den
-   anderen Spielen auch, siehe .game-play in main.css). */
+   anderen Spielen auch, siehe .game-play in main.css). Bewusst OHNE eigenes
+   height/width: das käme mit dem geerbten flex:1/max-width/margin:auto aus
+   .game-play in Konflikt und war der Grund, warum die Gruppe zuvor nicht
+   sauber mittig saß, sondern nach oben verschoben wirkte. */
 .game-play--bombe {
   display: flex !important;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 32px;
-  height: 100%;
-  width: 100%;
 }
 
 /* ---------- Start-Reveal: "X fängt an", bevor der Timer losläuft ----------

@@ -220,9 +220,10 @@
       ? selectedNames[Math.floor(Math.random() * selectedNames.length)]
       : null;
 
-    playStatus.textContent = starter
-      ? `${starter} fängt an – nenn einen Begriff, dann weiterreichen!`
-      : "Nenn einen Begriff aus der Kategorie, dann weiterreichen!";
+    // Kurz halten - die Spielregel ("Begriff nennen, dann weitergeben")
+    // steht schon in der Kategorie-Karte darüber, muss hier nicht nochmal
+    // wiederholt werden.
+    playStatus.textContent = starter ? `${starter} fängt an!` : "Gib das Handy weiter!";
 
     // Timer startet erst NACH dem Start-Reveal, nicht schon währenddessen -
     // sonst könnte die Bombe theoretisch schon hochgehen, bevor überhaupt
