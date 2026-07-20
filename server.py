@@ -147,7 +147,8 @@ class AnnaRequestHandler(SimpleHTTPRequestHandler):
             self.send_header("Cache-Control", "no-store")
         else:
             filename = Path(path).name
-            if filename in NO_CACHE_FILENAMES or filename == "":
+            suffix = Path(path).suffix.lower()
+            if filename in NO_CACHE_FILENAMES or filename == "" or suffix in (".js", ".css"):
                 self.send_header("Cache-Control", "no-cache, must-revalidate")
             else:
                 self.send_header("Cache-Control", "public, max-age=3600")
