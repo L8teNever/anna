@@ -107,11 +107,12 @@
     // Einblend-Animation gleich wieder bei opacity:0 neu startete - das war
     // das doppelte Aufflackern bei jedem Seitenwechsel.
     document.body.classList.remove("page-transition-out");
-    document.body.addEventListener(
-      "animationend",
-      () => document.body.classList.remove("page-transition-in"),
-      { once: true }
-    );
+    
+    // Die Transition-Klasse nach 600ms entfernen, damit alle verzögerten
+    // Kinder (Staggered Animation) vollständig zu Ende animieren können.
+    setTimeout(() => {
+      document.body.classList.remove("page-transition-in");
+    }, 600);
   }
 
   async function swapTo(url, { push = true } = {}) {
