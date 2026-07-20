@@ -777,6 +777,13 @@ body.page-transition-out {
   min-width: 0;
 }
 
+.settings-row > .m3-button,
+.settings-row > .m3-segmented,
+.settings-row > .m3-switch,
+.settings-row > .m3-label {
+  flex-shrink: 0;
+}
+
 .settings-row__title {
   font-size: 0.95rem;
   font-weight: 600;
