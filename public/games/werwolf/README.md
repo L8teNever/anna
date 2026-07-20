@@ -69,11 +69,13 @@ bleiben unverändert rein clientseitig.
   (`secrets.token_urlsafe`), es gibt keinen Endpunkt, der Räume auflistet –
   nur wer den exakten Link/QR-Code hat, kann beitreten. Beitritt geht nur,
   solange die Runde noch in der Lobby ist. Rate-Limiting pro IP auf
-  join/action-Endpunkten.
+  **allen** POST-Endpunkten (nicht nur join/action), plus ein Deckel für
+  die maximal gleichzeitig aktiven Räume (`MAX_ACTIVE_ROOMS`) gegen einen
+  langsamen, unter dem Rate-Limit bleibenden Dauerangriff.
 - **Datensparsamkeit (DSGVO)**: alles nur im Arbeitsspeicher, kein Logging
-  von Namen/Rollen auf Platte, Räume verfallen nach 6h Inaktivität
-  (`ROOM_TTL_SECONDS`) oder wenn der Host beendet. Dokumentiert in der
-  Datenschutzerklärung unter `/rechtliches` (Abschnitt 5) – dort
+  von Namen/Rollen/IP-Adressen auf Platte, Räume verfallen nach 6h
+  Inaktivität (`ROOM_TTL_SECONDS`) oder wenn der Host beendet. Dokumentiert
+  in der Datenschutzerklärung unter `/rechtliches` (Abschnitt 5) – dort
   nachziehen, falls sich an dieser serverseitigen Verarbeitung etwas
   ändert.
 - **Reconnect**: der Client speichert `{playerToken}` pro Raum in

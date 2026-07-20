@@ -71,4 +71,4 @@ Genau wie bei den anderen Spielen:
 Wie gewohnt speichern/committen. Da die App offline-fähig ist, kann es sein,
 dass Geräte, die die App schon offen hatten, noch die alte Version der Datei
 aus dem Cache zeigen – dann hilft in den Einstellungen „Cache löschen“ oder
-das Update-Banner bestätigen.
+das Update-Popup bestätigen.

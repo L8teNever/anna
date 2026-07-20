@@ -1,10 +1,86 @@
 # Anna – Partyspiele
 
+Eine selbst gehostete Sammlung browserbasierter Partyspiele als Progressive
+Web App (PWA). Läuft nach dem ersten Laden komplett offline, ohne
+Benutzerkonten, ohne Werbung und ohne Tracking – Details dazu in der
+[Datenschutzerklärung](public/rechtliches/index.html).
+
+## Spiele
+
+| Spiel | Kurzbeschreibung |
+|---|---|
+| Tickende Bombe | Begriff aus der aktiven Kategorie nennen, bevor die Bombe hochgeht |
+| Impostor | Alle außer dem Impostor kennen das Geheimwort |
+| Ich hab noch nie | Klassisches "Ich hab noch nie …"-Trinkspiel |
+| Wer würde eher | Alle zeigen gleichzeitig auf die passende Person |
+| Wer bin ich? | Eigene Identität per Ja/Nein-Fragen erraten |
+| Perfekte Form | Form freihand nachzeichnen, Prozentzahl entscheidet |
+| Werwolf | Einzelgerät **oder** echter Online-Mehrspieler-Modus – [eigenes README](public/games/werwolf/README.md) |
+
+Jedes Spiel liegt unter `public/games/<id>/`, meist mit eigener
+`categories.json` (Wörter/Fragen/Prompts) und teils einem eigenen README mit
+Details zur jeweiligen Spiellogik.
+
+## Tech-Stack
+
+- **Backend**: Python-Standardbibliothek (`http.server` /
+  `ThreadingHTTPServer`) – kein Framework, keine Datenbank. Einzige externe
+  Abhängigkeit ist Pillow (`image_processor.py`, für die
+  "Wer bin ich?"-Avatarverarbeitung).
+- **Frontend**: Vanilla JavaScript ohne Build-Schritt, Bundler oder
+  Framework.
+- Jedes Spiel ist bewusst ein eigenständiges HTML-Dokument statt einer
+  Single-Page-App – so kann jedes Spiel unabhängig fürs Offline-Spielen
+  vorgecacht werden (siehe `public/sw.js`). Ein eigenes clientseitiges
+  Routing (`public/js/router.js`) sorgt trotzdem für flüssige Übergänge ohne
+  echte Seiten-Reloads.
+- **Persistenz**: ausschließlich `localStorage` im Browser (Spielerliste,
+  Favoriten, Einstellungen) – verlässt nie das Gerät. Einzige Ausnahme: Der
+  Werwolf-Online-Modus hält den laufenden Rundenstand kurzzeitig im
+  Server-Arbeitsspeicher (siehe `werwolf_backend.py`), nie auf Platte.
+
+## Lokal starten
+
+```bash
+python server.py
+```
+
+Läuft danach auf `http://localhost:8080` (Port über die Umgebungsvariable
+`PORT`, Host über `HOST` änderbar).
+
+## Projektstruktur
+
+```
+server.py                  Statischer Webserver + Routing zu werwolf_backend.py
+werwolf_backend.py          Werwolf-Online-Backend (einziges Spiel mit Server-Logik)
+image_processor.py          Avatar-Bildverarbeitung für "Wer bin ich?"
+public/
+  index.html                 Startseite
+  settings/                  Einstellungsseite
+  rechtliches/                Impressum & Datenschutzerklärung
+  games/<id>/                  Ein Ordner pro Spiel (index.html, <id>.js, <id>.css, categories.json)
+  js/                          Gemeinsame Module (Router, Storage, Picker, ...)
+  css/                          Gemeinsames Material-3-Design-System
+  sw.js                        Service Worker (Offline-Caching, Update-Erkennung)
+```
+
+## Neues Spiel hinzufügen
+
+1. Neuen Ordner `public/games/<id>/` mit einer `index.html` anlegen – die
+   Route `/<id>` wird von `server.py` automatisch erkannt.
+2. Eintrag in `public/js/game-registry.js` (`GAMES`-Array) ergänzen –
+   einzige Stelle, die für Startseite, Suche und Offline-Cache angepasst
+   werden muss.
+3. Bei Wort-/Fragen-Kategorien: eigene `categories.json`, geladen über
+   `CategoryPicker.create(...)` (siehe `public/js/category-picker.js`).
+4. `APP_VERSION` in `public/js/version.js` **und** `public/sw.js`
+   hochzählen (siehe unten, warum beide Stellen nötig sind).
+
 ## Lizenz
 
-Dieses Projekt steht unter der [MIT-Lizenz](LICENSE) – frei nutzbar, veränderbar
-und weiterverbreitbar, auch kommerziell, solange der Lizenz-/Copyright-Hinweis
-erhalten bleibt.
+Dieses Projekt steht unter der [MIT-Lizenz](LICENSE) – frei nutzbar,
+veränderbar und weiterverbreitbar, auch kommerziell, solange der
+Lizenz-/Copyright-Hinweis erhalten bleibt.
 
 ## Client-seitige Update-Architektur (Service Worker)
 
@@ -31,7 +107,7 @@ wie `game-registry.js` sich geändert hat!). Alles andere läuft automatisch:
 
 1. Browser erkennt einen Byte-Unterschied in `/sw.js` und installiert die
    neue Version im Hintergrund (alter Worker bleibt bis zur Bestätigung aktiv).
-2. `public/js/pwa-helper.js` zeigt ein Update-Banner. Der Nutzer muss aktiv
+2. `public/js/pwa-helper.js` zeigt ein Update-Popup. Der Nutzer muss aktiv
    auf "Aktualisieren" tippen – es gibt **keinen** automatischen Wechsel
    mitten in einer laufenden Spielrunde.
 3. Nach Bestätigung schickt die Seite `SKIP_WAITING` an den neuen Worker,
@@ -54,7 +130,7 @@ wie `game-registry.js` sich geändert hat!). Alles andere läuft automatisch:
 (Ein früherer Versuch, hier zusätzlich einen zweiten, vom Service-Worker
 unabhängigen Versionsabgleich per Roh-Fetch von `version.js` einzubauen,
 wurde wieder entfernt: er hat durch CDN-/Cache-Eigenheiten gelegentlich
-einen falschen Unterschied gemeldet und dadurch das Update-Banner in einer
+einen falschen Unterschied gemeldet und dadurch das Update-Popup in einer
 Schleife erneut angezeigt. Da Punkt 1 oben (Byte-Diff direkt in `sw.js`)
 die eigentliche Ursache bereits zuverlässig löst, war der Zusatz-Check
 unnötiges Risiko ohne echten Zusatznutzen.)
@@ -81,47 +157,4 @@ weil beide sich dieselbe Origin-Speicherung teilen.
 privaten/Inkognito-Fenster testen. Das startet komplett ohne alten Cache/
 Service Worker. Tritt das Problem dort NICHT auf, liegt es an einem alten,
 lokal feststeckenden Zustand auf dem ursprünglichen Testgerät (siehe oben),
-nicht am Code oder an Cloudflare.
-
-## Cloudflare Cache-Busting & Updates
-
-Die Anwendung verwendet eine Kombination aus einem Service Worker (für Offline-Fähigkeit) und einem Cloudflare Worker (für dynamisches Cache-Busting bei Updates).
-
-### Wichtig: Der `cf-cache-bust` Meta-Tag
-
-In allen HTML-Dateien der Anwendung muss sich im `<head>`-Bereich folgender Meta-Tag befinden:
-
-```html
-<meta name="cf-cache-bust" content="true" />
-```
-
-#### Warum muss dieser Tag auf **jeder** Seite vorhanden sein?
-
-1. **Domain-weites Flagging im Cloudflare Worker:**
-   Der Cloudflare Worker scannt beim Laden einer Seite nach diesem Tag. Wenn er ihn findet, aktiviert er das Cache-Busting (versionierte Asset-Pfade mit `?cb=...`) für die gesamte Domain. Dieses Flag wird im Worker für **5 Minuten** zwischengespeichert.
-
-2. **Gefahr durch direkte Einstiegspunkte (Bookmarks):**
-   Wenn ein Nutzer ein Lesezeichen direkt auf ein Unterspiel setzt (z. B. `https://anna.kulbarts.com/games/bombe/`) oder die Einstellungen öffnet, ohne vorher die Startseite besucht zu haben, und seit dem letzten Besuch mehr als 5 Minuten vergangen sind:
-   - Der 5-Minuten-Marker im Worker ist abgelaufen.
-   - Der Nutzer ruft direkt die Unterseite auf.
-   - Wäre der Meta-Tag *nur* auf der Startseite vorhanden, würde der Worker den Tag beim Laden der Unterseite nicht sehen und das Cache-Busting **nicht** aktivieren.
-   - Die App würde alte, veraltete Dateien aus dem CDN-Cache laden und es käme zu Darstellungsfehlern.
-
-3. **Garantierte Ausfallsicherheit:**
-   Indem der Tag in **allen** HTML-Dateien (`index.html`, `/settings/index.html`, `/games/*/index.html`, `404.html`) integriert ist, wird der Marker bei jedem Seitenaufruf – egal über welchen Pfad der Nutzer einsteigt – zuverlässig gesetzt und verlängert.
-
-### Cloudflare Worker Injektionen komplett deaktivieren
-
-Die App ist für die Ausführung als eigenständige PWA optimiert und besitzt bereits eigene native UI-Elemente (z.B. flüssige Animationen, eigene "Rechtliches"-Links in der Topbar). 
-
-Um **alle** automatischen Injektionen und Eingriffe des Cloudflare Workers auf dieser Domain **komplett abzuschalten**, muss sich in **ausnahmslos allen HTML-Dateien** im `<head>`-Bereich zusätzlich folgender Meta-Tag befinden:
-
-```html
-<meta name="cf-worker-bypass" content="true" />
-```
-
-Durch diesen Tag ignoriert der Cloudflare Worker die Seite komplett und injiziert nichts mehr. Dies schaltet folgende Funktionen des Workers ab:
-- Kein Ladeanimations-Overlay (wird hier nicht benötigt, da Cache-geladen)
-- Kein "Rechtliches"-Button unten links
-- Kein Favicon-Fallback-Script
-- Keine eigenen 404/403/500/503-Fehlerseiten (Origin-Fehler kommen unverändert durch)
+nicht am Code selbst.
