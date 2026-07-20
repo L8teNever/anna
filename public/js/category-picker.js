@@ -26,6 +26,7 @@
     nie: "Aussagen",
     impostor: "Wörter",
     werbinich: "Wörter",
+    naeher: "Fragen",
   };
 
   function escapeHtml(value) {

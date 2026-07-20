@@ -1,0 +1,50 @@
+[
+  {
+    "id": "general",
+    "label": "Allgemein",
+    "icon": "🧠",
+    "desc": "Bunte Mischung aus kuriosen Schätzfragen",
+    "words": [
+      { "word": "Wie viele Knochen besitzt der menschliche Körper eines Erwachsenen?", "answer": 206, "unit": "Knochen", "min": 100, "max": 400 },
+      { "word": "In welchem Jahr ging die Titanic auf ihrer Jungfernfahrt unter?", "answer": 1912, "unit": "Jahr", "min": 1800, "max": 2000 },
+      { "word": "Wie viele Tasten hat ein Standardklavier?", "answer": 88, "unit": "Tasten", "min": 40, "max": 120 },
+      { "word": "Wie viele Zähne besitzt ein erwachsener Mensch normalerweise (inkl. Weisheitszähne)?", "answer": 32, "unit": "Zähne", "min": 10, "max": 50 },
+      { "word": "Wie viele Liter Bier werden in Deutschland durchschnittlich pro Kopf und Jahr getrunken?", "answer": 92, "unit": "Liter", "min": 20, "max": 200 },
+      { "word": "Wie viele Tasten hat eine klassische Computer-Tastatur (QWERTZ-Layout)?", "answer": 105, "unit": "Tasten", "min": 50, "max": 150 },
+      { "word": "Wie viele Streifen hat die Flagge der USA?", "answer": 13, "unit": "Streifen", "min": 5, "max": 30 },
+      { "word": "Wie viele rote Felder gibt es auf einem Standard-Rouletterad?", "answer": 18, "unit": "Felder", "min": 10, "max": 40 }
+    ]
+  },
+  {
+    "id": "science",
+    "label": "Natur & Rekorde",
+    "icon": "🧪",
+    "desc": "Geografie, Tiere und Naturwissenschaften",
+    "words": [
+      { "word": "Wie viele Sekunden braucht das Licht der Sonne, um die Erde zu erreichen?", "answer": 500, "unit": "Sekunden", "min": 100, "max": 1000 },
+      { "word": "Wie hoch ist der Eiffelturm in Paris (in Metern, ohne Antenne)?", "answer": 300, "unit": "Meter", "min": 100, "max": 600 },
+      { "word": "Wie viele Minuten braucht das Licht, um ein Lichtjahr zurückzulegen?", "answer": 525960, "unit": "Minuten", "min": 100000, "max": 1000000 },
+      { "word": "Wie viele Länder gibt es aktuell auf der Erde (UN-Mitglieder + Beobachter)?", "answer": 195, "unit": "Länder", "min": 80, "max": 300 },
+      { "word": "Wie lang ist der Äquator der Erde in Kilometern (gerundet)?", "answer": 40075, "unit": "Kilometer", "min": 10000, "max": 80000 },
+      { "word": "Bei wie viel Grad Celsius liegt der absolute Nullpunkt (in negativen Graden)?", "answer": 273, "unit": "°C", "min": 100, "max": 500 },
+      { "word": "Wie hoch ist der Mount Everest in Metern?", "answer": 8848, "unit": "Meter", "min": 4000, "max": 15000 },
+      { "word": "Wie viele Tage benötigt der Planet Mars für einen vollständigen Umlauf um die Sonne?", "answer": 687, "unit": "Tage", "min": 200, "max": 1200 }
+    ]
+  },
+  {
+    "id": "popculture",
+    "label": "Popkultur & Alltag",
+    "icon": "🍿",
+    "desc": "Internet, Filme, Marken und Kuriosem",
+    "words": [
+      { "word": "Wie viele Emojis gab es im Unicode-Standard Version 15.0 insgesamt?", "answer": 3609, "unit": "Emojis", "min": 500, "max": 10000 },
+      { "word": "In welchem Jahr wurde die erste PlayStation-Konsole in Japan veröffentlicht?", "answer": 1994, "unit": "Jahr", "min": 1980, "max": 2010 },
+      { "word": "Wie viele Sekunden dauert das berühmte Netflix-Intro-Logo-Geräusch?", "answer": 4, "unit": "Sekunden", "min": 1, "max": 10 },
+      { "word": "Wie viele Oscars hat der Film 'Titanic' (1997) gewonnen?", "answer": 11, "unit": "Oscars", "min": 1, "max": 20 },
+      { "word": "Wie viele Felder hat ein normales Schachbrett?", "answer": 64, "unit": "Felder", "min": 30, "max": 100 },
+      { "word": "Wie viele Bundesstaaten haben die USA?", "answer": 50, "unit": "Staaten", "min": 10, "max": 100 },
+      { "word": "In welchem Jahr wurde Google offiziell gegründet?", "answer": 1998, "unit": "Jahr", "min": 1980, "max": 2010 },
+      { "word": "Wie viele Ringe hat das offizielle olympische Symbol?", "answer": 5, "unit": "Ringe", "min": 3, "max": 10 }
+    ]
+  }
+]

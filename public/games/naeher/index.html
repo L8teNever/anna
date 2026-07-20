@@ -14,13 +14,13 @@
   </script>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0f1014" />
-  <title>Tickende Bombe – Anna</title>
+  <title>Wer ist näher dran? – Anna</title>
   <link rel="manifest" href="/manifest.json" />
   <link rel="icon" href="/assets/icons/icon-192.png" />
   <link rel="stylesheet" href="/css/material.css" />
   <link rel="stylesheet" href="/css/components.css" />
   <link rel="stylesheet" href="/css/main.css" />
-  <link rel="stylesheet" href="/games/bombe/bombe.css?v=3.56.10" />
+  <link rel="stylesheet" href="/games/naeher/naeher.css?v=3.56.10" />
   <!-- Session-globale Scripts, siehe router.js -->
   <script src="/js/icons.js"></script>
   <script src="/js/router.js"></script>
@@ -35,8 +35,8 @@
         <svg class="m3-icon"><use href="#icon-arrow-back"></use></svg>
       </button>
       <h1 class="game-topbar__title">
-        <svg class="m3-icon" style="vertical-align: -5px"><use href="#icon-bomb"></use></svg>
-        Tickende Bombe
+        <svg class="m3-icon" style="vertical-align: -5px"><use href="#icon-target"></use></svg>
+        Wer ist näher dran?
       </h1>
     </header>
 
@@ -44,30 +44,19 @@
     <section class="game-view app-view" id="setup-view">
       <div class="game-detail-card">
         <div class="game-detail-card__top">
-          <span class="m3-tag" style="background: var(--game-red-container); color: var(--game-red)">Party</span>
-          <span class="game-detail-card__limit">2–8 Spieler</span>
+          <span class="m3-tag" style="background: var(--game-orange-container); color: var(--game-orange)">Schätzen</span>
+          <span class="game-detail-card__limit">2–6 Spieler</span>
         </div>
         <p class="m3-body">
-          Reagiere schnell, nenn einen Begriff aus der Kategorie und reiche das Gerät weiter, bevor die Bombe
-          in deinen Händen hochgeht!
+          Wer hat das beste Schätzgefühl? Nacheinander tragt ihr eure Tipps zu skurrilen Rekorden und Fakten ein. Die Messskala deckt auf, wer am dichtesten dran ist!
         </p>
-      </div>
-
-      <div class="game-options-card">
-        <h2 class="game-section-title">
-          <svg class="m3-icon"><use href="#icon-sliders"></use></svg> Einstellungen
-        </h2>
-        <div class="game-option-row">
-          <span class="game-option-row__label">Zünddauer<br /><span class="game-option-row__hint">passt sich automatisch an die Mitspielerzahl an</span></span>
-          <span class="m3-tag" id="fuse-range-display" style="background: var(--game-red-container); color: var(--game-red)">–</span>
-        </div>
       </div>
 
       <button type="button" class="picker-launch-btn" id="open-category-select-button">
         <div class="picker-launch-btn__left">
           <div class="picker-launch-btn__icon"><svg class="m3-icon"><use href="#icon-grid"></use></svg></div>
           <div>
-            <p class="picker-launch-btn__title">Wort-Kategorien</p>
+            <p class="picker-launch-btn__title">Fragen-Kategorien</p>
             <p class="picker-launch-btn__hint" id="category-select-summary">Alle Kategorien aktiv</p>
           </div>
         </div>
@@ -87,12 +76,12 @@
 
       <div class="validation-warning" id="validation-warning" hidden>
         <svg class="m3-icon" style="width: 16px; height: 16px"><use href="#icon-alert-triangle"></use></svg>
-        <span id="validation-warning-text">Für dieses Spiel werden 2–8 Mitspieler benötigt.</span>
+        <span id="validation-warning-text">Für dieses Spiel werden 2–6 Mitspieler benötigt.</span>
       </div>
 
       <div class="game-bottom-bar">
-        <button type="button" class="m3-button m3-button--filled" id="start-button">
-          <svg class="m3-icon" style="width: 18px; height: 18px"><use href="#icon-play"></use></svg> Bombe starten
+        <button type="button" class="m3-button m3-button--filled" id="start-button" disabled>
+          <svg class="m3-icon" style="width: 18px; height: 18px"><use href="#icon-play"></use></svg> Spiel starten
         </button>
       </div>
     </section>
@@ -104,7 +93,7 @@
           <button type="button" class="m3-icon-button" id="category-select-back-button" aria-label="Zurück">
             <svg class="m3-icon"><use href="#icon-arrow-back"></use></svg>
           </button>
-          <span class="picker-view-header__title">Wort-Kategorien</span>
+          <span class="picker-view-header__title">Kategorien</span>
         </div>
         <div class="picker-view-header__bulk">
           <button type="button" class="picker-view-header__bulk-btn picker-view-header__bulk-btn--primary" id="category-bulk-all">Alle</button>
@@ -162,41 +151,112 @@
 
     <!-- ---------- Spiel-Ansicht ---------- -->
     <section class="game-view app-view" id="play-view" hidden>
-      <div class="game-play game-play--bombe">
+      <div class="naeher-play-container">
+        
+        <!-- STATE 1: BEREIT / PASS & PLAY SCREEN -->
+        <div class="naeher-state-card" id="play-state-ready">
+          <div class="naeher-icon-badge">
+            <svg class="m3-icon"><use href="#icon-users"></use></svg>
+          </div>
+          <h2 class="naeher-state-title">Gib das Gerät weiter!</h2>
+          <p class="naeher-state-desc">
+            Reiche das Gerät an <strong id="next-player-name" class="naeher-highlight-name">...</strong> weiter.<br/>
+            Schau nicht auf den Bildschirm, bis du an der Reihe bist!
+          </p>
+          <button type="button" class="m3-button m3-button--filled" id="btn-start-guess" style="width: 100%">
+            Schätzung starten
+          </button>
+        </div>
 
-        <!-- Start-Reveal: liegt kurz über allem, zeigt groß, wer anfängt.
-             Bleibt stehen, bis draufgetippt wird - erst dann startet der
-             eigentliche Timer (siehe bombe.js). -->
-        <div class="starter-reveal" id="starter-reveal" hidden>
-          <div class="starter-reveal__wave"></div>
-          <p class="starter-reveal__hint">Los geht's</p>
-          <h2 class="starter-reveal__name" id="starter-reveal-name"></h2>
-          <div class="starter-reveal__tap-hint">
-            <svg class="m3-icon"><use href="#icon-touch"></use></svg>
-            <span>Tippen zum Start</span>
+        <!-- STATE 2: SCHÄTZ-INPUT SCREEN -->
+        <div class="naeher-state-card" id="play-state-input" hidden>
+          <div class="naeher-question-card">
+            <p class="naeher-question-hint">Schätzfrage:</p>
+            <h3 class="naeher-question-text" id="input-question-text">Wie hoch ist der Eiffelturm?</h3>
+          </div>
+
+          <div class="naeher-input-area">
+            <p class="naeher-input-label">Deine Schätzung, <span id="input-player-name" class="naeher-highlight-name">...</span>:</p>
+            
+            <div class="naeher-value-display-wrapper">
+              <span id="guess-value-display" class="naeher-value-display">150</span>
+              <span id="guess-unit-display" class="naeher-unit-display">Meter</span>
+            </div>
+
+            <!-- Slider & Adjusters -->
+            <div class="naeher-slider-group">
+              <button type="button" class="naeher-adjust-btn" id="btn-guess-minus" aria-label="Minus">
+                <svg class="m3-icon"><use href="#icon-minus"></use></svg>
+              </button>
+              <input type="range" class="naeher-slider" id="guess-slider" min="0" max="1000" value="150" />
+              <button type="button" class="naeher-adjust-btn" id="btn-guess-add" aria-label="Plus">
+                <svg class="m3-icon"><use href="#icon-add"></use></svg>
+              </button>
+            </div>
+
+            <div class="naeher-slider-limits">
+              <span id="limit-min">Min: 0</span>
+              <span id="limit-max">Max: 1000</span>
+            </div>
+          </div>
+
+          <button type="button" class="m3-button m3-button--filled" id="btn-lock-guess" style="width: 100%">
+            <svg class="m3-icon"><use href="#icon-check"></use></svg> Wert einloggen
+          </button>
+        </div>
+
+        <!-- STATE 3: AUFLÖSUNG / REVEAL SCREEN -->
+        <div class="naeher-state-card" id="play-state-reveal" hidden>
+          <div class="naeher-question-card">
+            <h3 class="naeher-question-text" id="reveal-question-text">Wie hoch ist der Eiffelturm?</h3>
+          </div>
+
+          <!-- Die digitale Schätzanzeige (mit Ticker-Effekt) -->
+          <div class="naeher-reveal-answer-box">
+            <span class="naeher-reveal-label">Echte Antwort:</span>
+            <div class="naeher-reveal-value-container">
+              <span id="reveal-correct-answer" class="naeher-reveal-value">?</span>
+              <span id="reveal-unit-display" class="naeher-reveal-unit"></span>
+            </div>
+          </div>
+
+          <!-- Virtuelle Messskala / Ruler -->
+          <div class="naeher-ruler-wrapper" id="ruler-wrapper" hidden>
+            <div class="naeher-ruler-track" id="ruler-track">
+              <!-- Korrekter Pin & Spielerpins werden per JS gerendert -->
+            </div>
+            <div class="naeher-ruler-labels">
+              <span id="ruler-label-min">0</span>
+              <span id="ruler-label-correct" class="naeher-label-correct">Antwort</span>
+              <span id="ruler-label-max">1000</span>
+            </div>
+          </div>
+
+          <!-- Rundenergebnisse -->
+          <div class="naeher-results-container" id="round-results-container" hidden>
+            <h4 class="naeher-results-title">Ergebnisse dieser Runde:</h4>
+            <div class="naeher-results-list" id="round-results-list">
+              <!-- Listeneinträge werden per JS gerendert -->
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div style="margin-top: 16px; width: 100%">
+            <button type="button" class="m3-button m3-button--filled" id="btn-reveal-answer" style="width: 100%">
+              Antwort enthüllen!
+            </button>
+            <div id="reveal-end-actions" style="display: flex; flex-direction: column; gap: 8px; width: 100%" hidden>
+              <div class="quick-rating" id="quick-rating-reveal" style="margin-bottom: 8px" hidden></div>
+              <button type="button" class="m3-button m3-button--filled" id="btn-restart-game" style="width: 100%">
+                Noch eine Runde
+              </button>
+              <button type="button" class="m3-button m3-button--text" id="btn-exit-to-home" style="width: 100%">
+                Zur Startseite
+              </button>
+            </div>
           </div>
         </div>
 
-        <!-- Aktive Kategorie – groß oben -->
-        <div class="active-cat" id="active-cat-badge" hidden>
-          <p class="active-cat__hint">Kategorie dieser Runde</p>
-          <p class="active-cat__label" id="active-cat-text"></p>
-          <p class="active-cat__rule">Nenn einen Begriff → dann weitergeben!</p>
-          <p class="active-cat__example" id="active-cat-example" hidden></p>
-        </div>
-
-        <div class="bomb-ring" id="bomb-ring">
-          <svg class="m3-icon bomb-ring__icon" id="bomb-icon"><use href="#icon-bomb"></use></svg>
-        </div>
-        <p class="m3-title" id="play-status">Gib das Handy weiter…</p>
-      </div>
-
-      <div class="game-bottom-bar" id="play-actions" hidden>
-        <div class="quick-rating" id="quick-rating" hidden></div>
-        <button type="button" class="m3-button m3-button--filled" id="restart-button">Neue Runde</button>
-        <button type="button" class="m3-button m3-button--text" id="exit-button" style="margin-top: 8px">
-          Zur Startseite
-        </button>
       </div>
     </section>
   </div>
@@ -214,7 +274,7 @@
   <script src="/js/audio.js"></script>
   <script src="/js/touch-fixes.js"></script>
   <script src="/js/github-feedback.js"></script>
-  <script src="/games/bombe/bombe.js"></script>
+  <script src="/games/naeher/naeher.js?v=3.56.10"></script>
   <script src="/js/privacy-banner.js"></script>
 </body>
 </html>

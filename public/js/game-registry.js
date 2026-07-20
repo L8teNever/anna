@@ -20,6 +20,18 @@
 (function (root) {
   const GAMES = [
     {
+      id: "naeher",
+      name: "Wer ist näher dran?",
+      tag: "Schätzen",
+      description: "Das ultimative, rasante Schätzduell für deine Party.",
+      detail: "Tritt mit deinen Freunden an einem Smartphone an. Schätzt skurrile Fakten, geografische Rekorde oder wissenschaftliche Zahlen. Wer am nächsten an der echten Antwort liegt, gewinnt!",
+      icon: "target",
+      color: "orange",
+      minPlayers: 2,
+      maxPlayers: 6,
+      assets: ["/games/naeher/naeher.js", "/games/naeher/naeher.css", "/games/naeher/categories.json"],
+    },
+    {
       id: "bombe",
       name: "Tickende Bombe",
       tag: "Party",

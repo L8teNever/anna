@@ -10,5 +10,5 @@
  * Stellen bei jeder Änderung gemeinsam hochzählen!
  */
 (function (root) {
-  root.APP_VERSION = "3.56.8";
+  root.APP_VERSION = "3.56.10";
 })(typeof self !== "undefined" ? self : this);

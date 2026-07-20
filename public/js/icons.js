@@ -20,6 +20,9 @@
   sprite.setAttribute("aria-hidden", "true");
   sprite.style.display = "none";
   sprite.innerHTML = `
+    <symbol id="icon-target" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/>
+    </symbol>
     <symbol id="icon-search" viewBox="0 0 24 24">
       <circle cx="10" cy="10" r="6"/><line x1="21" y1="21" x2="15.2" y2="15.2"/>
     </symbol>
