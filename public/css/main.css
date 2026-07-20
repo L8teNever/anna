@@ -170,22 +170,33 @@ body.page-transition-out {
   font-weight: 800;
   letter-spacing: -0.02em;
   line-height: 1;
+  transform-origin: left center;
   transition: opacity 0.25s var(--m3-easing-standard), transform 0.25s var(--m3-easing-standard);
 }
 
 .app-topbar[data-search-active="true"] .app-topbar__title {
   opacity: 0;
-  transform: scale(0.96);
+  transform: translateX(-12px) scale(0.96);
   pointer-events: none;
 }
 
 .app-topbar__search {
   position: absolute;
   inset: 0;
+  display: flex;
+  align-items: center;
   opacity: 0;
   transform: scale(0.97);
   pointer-events: none;
   transition: opacity 0.25s var(--m3-easing-standard), transform 0.25s var(--m3-easing-standard);
+}
+
+/* display:flex oben macht .m3-search zum Flex-Item statt zum Block-Kind -
+   Flex-Items strecken sich anders als Block-Elemente NICHT automatisch auf
+   die volle Breite, ohne das würde die Suchleiste auf ihre Inhaltsbreite
+   schrumpfen. */
+.app-topbar__search .m3-search {
+  width: 100%;
 }
 
 .app-topbar[data-search-active="true"] .app-topbar__search {
@@ -201,19 +212,49 @@ body.page-transition-out {
   flex-shrink: 0;
 }
 
-.app-topbar__filter-btn {
-  transition: opacity 0.2s var(--m3-easing-standard), transform 0.2s var(--m3-easing-standard), width 0.2s;
-  width: 0;
-  opacity: 0;
-  transform: scale(0.8);
-  pointer-events: none;
-  overflow: hidden;
+/* Combined settings/close button and morph transitions */
+.app-topbar__action-btn {
+  position: relative;
 }
 
-.app-topbar[data-search-active="true"] .app-topbar__filter-btn {
-  width: 48px;
+.app-topbar__action-btn span {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s cubic-bezier(0.2, 0, 0, 1), 
+              transform 0.3s cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* Bewusst #action-icon-settings/-close statt #icon-settings/-close: Diese
+   IDs würden sonst mit den GLEICHNAMIGEN <symbol id="icon-settings">/
+   <symbol id="icon-close"> aus dem Icon-Sprite (siehe icons.js, landet im
+   <head>) kollidieren - doppelte IDs auf der Seite. CSS-ID-Selektoren
+   matchen ALLE Elemente mit der ID, nicht nur das erste (anders als
+   getElementById) - die Morph-Transform/-Opacity wäre damit auch auf die
+   <symbol>-Definition selbst angewendet worden, die von JEDER <use
+   href="#icon-settings">-Referenz app-weit gemeinsam genutzt wird. */
+#action-icon-settings {
   opacity: 1;
-  transform: scale(1);
+  transform: rotate(0deg) scale(1);
+}
+
+#action-icon-close {
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.75);
+  pointer-events: none;
+}
+
+.app-topbar[data-search-active="true"] #action-icon-settings {
+  opacity: 0;
+  transform: rotate(180deg) scale(0.75);
+  pointer-events: none;
+}
+
+.app-topbar[data-search-active="true"] #action-icon-close {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
   pointer-events: auto;
 }
 

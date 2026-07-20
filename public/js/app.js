@@ -10,6 +10,7 @@
   const searchInput = document.getElementById("search-input");
   const clearSearchButton = document.getElementById("clear-search-button");
   const searchTriggerButton = document.getElementById("search-trigger-button");
+  const actionButton = document.getElementById("settings-button");
   const filterToggleButton = document.getElementById("filter-toggle-button");
   const filterPanel = document.getElementById("filter-panel");
   const favFilterToggle = document.getElementById("fav-filter-toggle");
@@ -121,7 +122,7 @@
 
       // Muss NACH card.innerHTML gesetzt werden - innerHTML ersetzt sonst
       // alle Kind-Elemente und würde diesen Banner-Layer sofort wieder
-      // entfernen (war der Bug: Banner wurde erzeugt, aber nie sichtbar).
+      // entfernen (war the Bug: Banner wurde erzeugt, aber nie sichtbar).
       if (bannerUrl) {
         card.classList.add("game-card--has-banner");
         const pos = (bannerConfig[game.id] && bannerConfig[game.id].position) || "center 50%";
@@ -155,6 +156,12 @@
   function openSearch() {
     searchActive = true;
     topbar.dataset.searchActive = "true";
+    if (searchTriggerButton) searchTriggerButton.style.display = "none";
+    if (filterToggleButton) filterToggleButton.style.display = "inline-flex";
+    if (actionButton) {
+      actionButton.title = "Suche schließen";
+      actionButton.setAttribute("aria-label", "Suche schließen");
+    }
     setTimeout(() => searchInput.focus(), 200);
   }
 
@@ -164,6 +171,12 @@
     searchInput.value = "";
     clearSearchButton.hidden = true;
     filterPanel.dataset.open = "false";
+    if (searchTriggerButton) searchTriggerButton.style.display = "inline-flex";
+    if (filterToggleButton) filterToggleButton.style.display = "none";
+    if (actionButton) {
+      actionButton.title = "Einstellungen";
+      actionButton.setAttribute("aria-label", "Einstellungen");
+    }
     renderGames("");
   }
 
@@ -172,6 +185,12 @@
     topbar.dataset.searchActive = "false";
     searchInput.value = "";
     clearSearchButton.hidden = true;
+    if (searchTriggerButton) searchTriggerButton.style.display = "inline-flex";
+    if (filterToggleButton) filterToggleButton.style.display = "none";
+    if (actionButton) {
+      actionButton.title = "Einstellungen";
+      actionButton.setAttribute("aria-label", "Einstellungen");
+    }
 
     showOnlyFavorites = false;
     favFilterToggle.checked = false;
@@ -185,10 +204,16 @@
     renderGames("");
   }
 
-  searchTriggerButton.addEventListener("click", () => {
-    if (searchActive) closeSearch();
-    else openSearch();
-  });
+  searchTriggerButton.addEventListener("click", openSearch);
+  if (actionButton) {
+    actionButton.addEventListener("click", () => {
+      if (searchActive) {
+        closeSearch();
+      } else {
+        Router.navigate("/settings");
+      }
+    });
+  }
 
   searchInput.addEventListener("input", () => {
     clearSearchButton.hidden = searchInput.value.length === 0;

@@ -50,15 +50,20 @@
       </div>
 
       <div class="app-topbar__actions">
-        <button type="button" class="m3-icon-button app-topbar__filter-btn" id="filter-toggle-button" aria-label="Filter" title="Filter">
+        <button type="button" class="m3-icon-button" id="filter-toggle-button" aria-label="Filter öffnen" title="Filter öffnen" style="display: none;">
           <svg class="m3-icon"><use href="#icon-sliders"></use></svg>
         </button>
         <button type="button" class="m3-icon-button" id="search-trigger-button" aria-label="Suche öffnen" title="Suche öffnen" style="color: var(--m3-primary)">
           <svg class="m3-icon"><use href="#icon-search"></use></svg>
         </button>
-        <a href="/settings" class="m3-icon-button interactive-item" aria-label="Einstellungen" title="Einstellungen">
-          <svg class="m3-icon"><use href="#icon-settings"></use></svg>
-        </a>
+        <button type="button" class="m3-icon-button app-topbar__action-btn" id="settings-button" aria-label="Einstellungen" title="Einstellungen">
+          <span id="action-icon-settings">
+            <svg class="m3-icon"><use href="#icon-settings"></use></svg>
+          </span>
+          <span id="action-icon-close">
+            <svg class="m3-icon"><use href="#icon-close"></use></svg>
+          </span>
+        </button>
       </div>
     </header>
 
