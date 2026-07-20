@@ -52,6 +52,7 @@
 
   const restartButton = document.getElementById("restart-button");
   const exitButton = document.getElementById("exit-button");
+  const quickRatingEl = document.getElementById("quick-rating");
 
   const playerPicker = PlayerPicker.create();
   const categoryPicker = CategoryPicker.create("impostor", "/games/impostor/categories.json");
@@ -333,6 +334,15 @@
       showRevealForCurrentPlayer();
     } else {
       ViewNav.transition(revealView, playView);
+      if (quickRatingEl) {
+        quickRatingEl.hidden = true;
+        GithubFeedback.renderQuickRating(quickRatingEl, {
+          gameId: "impostor",
+          gameName: "Impostor",
+          categoryLabel: hintCategoryLabel,
+          word: secretWord,
+        });
+      }
     }
   });
 

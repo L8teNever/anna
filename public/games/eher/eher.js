@@ -22,6 +22,7 @@
   const eherCard = document.getElementById("eher-card");
   const statementText = document.getElementById("eher-statement-text");
   const categoryLabelEl = document.getElementById("eher-category-label");
+  const quickRatingEl = document.getElementById("quick-rating");
 
   const categoryPicker = CategoryPicker.create("eher", "/games/eher/categories.json");
 
@@ -75,12 +76,23 @@
     if (!next) {
       statementText.textContent = "Keine Fragen in den gewählten Kategorien – bitte andere Kategorien wählen.";
       categoryLabelEl.textContent = "";
+      if (quickRatingEl) quickRatingEl.hidden = true;
       return;
     }
 
     lastShown = next;
     statementText.textContent = next.text;
     categoryLabelEl.textContent = `${next.categoryIcon || ""} ${next.categoryLabel}`.trim();
+
+    if (quickRatingEl) {
+      quickRatingEl.hidden = true;
+      GithubFeedback.renderQuickRating(quickRatingEl, {
+        gameId: "eher",
+        gameName: "Wer würde eher",
+        categoryLabel: next.categoryLabel,
+        word: next.text,
+      });
+    }
 
     // Kurzer Fade/Scale-Wechsel statt hartem Sprung.
     eherCard.classList.remove("eher-card--changing");

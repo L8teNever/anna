@@ -1015,6 +1015,48 @@ body.page-transition-out {
   width: 100%;
 }
 
+/* ---------- Runden-Ende: "Fandest du ... gut?" (siehe github-feedback.js) ---------- */
+.quick-rating {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+  background: var(--m3-surface-container);
+  border: 1px solid var(--m3-outline-variant);
+  border-radius: var(--m3-shape-md);
+  text-align: center;
+}
+
+.quick-rating[hidden] {
+  display: none;
+}
+
+.quick-rating__label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--m3-on-surface-variant);
+}
+
+.quick-rating__buttons {
+  display: flex;
+  gap: 8px;
+}
+
+/* Überschreibt die 100%-Breite, die .game-bottom-bar .m3-button normalerweise
+   erzwingt (siehe oben) - diese beiden Buttons sollen kompakt nebeneinander
+   bleiben, nicht die volle Breite ausfüllen. */
+.quick-rating__buttons .m3-button {
+  width: auto;
+}
+
+.quick-rating__thanks {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--m3-primary);
+}
+
 .game-play {
   flex: 1;
   min-height: 0;

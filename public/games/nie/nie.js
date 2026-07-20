@@ -21,6 +21,7 @@
   const nieCard = document.getElementById("nie-card");
   const statementText = document.getElementById("nie-statement-text");
   const categoryLabelEl = document.getElementById("nie-category-label");
+  const quickRatingEl = document.getElementById("quick-rating");
 
   const categoryPicker = CategoryPicker.create("nie", "/games/nie/categories.json");
 
@@ -74,12 +75,23 @@
     if (!next) {
       statementText.textContent = "Keine Aussagen in den gewählten Kategorien – bitte andere Kategorien wählen.";
       categoryLabelEl.textContent = "";
+      if (quickRatingEl) quickRatingEl.hidden = true;
       return;
     }
 
     lastShown = next;
     statementText.textContent = next.text;
     categoryLabelEl.textContent = `${next.categoryIcon || ""} ${next.categoryLabel}`.trim();
+
+    if (quickRatingEl) {
+      quickRatingEl.hidden = true;
+      GithubFeedback.renderQuickRating(quickRatingEl, {
+        gameId: "nie",
+        gameName: "Ich hab noch nie",
+        categoryLabel: next.categoryLabel,
+        word: next.text,
+      });
+    }
 
     // Kurzer Fade/Scale-Wechsel statt hartem Sprung.
     nieCard.classList.remove("nie-card--changing");

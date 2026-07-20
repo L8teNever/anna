@@ -395,6 +395,45 @@
   border-color: var(--m3-primary);
 }
 
+.m3-select {
+  width: 100%;
+  min-width: 0;
+  height: 44px;
+  padding: 0 40px 0 16px;
+  border-radius: var(--m3-shape-sm);
+  border: 2px solid var(--m3-outline-variant);
+  background-color: var(--m3-surface-container-low);
+  color: var(--m3-on-surface);
+  font-size: 0.95rem;
+  font-family: inherit;
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+  transition: border-color 0.2s var(--m3-easing-standard);
+  /* Eigener Pfeil statt Browser-Standard, passend zum Rest der Icons. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23c4c6cf' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 20px;
+}
+
+.m3-select:focus {
+  border-color: var(--m3-primary);
+}
+
+.m3-select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.m3-field-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--m3-on-surface-variant);
+  margin-bottom: 6px;
+}
+
 /* ---------- Switch (Einstellungen) ---------- */
 .m3-switch {
   position: relative;

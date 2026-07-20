@@ -37,6 +37,7 @@
   const playActions     = document.getElementById("play-actions");
   const restartButton   = document.getElementById("restart-button");
   const exitButton      = document.getElementById("exit-button");
+  const quickRatingEl   = document.getElementById("quick-rating");
 
   const openCategorySelectBtn = document.getElementById("open-category-select-button");
   const categoryBackButton    = document.getElementById("category-select-back-button");
@@ -69,6 +70,7 @@
   let roundActive    = false;
   let starterRevealOutTimeoutId  = null;
   let starterRevealDismissHandler = null;
+  let currentRoundCategory = null; // { id, label, icon, word } - für das Runden-Ende-Feedback
 
   /* ------------------------------------------------------------------ */
   /* Zünddauer aus Mitspielerzahl berechnen                               */
@@ -196,6 +198,7 @@
 
     // Kategorie ziehen und anzeigen
     const cat = pickCategory();
+    currentRoundCategory = cat;
     if (cat && activeCatBadge) {
       const promptText = cat.word || cat.label;
       activeCatText.textContent = `${cat.icon}  ${promptText}`;
@@ -240,6 +243,16 @@
     playStatus.textContent = "💥 BOOM! Die Bombe ist hochgegangen.";
     playStatus.dataset.exploded = "true";
     playActions.hidden = false;
+
+    if (quickRatingEl) quickRatingEl.hidden = true;
+    if (currentRoundCategory) {
+      GithubFeedback.renderQuickRating(quickRatingEl, {
+        gameId: "bombe",
+        gameName: "Tickende Bombe",
+        categoryLabel: currentRoundCategory.label,
+        word: currentRoundCategory.word || currentRoundCategory.label,
+      });
+    }
 
     // Screen Shake
     document.body.classList.add("shake");
