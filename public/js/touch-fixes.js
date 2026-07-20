@@ -32,14 +32,28 @@
   // meldet die tatsächliche sichtbare Fenstergröße OHNE die Tastatur.
   if (!window.visualViewport) return;
 
-  let scrollY = 0;
   let ticking = false;
+
+  // Offene Modals (z.B. die Feedback-Popups) an den Visual Viewport binden:
+  // .m3-modal ist position:fixed + inset:0 relativ zum LAYOUT-Viewport, der
+  // sich beim Öffnen der Tastatur v.a. auf iOS NICHT verkleinert (nur der
+  // Visual Viewport tut das) - ohne das hier ragt der untere Teil des
+  // Dialogs unsichtbar hinter die Tastatur. top/height kommen direkt vom
+  // Visual Viewport, .m3-modal__dialog (siehe components.css) übernimmt die
+  // neue Höhe automatisch über max-height: 100%.
+  function repositionOpenModals() {
+    document.querySelectorAll(".m3-modal:not([hidden])").forEach((modal) => {
+      modal.style.top = `${window.visualViewport.offsetTop}px`;
+      modal.style.height = `${window.visualViewport.height}px`;
+    });
+  }
 
   function onViewportChange() {
     if (ticking) return;
     ticking = true;
     requestAnimationFrame(() => {
       ticking = false;
+      repositionOpenModals();
       const focused = document.activeElement;
       if (!focused) return;
       const tag = focused.tagName.toLowerCase();

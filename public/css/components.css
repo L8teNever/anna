@@ -630,14 +630,15 @@
   position: relative;
   width: 100%;
   max-width: 400px;
-  /* dvh statt vh: passt sich der TATSÄCHLICH sichtbaren Höhe an (Handy-
-     Browserleiste/PWA-Chrome eingerechnet), sonst kann der Dialog knapp
-     über den unteren Bildschirmrand hinausragen. Safe-area-Werte hier
-     nochmal abziehen, da .m3-modal das Padding auf beiden Seiten damit
-     aufstockt (s.o.) und der Dialog sonst trotzdem zu hoch werden könnte. */
-  max-height: calc(
-    100dvh - 32px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)
-  );
+  /* 100% statt 100dvh: relativ zur Content-Box von .m3-modal (dessen
+     Padding inkl. Safe-Area damit automatisch schon abgezogen ist, da
+     Prozent-Höhen bei Flex-Items sich auf die Content-Box des Containers
+     beziehen). Bei offener Handy-Tastatur setzt touch-fixes.js top/height
+     von .m3-modal live auf window.visualViewport - dadurch schrumpft auch
+     dieser Dialog automatisch mit, statt teils hinter der Tastatur zu
+     verschwinden (v.a. iOS, wo sich der Layout-Viewport dabei NICHT
+     verkleinert). */
+  max-height: 100%;
   overflow-y: auto;
   background: var(--m3-surface);
   border: 1px solid var(--m3-outline-variant);
