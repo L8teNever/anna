@@ -19,7 +19,7 @@
   <link rel="icon" href="/assets/icons/icon-192.png" />
   <link rel="stylesheet" href="/css/material.css" />
   <link rel="stylesheet" href="/css/components.css" />
-  <link rel="stylesheet" href="/css/main.css?v=3.56.4" />
+  <link rel="stylesheet" href="/css/main.css?v=3.56.7" />
   <!-- Session-globale Scripts, siehe router.js -->
   <script src="/js/icons.js"></script>
   <script src="/js/router.js"></script>
@@ -112,36 +112,16 @@
       </section>
 
       <section class="settings-section">
-        <h2 class="m3-title">Feedback</h2>
-        <p class="settings-row__hint" style="margin: -4px 0 12px">
-          Landet als Issue direkt in unserem <a href="https://github.com/L8teNever/anna" target="_blank" rel="noopener">GitHub-Repo</a> – ohne eigene Datenbank auf diesem Server.
-        </p>
-        <p class="settings-row__hint" style="margin: -8px 0 16px; font-size: 0.85rem; display: flex; flex-wrap: wrap; gap: 12px;">
-          <span>Bestehende Einträge ansehen:</span>
-          <a href="https://github.com/L8teNever/anna/issues?q=is%3Aissue+is%3Aopen+label%3Abug" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 4px;">🐛 Bugs</a>
-          <a href="https://github.com/L8teNever/anna/issues?q=is%3Aissue+is%3Aopen+label%3Adislike" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 4px;">👎 Wort-Dislikes</a>
-          <a href="https://github.com/L8teNever/anna/issues?q=is%3Aissue+is%3Aopen+label%3Aword-suggestion" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 4px;">✨ Wort-Vorschläge</a>
+        <h2 class="m3-title">Feedback &amp; Ideen</h2>
+        <p class="settings-row__hint" style="margin: -4px 0 16px">
+          Landet direkt in unserem <a href="https://github.com/L8teNever/anna" target="_blank" rel="noopener">GitHub-Repo</a> – ohne eigene Datenbank auf diesem Server.
         </p>
         <div class="settings-row">
           <div class="settings-row__label">
-            <span class="settings-row__title">Bug melden</span>
-            <span class="settings-row__hint">Fehler oder Problem melden</span>
+            <span class="settings-row__title">Feedback &amp; Vorschläge</span>
+            <span class="settings-row__hint">Bugs melden, Wörter/Spiele bewerten oder neue Ideen vorschlagen</span>
           </div>
-          <button type="button" class="m3-button m3-button--tonal" id="feedback-bug-button">Melden</button>
-        </div>
-        <div class="settings-row">
-          <div class="settings-row__label">
-            <span class="settings-row__title">Neues Wort vorschlagen</span>
-            <span class="settings-row__hint">Wort, Frage oder Prompt für ein Spiel vorschlagen</span>
-          </div>
-          <button type="button" class="m3-button m3-button--tonal" id="feedback-suggest-button">Vorschlagen</button>
-        </div>
-        <div class="settings-row">
-          <div class="settings-row__label">
-            <span class="settings-row__title">Wort melden</span>
-            <span class="settings-row__hint">Wort/Frage, das/die nicht gefällt oder nicht passt</span>
-          </div>
-          <button type="button" class="m3-button m3-button--tonal" id="feedback-report-button">Melden</button>
+          <button type="button" class="m3-button m3-button--filled" id="feedback-unified-button">Feedback geben</button>
         </div>
       </section>
 
@@ -166,10 +146,10 @@
   <script src="/js/confirm-dialog.js"></script>
   <script src="/js/cache-tools.js"></script>
   <script src="/js/touch-fixes.js"></script>
-  <script src="/js/custom-select.js?v=3.56.4"></script>
-  <script src="/js/github-feedback.js?v=3.56.4"></script>
-  <script src="/js/feedback-modals.js?v=3.56.4"></script>
-  <script src="/js/settings.js?v=3.56.4"></script>
+  <script src="/js/custom-select.js?v=3.56.7"></script>
+  <script src="/js/github-feedback.js?v=3.56.7"></script>
+  <script src="/js/feedback-modals.js?v=3.56.7"></script>
+  <script src="/js/settings.js?v=3.56.7"></script>
   <script src="/js/privacy-banner.js"></script>
 </body>
 </html>
