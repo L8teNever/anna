@@ -55,6 +55,28 @@
   gap: 8px;
   padding-right: 4px;
   padding-bottom: 24px;
+  /* Dünner, zum Design passender Scrollbalken statt der klobigen
+     Browser-Standardleiste - fällt bei vielen Mitspielern (lange Liste)
+     sonst deutlich aus dem Rahmen. */
+  scrollbar-width: thin;
+  scrollbar-color: var(--m3-outline-variant) transparent;
+}
+
+.identity-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.identity-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.identity-list::-webkit-scrollbar-thumb {
+  background: var(--m3-outline-variant);
+  border-radius: var(--m3-shape-full);
+}
+
+.identity-list::-webkit-scrollbar-thumb:hover {
+  background: var(--m3-outline);
 }
 
 .identity-list__item {

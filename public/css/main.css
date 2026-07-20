@@ -922,7 +922,7 @@ body.page-transition-out {
   align-items: center;
   justify-content: flex-start;
   padding-top: 16px;
-  padding-bottom: 24px;
+  padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
   gap: 12px;
   max-width: 420px;
   margin: 0 auto;
@@ -938,7 +938,11 @@ body.page-transition-out {
   width: 100%;
   flex-shrink: 0;
   z-index: 10;
-  margin-top: 16px;
+  /* Schiebt den Button in .reveal-stage (flex column) ganz nach unten, wenn
+     der Inhalt darüber die Höhe nicht ausfüllt - genau dasselbe Muster wie
+     .game-bottom-bar (siehe dort). Ohne das blieb der Button direkt unter
+     der Karte hängen statt am unteren Bildschirmrand. */
+  margin-top: auto;
   background: var(--m3-primary);
   color: var(--m3-on-primary);
   box-shadow: 0 0 16px var(--m3-background);
