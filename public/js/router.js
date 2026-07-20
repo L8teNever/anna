@@ -107,12 +107,13 @@
     // Einblend-Animation gleich wieder bei opacity:0 neu startete - das war
     // das doppelte Aufflackern bei jedem Seitenwechsel.
     document.body.classList.remove("page-transition-out");
-    
-    // Die Transition-Klasse nach 600ms entfernen, damit alle verzögerten
-    // Kinder (Staggered Animation) vollständig zu Ende animieren können.
+
+    // Die Transition-Klasse entfernen, sobald alle verzögerten Kinder
+    // (Staggered Animation, siehe main.css) fertig animiert sind - längste
+    // Stagger-Verzögerung (0.16s) + Animationsdauer (0.22s) mit Puffer.
     setTimeout(() => {
       document.body.classList.remove("page-transition-in");
-    }, 600);
+    }, 420);
   }
 
   async function swapTo(url, { push = true } = {}) {
@@ -121,7 +122,7 @@
     document.body.classList.add("page-transition-out");
 
     try {
-      const [res] = await Promise.all([fetch(url), new Promise((resolve) => setTimeout(resolve, 140))]);
+      const [res] = await Promise.all([fetch(url), new Promise((resolve) => setTimeout(resolve, 100))]);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const html = await res.text();
       const newDoc = new DOMParser().parseFromString(html, "text/html");

@@ -42,6 +42,24 @@
     return parts[1] || "";
   }
 
+  // Löst dieselbe Staggered-Pop-Animation aus wie ein echter Seitenaufbau
+  // (siehe main.css, Klasse dort heißt page-transition-in) - nur über eine
+  // EIGENE body-Klasse statt page-transition-in, damit dabei NICHT
+  // zusätzlich die ganze Seite nochmal mit-refadet (das würde bei jedem
+  // Öffnen z.B. der Kategorie-Auswahl unnötig den kompletten Bildschirm
+  // kurz ausblenden statt nur den neuen View-Inhalt reinpoppen zu lassen).
+  function triggerContentPopIn() {
+    document.body.classList.remove("view-transition-in");
+    void document.body.offsetWidth; // Reflow erzwingen, damit die Animation neu startet
+    document.body.classList.add("view-transition-in");
+    // Entfernen, sobald alle verzögerten Kinder (Stagger, siehe main.css)
+    // fertig animiert sind - längste Verzögerung (0.14s) + Animationsdauer
+    // (0.22s) mit Puffer.
+    setTimeout(() => {
+      document.body.classList.remove("view-transition-in");
+    }, 400);
+  }
+
   function performTransition(fromEl, toEl) {
     if (!fromEl || !toEl || fromEl === toEl || isTransitioning) return;
     isTransitioning = true;
@@ -59,12 +77,13 @@
       toEl.hidden = false;
       toEl.classList.add("app-view--entering");
       toEl.dispatchEvent(new CustomEvent("viewshow", { bubbles: true }));
+      triggerContentPopIn();
 
       requestAnimationFrame(() => {
         toEl.classList.remove("app-view--entering");
         isTransitioning = false;
       });
-    }, 220);
+    }, 160);
   }
 
   /**
@@ -94,6 +113,7 @@
       const topbar = document.getElementById("game-topbar");
       if (topbar) topbar.hidden = toEl.hasAttribute("data-hide-topbar");
       toEl.dispatchEvent(new CustomEvent("viewshow", { bubbles: true }));
+      triggerContentPopIn();
     }
   }
 

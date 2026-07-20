@@ -49,49 +49,53 @@
 @media (prefers-reduced-motion: no-preference) {
   body:not(.router-navigated),
   body.page-transition-in {
-    animation: anna-page-enter 0.3s var(--m3-easing-standard) both;
+    animation: anna-page-enter 0.2s var(--m3-easing-standard) both;
   }
 
-  /* Staggered Pop-Up Animation für Inhaltselemente */
-  body.page-transition-in .game-card,
-  body.page-transition-in .game-detail-card,
-  body.page-transition-in .game-options-card,
-  body.page-transition-in .picker-launch-btn,
-  body.page-transition-in .settings-section,
-  body.page-transition-in .legal-content,
-  body.page-transition-in .game-bottom-bar,
-  body.page-transition-in .game-topbar,
-  body.page-transition-in .app-topbar,
-  body:not(.router-navigated) .game-card,
-  body:not(.router-navigated) .game-detail-card,
-  body:not(.router-navigated) .game-options-card,
-  body:not(.router-navigated) .picker-launch-btn,
-  body:not(.router-navigated) .settings-section,
-  body:not(.router-navigated) .legal-content,
-  body:not(.router-navigated) .game-bottom-bar,
-  body:not(.router-navigated) .game-topbar,
-  body:not(.router-navigated) .app-topbar {
-    animation: anna-element-pop 0.35s var(--m3-easing-emphasized) both;
+  /* Staggered Pop-Up Animation für Inhaltselemente - läuft bei jedem echten
+     Seitenaufbau/-wechsel (page-transition-in / :not(.router-navigated))
+     UND jetzt auch bei In-Page-Ansichtswechseln innerhalb eines Spiels
+     (view-transition-in, siehe view-nav.js) - z.B. beim Öffnen der
+     Kategorie-/Mitspieler-Auswahl, nicht mehr nur beim ersten Laden der
+     Seite. :is() bündelt die drei body-Auslöser, statt jede Zeile dreifach
+     auszuschreiben. */
+  body:is(.page-transition-in, .view-transition-in, :not(.router-navigated)) :is(
+    .game-card,
+    .game-detail-card,
+    .game-options-card,
+    .picker-launch-btn,
+    .settings-section,
+    .legal-content,
+    .game-bottom-bar,
+    .game-topbar,
+    .app-topbar,
+    .picker-view-header,
+    #categories-pool,
+    .picker-search-create,
+    .picker-list-toolbar,
+    .player-picker__list
+  ) {
+    animation: anna-element-pop 0.22s var(--m3-easing-emphasized) both;
   }
 
   /* Stagger-Verzögerungen für Karten (Startseite) */
-  body.page-transition-in .game-grid > *:nth-child(1), body:not(.router-navigated) .game-grid > *:nth-child(1) { animation-delay: 0.02s; }
-  body.page-transition-in .game-grid > *:nth-child(2), body:not(.router-navigated) .game-grid > *:nth-child(2) { animation-delay: 0.05s; }
-  body.page-transition-in .game-grid > *:nth-child(3), body:not(.router-navigated) .game-grid > *:nth-child(3) { animation-delay: 0.08s; }
-  body.page-transition-in .game-grid > *:nth-child(4), body:not(.router-navigated) .game-grid > *:nth-child(4) { animation-delay: 0.11s; }
-  body.page-transition-in .game-grid > *:nth-child(5), body:not(.router-navigated) .game-grid > *:nth-child(5) { animation-delay: 0.14s; }
-  body.page-transition-in .game-grid > *:nth-child(6), body:not(.router-navigated) .game-grid > *:nth-child(6) { animation-delay: 0.17s; }
-  body.page-transition-in .game-grid > *:nth-child(7), body:not(.router-navigated) .game-grid > *:nth-child(7) { animation-delay: 0.20s; }
-  body.page-transition-in .game-grid > *:nth-child(8), body:not(.router-navigated) .game-grid > *:nth-child(8) { animation-delay: 0.23s; }
-  body.page-transition-in .game-grid > *:nth-child(n+9), body:not(.router-navigated) .game-grid > *:nth-child(n+9) { animation-delay: 0.26s; }
+  body:is(.page-transition-in, .view-transition-in, :not(.router-navigated)) .game-grid > *:nth-child(1) { animation-delay: 0.01s; }
+  body:is(.page-transition-in, .view-transition-in, :not(.router-navigated)) .game-grid > *:nth-child(2) { animation-delay: 0.03s; }
+  body:is(.page-transition-in, .view-transition-in, :not(.router-navigated)) .game-grid > *:nth-child(3) { animation-delay: 0.05s; }
+  body:is(.page-transition-in, .view-transition-in, :not(.router-navigated)) .game-grid > *:nth-child(4) { animation-delay: 0.07s; }
+  body:is(.page-transition-in, .view-transition-in, :not(.router-navigated)) .game-grid > *:nth-child(5) { animation-delay: 0.09s; }
+  body:is(.page-transition-in, .view-transition-in, :not(.router-navigated)) .game-grid > *:nth-child(6) { animation-delay: 0.10s; }
+  body:is(.page-transition-in, .view-transition-in, :not(.router-navigated)) .game-grid > *:nth-child(7) { animation-delay: 0.12s; }
+  body:is(.page-transition-in, .view-transition-in, :not(.router-navigated)) .game-grid > *:nth-child(8) { animation-delay: 0.14s; }
+  body:is(.page-transition-in, .view-transition-in, :not(.router-navigated)) .game-grid > *:nth-child(n+9) { animation-delay: 0.16s; }
 
   /* Stagger-Verzögerungen für Ansichten (Spiele & Einstellungen) */
-  body.page-transition-in .game-view > *:nth-child(1), body:not(.router-navigated) .game-view > *:nth-child(1) { animation-delay: 0.03s; }
-  body.page-transition-in .game-view > *:nth-child(2), body:not(.router-navigated) .game-view > *:nth-child(2) { animation-delay: 0.07s; }
-  body.page-transition-in .game-view > *:nth-child(3), body:not(.router-navigated) .game-view > *:nth-child(3) { animation-delay: 0.11s; }
-  body.page-transition-in .game-view > *:nth-child(4), body:not(.router-navigated) .game-view > *:nth-child(4) { animation-delay: 0.15s; }
-  body.page-transition-in .game-view > *:nth-child(5), body:not(.router-navigated) .game-view > *:nth-child(5) { animation-delay: 0.19s; }
-  body.page-transition-in .game-view > *:nth-child(n+6), body:not(.router-navigated) .game-view > *:nth-child(n+6) { animation-delay: 0.23s; }
+  body:is(.page-transition-in, .view-transition-in, :not(.router-navigated)) .game-view > *:nth-child(1) { animation-delay: 0.02s; }
+  body:is(.page-transition-in, .view-transition-in, :not(.router-navigated)) .game-view > *:nth-child(2) { animation-delay: 0.04s; }
+  body:is(.page-transition-in, .view-transition-in, :not(.router-navigated)) .game-view > *:nth-child(3) { animation-delay: 0.07s; }
+  body:is(.page-transition-in, .view-transition-in, :not(.router-navigated)) .game-view > *:nth-child(4) { animation-delay: 0.09s; }
+  body:is(.page-transition-in, .view-transition-in, :not(.router-navigated)) .game-view > *:nth-child(5) { animation-delay: 0.11s; }
+  body:is(.page-transition-in, .view-transition-in, :not(.router-navigated)) .game-view > *:nth-child(n+6) { animation-delay: 0.14s; }
 }
 
 @keyframes anna-page-enter {
@@ -113,12 +117,12 @@
 /* Von router.js gesetzt, kurz bevor eine Navigation tatsächlich losgeht */
 body.page-transition-out {
   opacity: 0;
-  transition: opacity 0.14s var(--m3-easing-standard);
+  transition: opacity 0.1s var(--m3-easing-standard);
 }
 
 /* ---------- Generischer View-Wechsel (view-nav.js) ---------- */
 .app-view {
-  transition: opacity 0.22s var(--m3-easing-standard), transform 0.22s var(--m3-easing-standard);
+  transition: opacity 0.16s var(--m3-easing-standard), transform 0.16s var(--m3-easing-standard);
   opacity: 1;
   transform: translateX(0);
 }
