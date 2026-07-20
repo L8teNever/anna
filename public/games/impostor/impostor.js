@@ -46,6 +46,8 @@
   const revealCardBack = document.getElementById("reveal-card-back");
   const revealRole = document.getElementById("reveal-role");
   const revealWord = document.getElementById("reveal-word");
+  const revealExplainButton = document.getElementById("reveal-explain-button");
+  const revealDescription = document.getElementById("reveal-description");
   const revealNextButton = document.getElementById("reveal-next-button");
 
   const restartButton = document.getElementById("restart-button");
@@ -171,6 +173,8 @@
   let roundPlayers = [];
   let impostorIndices = new Set();
   let secretWord = "";
+  let secretHint = null;
+  let secretDescription = null;
   let hintCategoryLabel = null;
   let currentRevealIndex = 0;
 
@@ -222,20 +226,22 @@
     return copy;
   }
 
+  // Eingebaute Kategorien (categories.json) liefern Wort-Objekte mit einem
+  // pro Wort handverlesenen Hilfewort ({ word, hint, description? }) -
+  // selbst angelegte Kategorien (siehe category-picker.js) speichern
+  // dagegen nur schlichte Text-Strings, weil deren Erstellungsdialog kein
+  // Hilfewort abfragt. Diese Funktion gleicht beide Formen an.
+  function normalizeWordEntry(entry) {
+    if (typeof entry === "string") return { word: entry, hint: null, description: null };
+    return { word: entry.word, hint: entry.hint || null, description: entry.description || null };
+  }
+
   function pickRoundWord() {
     const active = categoryPicker.getSelectedCategories().filter((c) => Array.isArray(c.words) && c.words.length);
-    if (!active.length) return { word: null, categoryLabel: null };
+    if (!active.length) return { word: null, hint: null, description: null, categoryLabel: null };
     const category = active[Math.floor(Math.random() * active.length)];
-    const words = category.words;
-    const word = words[Math.floor(Math.random() * words.length)];
-    // Hilfewort für den Impostor: statt (wie früher) irgendein zufälliges
-    // ANDERES Wort derselben Kategorie zu zeigen - das kann je nach Kategorie
-    // völlig unpassend sein (z.B. Wort "Konsole", Hilfewort "TikTok") - zeigt
-    // der Hinweis jetzt einfach den Kategorienamen selbst. Der hilft IMMER
-    // ein bisschen beim Bluffen (grobe Richtung, ohne das genaue Wort zu
-    // verraten), unabhängig davon, wie thematisch eng die einzelnen Wörter
-    // einer Kategorie zueinander passen.
-    return { word, categoryLabel: category.label };
+    const entry = normalizeWordEntry(category.words[Math.floor(Math.random() * category.words.length)]);
+    return { word: entry.word, hint: entry.hint, description: entry.description, categoryLabel: category.label };
   }
 
   function showRevealForCurrentPlayer() {
@@ -252,9 +258,18 @@
     revealRole.classList.toggle("reveal-card__role--impostor", isImpostor);
     if (isImpostor) {
       revealRole.textContent = "Du bist der Impostor!";
-      revealWord.textContent = hintCategoryLabel
-        ? `Hinweis: Kategorie „${hintCategoryLabel}“`
-        : "Kein Wort – hör gut zu und bluffe mit!";
+      if (!hintWordToggle.checked) {
+        revealWord.textContent = "Kein Wort – hör gut zu und bluffe mit!";
+      } else if (secretHint) {
+        // Handverlesenes Hilfewort aus categories.json - passt zum Wort,
+        // ohne es direkt zu verraten (siehe normalizeWordEntry()).
+        revealWord.textContent = `Hinweis: ${secretHint}`;
+      } else {
+        // Fallback für selbst angelegte Kategorien ohne Hilfewort pro Wort.
+        revealWord.textContent = hintCategoryLabel
+          ? `Hinweis: Kategorie „${hintCategoryLabel}“`
+          : "Kein Wort – hör gut zu und bluffe mit!";
+      }
     } else {
       revealRole.textContent = "Dein Wort:";
       revealWord.textContent = secretWord;
@@ -263,6 +278,9 @@
     revealCardBack.hidden = false;
     revealCardFront.hidden = false;
     revealNextButton.hidden = true;
+    revealExplainButton.hidden = true;
+    revealDescription.hidden = true;
+    revealDescription.textContent = "";
     delete revealCard.dataset.peeked;
     const hint = document.getElementById("reveal-card-hint");
     if (hint) hint.innerHTML = "Gedrückt halten,<br/>um dein Wort zu sehen";
@@ -283,13 +301,29 @@
 
   function hideCurrentPlayer(finished) {
     revealCard.classList.remove("reveal-card--revealed", "reveal-card--impostor");
-    
+
     if (finished || revealCard.dataset.peeked) {
       revealNextButton.hidden = false;
       const hint = document.getElementById("reveal-card-hint");
       if (hint) hint.innerHTML = "Erneut ansehen<br/>(gedrückt halten)";
+
+      // Nur für Wort-Halter (nicht den Impostor) und nur, wenn der Begriff
+      // tatsächlich eine Erklärung hat (z.B. unbekannte Spicy-Begriffe).
+      const isImpostor = impostorIndices.has(currentRevealIndex);
+      revealExplainButton.hidden = isImpostor || !secretDescription;
     }
   }
+
+  revealExplainButton.addEventListener("click", () => {
+    // Nur die Sichtbarkeit umschalten, NICHT .textContent des Buttons
+    // setzen - das würde das darin enthaltene SVG-Icon mit löschen.
+    if (revealDescription.hidden) {
+      revealDescription.textContent = secretDescription || "";
+      revealDescription.hidden = false;
+    } else {
+      revealDescription.hidden = true;
+    }
+  });
 
   setupHoldReveal(revealCard, peekCurrentPlayer, hideCurrentPlayer);
 
@@ -304,9 +338,11 @@
 
   function beginRound() {
     roundPlayers = shuffle(playerPicker.getSelectedNames());
-    const { word, categoryLabel } = pickRoundWord();
+    const { word, hint, description, categoryLabel } = pickRoundWord();
     secretWord = word || "…";
-    hintCategoryLabel = hintWordToggle.checked ? categoryLabel : null;
+    secretHint = hint;
+    secretDescription = description;
+    hintCategoryLabel = categoryLabel;
     playerRevealAvatars = {};
     avatarSeedOffset = Math.floor(Math.random() * revealAvatars.length);
 

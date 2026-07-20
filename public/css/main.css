@@ -1199,6 +1199,17 @@ body.page-transition-out {
   line-height: 1.2;
 }
 
+/* Erklärtext für unbekannte Begriffe (z.B. bei Spicy-Kategorien) - nur
+   sichtbar, wenn "Was bedeutet das?" angetippt wurde, siehe impostor.js. */
+.reveal-card__description {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--m3-on-surface-variant);
+  text-align: center;
+  max-width: 320px;
+  margin: -8px auto 0;
+}
+
 /* ---------- Mitspieler-/Kategorie-Auswahl (Vollbild-Ansicht) ---------- */
 .picker-view-header {
   display: flex;
