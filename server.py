@@ -111,9 +111,6 @@ def resolve_route(raw_path: str) -> str | None:
     if path == "rechtliches":
         return "rechtliches/index.html"
 
-    if path == "feedback":
-        return "feedback/index.html"
-
     # Bereits vorhandene Dateien (css/js/json/png/...) unverändert lassen.
     if "." in path.rsplit("/", 1)[-1]:
         return None

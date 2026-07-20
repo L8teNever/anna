@@ -79,7 +79,7 @@
 // String mit hochgezählt werden (parallel zu version.js, das weiterhin die
 // in den Einstellungen angezeigte Versionsnummer liefert), sonst bleibt
 // sw.js byte-identisch und das gesamte Update-System bleibt wirkungslos.
-const APP_VERSION = "3.54.0";
+const APP_VERSION = "3.55.0";
 const CACHE_NAME = `anna-cache-${APP_VERSION}`;
 
 // Versionsunabhängige Marker: NICHT umbenennen und NICHT in CACHE_NAME
@@ -101,7 +101,6 @@ const CORE_ASSETS = [
   "/",
   "/settings",
   "/rechtliches",
-  "/feedback",
   "/manifest.json",
   "/css/material.css",
   "/css/components.css",
@@ -123,7 +122,8 @@ const CORE_ASSETS = [
   "/js/pwa-install.js",
   "/js/pwa-install-banner.js",
   "/js/github-feedback.js",
-  "/js/feedback-page.js",
+  "/js/feedback-modals.js",
+  "/js/custom-select.js",
   "/js/ripple.js",
   "/js/toast.js",
   "/js/view-nav.js",

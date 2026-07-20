@@ -113,13 +113,30 @@
 
       <section class="settings-section">
         <h2 class="m3-title">Feedback</h2>
-        <a href="/feedback" class="settings-row" style="text-decoration: none; color: inherit; cursor: pointer">
+        <p class="settings-row__hint" style="margin: -4px 0 12px">
+          Landet als Issue direkt in unserem <a href="https://github.com/L8teNever/anna" target="_blank" rel="noopener">GitHub-Repo</a> – ohne eigene Datenbank auf diesem Server.
+        </p>
+        <div class="settings-row">
           <div class="settings-row__label">
-            <span class="settings-row__title">Bug melden oder Vorschlag machen</span>
-            <span class="settings-row__hint">Fehler melden, neue Wörter vorschlagen oder Wörter melden – über GitHub</span>
+            <span class="settings-row__title">Bug melden</span>
+            <span class="settings-row__hint">Fehler oder Problem melden</span>
           </div>
-          <svg class="m3-icon" style="width: 18px; height: 18px; color: var(--m3-on-surface-variant)"><use href="#icon-arrow-up-right"></use></svg>
-        </a>
+          <button type="button" class="m3-button m3-button--tonal" id="feedback-bug-button">Melden</button>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row__label">
+            <span class="settings-row__title">Neues Wort vorschlagen</span>
+            <span class="settings-row__hint">Wort, Frage oder Prompt für ein Spiel vorschlagen</span>
+          </div>
+          <button type="button" class="m3-button m3-button--tonal" id="feedback-suggest-button">Vorschlagen</button>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row__label">
+            <span class="settings-row__title">Wort melden</span>
+            <span class="settings-row__hint">Wort/Frage, das/die nicht gefällt oder nicht passt</span>
+          </div>
+          <button type="button" class="m3-button m3-button--tonal" id="feedback-report-button">Melden</button>
+        </div>
       </section>
 
       <section class="settings-section">
@@ -137,11 +154,15 @@
 
   <script src="/js/version.js"></script>
   <script src="/js/storage.js"></script>
+  <script src="/js/game-registry.js"></script>
   <script src="/js/toast.js"></script>
   <script src="/js/ripple.js"></script>
   <script src="/js/confirm-dialog.js"></script>
   <script src="/js/cache-tools.js"></script>
   <script src="/js/touch-fixes.js"></script>
+  <script src="/js/custom-select.js"></script>
+  <script src="/js/github-feedback.js"></script>
+  <script src="/js/feedback-modals.js"></script>
   <script src="/js/settings.js"></script>
   <script src="/js/privacy-banner.js"></script>
 </body>

@@ -55,7 +55,7 @@
    * Impostor, Ich hab noch nie, Wer würde eher, Wer bin ich?). Ein Klick
    * öffnet sofort das passend vorausgefüllte Issue, kein Zwischenschritt -
    * bewusst niedrigschwellig, für ausführlicheres Feedback mit Begründung
-   * gibt es die /feedback-Seite.
+   * gibt es die Feedback-Popups in den Einstellungen (siehe feedback-modals.js).
    *
    * WICHTIG: das Wort selbst steht bewusst NICHT im sichtbaren Label, nur
    * im Hintergrund im generierten Issue - bei Impostor wird die
