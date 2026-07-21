@@ -5,9 +5,11 @@
  * ausgewählt. Über die Einstellungen (oben rechts) lässt sich der Modus
  * wechseln: Gewinner oder Teams, jeweils mit einstellbarer Anzahl.
  *
- * Sobald nach der Auswahl alle Finger vom Bildschirm genommen wurden,
- * setzt sich der Chooser nach AUTO_RESET_DELAY_MS von selbst zurück - kein
- * manueller "Nochmal"-Button nötig.
+ * Sobald ausgewählt wurde, läuft der Reset danach IMMER nach
+ * AUTO_RESET_DELAY_MS von selbst - unabhängig davon, ob noch Finger auf
+ * dem Bildschirm liegen (sonst könnte das Spiel ewig hängen bleiben, falls
+ * jemand seinen Finger einfach liegen lässt). Kein manueller
+ * "Nochmal"-Button nötig.
  */
 (function () {
   const MIN_FINGERS = 2;
@@ -35,9 +37,8 @@
     { solid: "#78909c", fill: "rgba(120, 144, 156, 0.28)" },
   ];
 
-  // Nach der Auswahl wartet der Chooser, bis WIRKLICH alle Finger vom
-  // Bildschirm genommen wurden, und setzt dann von selbst zurück - kein
-  // manueller "Nochmal"-Button mehr nötig.
+  // Läuft immer exakt so lange nach der Auswahl, egal ob noch Finger
+  // liegen - kein manueller "Nochmal"-Button mehr nötig.
   const AUTO_RESET_DELAY_MS = 3000;
 
   const backButton = document.getElementById("back-button");
@@ -178,10 +179,10 @@
     Sound.success();
     if (Storage.getSettings().vibrationEnabled && navigator.vibrate) navigator.vibrate([40, 40, 120]);
 
-    // Fingerabdrücke bleiben sichtbar, bis die zugehörigen Finger
-    // tatsächlich abgehoben werden (siehe onTouchEnd) - erst wenn ALLE weg
-    // sind, startet der Auto-Reset-Countdown.
-    if (activeTouches.size === 0) scheduleAutoReset();
+    // Countdown startet sofort, unabhängig davon, ob noch Finger liegen -
+    // sonst bliebe der Chooser hängen, falls jemand seinen Finger einfach
+    // nicht abhebt.
+    scheduleAutoReset();
   }
 
   function reset() {
@@ -222,18 +223,11 @@
 
   function onTouchEnd(event) {
     event.preventDefault();
-    if (selecting) return; // mitten im (kurzen) Auswahl-Moment nichts anfassen
-
-    if (selected) {
-      // Ergebnis bleibt sichtbar (Sieger/Team-Farbe), auch wenn der Finger
-      // schon abgehoben wurde - nur aus der Tracking-Map nehmen, damit wir
-      // wissen, wann WIRKLICH alle weg sind.
-      Array.from(event.changedTouches).forEach((touch) => {
-        activeTouches.delete(touch.identifier);
-      });
-      if (activeTouches.size === 0) scheduleAutoReset();
-      return;
-    }
+    // Nach der Auswahl läuft der Reset-Countdown bereits unabhängig vom
+    // Fingerstatus (siehe finishSelection()) - hier während "selecting"
+    // oder "selected" nichts mehr anfassen, das Ergebnis bleibt einfach
+    // sichtbar stehen, bis der Countdown von selbst abläuft.
+    if (selecting || selected) return;
 
     Array.from(event.changedTouches).forEach((touch) => {
       const entry = activeTouches.get(touch.identifier);
