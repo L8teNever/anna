@@ -279,6 +279,7 @@
 
       combinedInput.addEventListener("keypress", (event) => {
         if (event.key !== "Enter") return;
+        event.preventDefault();
         const trimmed = combinedInput.value.trim();
         const existsExactly = roster.some((existing) => existing.toLowerCase() === trimmed.toLowerCase());
         if (trimmed && !existsExactly) {
@@ -287,6 +288,11 @@
           searchQuery = "";
           updateInlineAddVisibility();
           render();
+          // Fokus bewusst im Feld halten (nicht nur Wert leeren) - beim
+          // Eintippen mehrerer Namen hintereinander muss man so nicht nach
+          // jedem Namen extra wieder reinklicken/-tippen, Tastatur bleibt
+          // auf dem Handy direkt offen für den nächsten Namen.
+          combinedInput.focus();
         }
       });
     }
@@ -298,6 +304,7 @@
         searchQuery = "";
         updateInlineAddVisibility();
         render();
+        combinedInput.focus();
       });
     }
 
