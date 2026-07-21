@@ -49,6 +49,7 @@ mimetypes.add_type("application/manifest+json", ".webmanifest")
 mimetypes.add_type("application/json", ".json")
 mimetypes.add_type("text/javascript", ".js")
 mimetypes.add_type("font/woff2", ".woff2")
+mimetypes.add_type("image/webp", ".webp")
 
 # Einfaches In-Memory-Rate-Limiting pro IP für ALLE /api/-GET-Endpunkte
 # (banners, reveal-avatars, und automatisch auch künftige) - dieselbe
