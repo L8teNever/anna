@@ -1,0 +1,38 @@
+/**
+ * Styles für den Reaktionsspiele-Hub selbst (Kachel-Liste + Bühne für das
+ * jeweils aktive Untergame). Styles der einzelnen Untergames (Reflextest,
+ * Zeitgefühl, ...) liegen bewusst in eigenen CSS-Dateien (reflex.css,
+ * stopuhr.css), damit ein neues Untergame diese Datei hier nie anfassen
+ * muss.
+ */
+
+.reaktion-hub-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reaktion-subgame-stage {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 24px 20px;
+  box-sizing: border-box;
+  background: var(--m3-surface-container);
+  border: 1px solid var(--m3-outline-variant);
+  border-radius: var(--m3-shape-xl);
+}
+
+/* Generischer Textbaustein, den jedes Untergame verwenden kann (Bestzeit-
+   Zeile) - bleibt hier statt in einer einzelnen Untergame-CSS-Datei, damit
+   kein Untergame heimlich von einem anderen mitgeladen werden muss, nur um
+   diese Klasse zu bekommen. */
+.reaktion-scoreline {
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--m3-on-surface-variant);
+  margin: 0 0 20px 0;
+}

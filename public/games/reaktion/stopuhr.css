@@ -1,0 +1,52 @@
+/**
+ * Styles für das Zeitgefühl-Untergame (siehe stopuhr.js).
+ */
+
+.su-stage {
+  width: 100%;
+  aspect-ratio: 1.3;
+  border-radius: var(--m3-shape-xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  box-sizing: border-box;
+  padding: 20px;
+  background: var(--m3-surface-container-high);
+  border: 1px solid var(--m3-outline-variant);
+  transition: background-color 0.2s var(--m3-easing-standard), border-color 0.2s var(--m3-easing-standard);
+}
+
+.su-stage__icon {
+  width: 48px;
+  height: 48px;
+  color: var(--m3-primary);
+}
+
+.su-stage--running .su-stage__icon {
+  animation: su-pulse 1s ease-in-out infinite;
+}
+
+@keyframes su-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.15); opacity: 0.55; }
+}
+
+.su-stage__text {
+  font-family: var(--m3-font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--m3-on-surface);
+  text-align: center;
+  margin: 0;
+}
+
+.su-stage--close {
+  background: var(--m3-primary-container);
+  border-color: var(--m3-primary);
+}
+
+.su-stage--close .su-stage__icon {
+  color: var(--m3-primary);
+}
