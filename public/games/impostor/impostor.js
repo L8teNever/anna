@@ -347,7 +347,13 @@
   });
 
   function beginRound() {
-    roundPlayers = shuffle(playerPicker.getSelectedNames());
+    // Bewusst NICHT gemischt: die Weitergabe-Reihenfolge richtet sich nach
+    // der vom Spielerpicker vorgegebenen Reihenfolge (siehe player-picker.js
+    // - Spieler lassen sich dort per Ziehen anordnen), damit das Gerät in
+    // einer vorhersehbaren, real am Tisch nachvollziehbaren Reihenfolge
+    // weitergereicht wird. Wer heimlich der Impostor ist, bleibt trotzdem
+    // zufällig (siehe shuffledIdx unten).
+    roundPlayers = playerPicker.getSelectedNames();
     const { word, hint, description, categoryLabel } = pickRoundWord();
     secretWord = word || "…";
     secretHint = hint;

@@ -83,6 +83,82 @@
       return roster.filter((name) => name.toLowerCase().includes(query));
     }
 
+    /* ------------------------------------------------------------------ */
+    /* Reihenfolge per Ziehen ändern (Griff links an jeder Zeile).           */
+    /* Wichtig für Spiele, die das Gerät reihum weitergeben (z.B. Impostor,  */
+    /* Wer ist näher dran?) - wer oben steht, ist zuerst dran, siehe          */
+    /* getSelectedNames() unten (filtert `roster` in genau dieser            */
+    /* Reihenfolge). Für andere Spiele ist die Reihenfolge irrelevant, die   */
+    /* Funktion stört dort also nicht, wird nur nie ausgewertet.             */
+    /* ------------------------------------------------------------------ */
+    let dragState = null;
+
+    function reorderingAllowed() {
+      // Während einer Suche ist nur eine gefilterte Teilmenge sichtbar -
+      // Ziehen wäre dort nicht eindeutig einer Position im Gesamt-Roster
+      // zuordenbar, deshalb bewusst deaktiviert (siehe
+      // player-picker__list--searching in components.css).
+      return !searchQuery.trim();
+    }
+
+    function startDrag(event, rowEl) {
+      if (!reorderingAllowed()) return;
+      event.preventDefault();
+      const rect = rowEl.getBoundingClientRect();
+      dragState = {
+        rowEl,
+        startClientY: event.clientY,
+        // +6px: der Row-Gap aus .player-picker__list, damit ein "ganzer
+        // Schritt" exakt einer Nachbarposition entspricht.
+        rowHeight: rect.height + 6,
+      };
+      rowEl.classList.add("player-row--dragging");
+      document.addEventListener("pointermove", onDragMove);
+      document.addEventListener("pointerup", endDrag);
+      document.addEventListener("pointercancel", endDrag);
+    }
+
+    function onDragMove(event) {
+      if (!dragState) return;
+      const { rowEl, rowHeight } = dragState;
+      const deltaY = event.clientY - dragState.startClientY;
+      rowEl.style.transform = `translateY(${deltaY}px)`;
+
+      const rows = Array.from(listEl.querySelectorAll(".player-row"));
+      const currentIndex = rows.indexOf(rowEl);
+      const step = Math.round(deltaY / rowHeight);
+      if (step === 0) return;
+
+      const targetIndex = Math.max(0, Math.min(rows.length - 1, currentIndex + step));
+      if (targetIndex === currentIndex) return;
+
+      // Zeile physisch an die neue Position verschieben (statt komplett neu
+      // zu rendern) - so bleibt die dragState.rowEl-Referenz und damit der
+      // laufende Zieh-Vorgang gültig. Die Ziel-Verschiebung, die dadurch
+      // schon "verbraucht" wurde, wird von startClientY abgezogen, damit
+      // der Finger visuell nahtlos an der Zeile bleibt statt zu springen.
+      const referenceNode = step > 0 ? rows[targetIndex].nextElementSibling : rows[targetIndex];
+      listEl.insertBefore(rowEl, referenceNode);
+      dragState.startClientY += step * rowHeight;
+      rowEl.style.transform = `translateY(${deltaY - step * rowHeight}px)`;
+    }
+
+    function endDrag() {
+      if (!dragState) return;
+      const { rowEl } = dragState;
+      rowEl.classList.remove("player-row--dragging");
+      rowEl.style.transform = "";
+      document.removeEventListener("pointermove", onDragMove);
+      document.removeEventListener("pointerup", endDrag);
+      document.removeEventListener("pointercancel", endDrag);
+      dragState = null;
+
+      const newOrder = Array.from(listEl.querySelectorAll(".player-row")).map((el) => el.dataset.name);
+      roster = newOrder;
+      Storage.setRoster(roster);
+      if (changeCallback) changeCallback(getSelectedNames());
+    }
+
     function render() {
       if (!listEl) return;
 
@@ -99,11 +175,16 @@
         return;
       }
 
+      listEl.classList.toggle("player-picker__list--searching", Boolean(searchQuery.trim()));
+
       listEl.innerHTML = visible
         .map((name) => {
           const checked = selected.has(name) ? "checked" : "";
           return `
             <div class="player-row" data-name="${escapeHtml(name)}">
+              <button type="button" class="player-row__drag-handle" data-drag-handle tabindex="-1" aria-label="${escapeHtml(name)} ziehen zum Sortieren (Reihenfolge = Spielreihenfolge)">
+                <svg class="m3-icon"><use href="#icon-drag-handle"></use></svg>
+              </button>
               <label class="player-row__main">
                 <input type="checkbox" class="player-row__checkbox" ${checked} />
                 <span class="player-row__name">${escapeHtml(name)}</span>
@@ -236,6 +317,13 @@
         const name = button.closest(".player-row").dataset.name;
         if (button.dataset.action === "rename") openRename(name);
         else if (button.dataset.action === "delete") deletePlayer(name);
+      });
+
+      listEl.addEventListener("pointerdown", (event) => {
+        const handle = event.target.closest("[data-drag-handle]");
+        if (!handle) return;
+        const rowEl = handle.closest(".player-row");
+        if (rowEl) startDrag(event, rowEl);
       });
     }
 

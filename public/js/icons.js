@@ -107,6 +107,14 @@
       <path d="M7 5H5a2 2 0 0 0 0 4h2"/><path d="M17 5h2a2 2 0 0 1 0 4h-2"/>
       <path d="M12 13v4"/><path d="M8 21h8"/>
     </symbol>
+    <symbol id="icon-drag-handle" viewBox="0 0 24 24">
+      <circle cx="9" cy="6" r="1.5" fill="currentColor" stroke="none"/>
+      <circle cx="9" cy="12" r="1.5" fill="currentColor" stroke="none"/>
+      <circle cx="9" cy="18" r="1.5" fill="currentColor" stroke="none"/>
+      <circle cx="15" cy="6" r="1.5" fill="currentColor" stroke="none"/>
+      <circle cx="15" cy="12" r="1.5" fill="currentColor" stroke="none"/>
+      <circle cx="15" cy="18" r="1.5" fill="currentColor" stroke="none"/>
+    </symbol>
     <symbol id="icon-drink" viewBox="0 0 24 24">
       <path d="M4 4h16l-8 10z"/>
       <line x1="12" y1="14" x2="12" y2="20"/>
