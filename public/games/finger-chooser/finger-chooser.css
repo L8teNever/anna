@@ -50,10 +50,10 @@
 
 .fc-dot {
   position: absolute;
-  width: 64px;
-  height: 64px;
-  margin-left: -32px;
-  margin-top: -32px;
+  width: 92px;
+  height: 92px;
+  margin-left: -46px;
+  margin-top: -46px;
   border-radius: 50%;
   background: var(--game-cyan-container);
   border: 3px solid var(--game-cyan);

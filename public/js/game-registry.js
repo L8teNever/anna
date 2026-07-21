@@ -33,6 +33,10 @@
       color: "cyan",
       minPlayers: 2,
       maxPlayers: 10,
+      // Braucht echtes Multi-Touch (mehrere gleichzeitige Finger) - auf
+      // einem reinen Maus-Gerät ohne Touch-Unterstützung ergibt die Kachel
+      // keinen Sinn und wird in app.js komplett ausgeblendet.
+      requiresTouch: true,
       assets: ["/games/finger-chooser/finger-chooser.js", "/games/finger-chooser/finger-chooser.css"],
     },
     {

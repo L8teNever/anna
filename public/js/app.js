@@ -75,6 +75,14 @@
     return typeof navigator !== "undefined" && navigator.onLine === false;
   }
 
+  // Für Spiele wie den Finger-Chooser, die echtes Multi-Touch brauchen -
+  // auf einem reinen Maus-Gerät ("mehr als eine Maus" gibt's nicht) macht
+  // die Kachel keinen Sinn und wird komplett ausgeblendet statt nur
+  // ausgegraut (anders als requiresOnline, das bewusst sichtbar bleibt).
+  function isTouchDevice() {
+    return typeof window !== "undefined" && ("ontouchstart" in window || (navigator.maxTouchPoints || 0) > 0);
+  }
+
   function renderGames(filterText) {
     const query = (filterText || "").trim().toLowerCase();
     const favorites = Storage.getFavorites();
@@ -85,6 +93,7 @@
       }
       if (showOnlyFavorites && !favorites.includes(game.id)) return false;
       if (!matchesPlayerFilter(game)) return false;
+      if (game.requiresTouch && !isTouchDevice()) return false;
       return true;
     });
 
