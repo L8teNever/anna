@@ -151,24 +151,9 @@
 
     <!-- ---------- Spiel-Ansicht ---------- -->
     <section class="game-view app-view" id="play-view" hidden>
-      <div class="naeher-play-container">
-        
-        <!-- STATE 1: BEREIT / PASS & PLAY SCREEN -->
-        <div class="naeher-state-card" id="play-state-ready">
-          <div class="naeher-icon-badge">
-            <svg class="m3-icon"><use href="#icon-users"></use></svg>
-          </div>
-          <h2 class="naeher-state-title">Gib das Gerät weiter!</h2>
-          <p class="naeher-state-desc">
-            Reiche das Gerät an <strong id="next-player-name" class="naeher-highlight-name">...</strong> weiter.<br/>
-            Schau nicht auf den Bildschirm, bis du an der Reihe bist!
-          </p>
-          <button type="button" class="m3-button m3-button--filled" id="btn-start-guess" style="width: 100%">
-            Schätzung starten
-          </button>
-        </div>
+      <div class="naeher-play-container" id="naeher-stage">
 
-        <!-- STATE 2: SCHÄTZ-INPUT SCREEN -->
+        <!-- STATE: SCHÄTZ-INPUT SCREEN -->
         <div class="naeher-state-card" id="play-state-input" hidden>
           <div class="naeher-question-card">
             <p class="naeher-question-hint">Schätzfrage:</p>
@@ -177,7 +162,7 @@
 
           <div class="naeher-input-area">
             <p class="naeher-input-label">Deine Schätzung, <span id="input-player-name" class="naeher-highlight-name">...</span>:</p>
-            
+
             <div class="naeher-value-display-wrapper">
               <span id="guess-value-display" class="naeher-value-display">150</span>
               <span id="guess-unit-display" class="naeher-unit-display">Meter</span>
@@ -205,7 +190,7 @@
           </button>
         </div>
 
-        <!-- STATE 3: AUFLÖSUNG / REVEAL SCREEN -->
+        <!-- STATE: AUFLÖSUNG / REVEAL SCREEN -->
         <div class="naeher-state-card" id="play-state-reveal" hidden>
           <div class="naeher-question-card">
             <h3 class="naeher-question-text" id="reveal-question-text">Wie hoch ist der Eiffelturm?</h3>
@@ -240,23 +225,56 @@
             </div>
           </div>
 
-          <!-- Action Buttons -->
-          <div style="margin-top: 16px; width: 100%">
-            <button type="button" class="m3-button m3-button--filled" id="btn-reveal-answer" style="width: 100%">
-              Antwort enthüllen!
-            </button>
-            <div id="reveal-end-actions" style="display: flex; flex-direction: column; gap: 8px; width: 100%" hidden>
-              <div class="quick-rating" id="quick-rating-reveal" style="margin-bottom: 8px" hidden></div>
-              <button type="button" class="m3-button m3-button--filled" id="btn-restart-game" style="width: 100%">
-                Noch eine Runde
-              </button>
-              <button type="button" class="m3-button m3-button--text" id="btn-exit-to-home" style="width: 100%">
-                Zur Startseite
-              </button>
-            </div>
+          <button type="button" class="m3-button m3-button--filled" id="btn-reveal-answer" style="width: 100%; margin-top: 16px">
+            Antwort enthüllen!
+          </button>
+        </div>
+
+        <!-- STATE: SPIELSTAND / PODIUM SCREEN -->
+        <div class="naeher-state-card" id="play-state-podium" hidden>
+          <div class="naeher-icon-badge naeher-icon-badge--gold">
+            <svg class="m3-icon"><use href="#icon-trophy"></use></svg>
+          </div>
+          <h2 class="naeher-podium-title">Spiel beendet!</h2>
+
+          <div class="naeher-podium-row" id="podium-row">
+            <!-- Top 3 werden per JS gerendert -->
+          </div>
+
+          <div class="naeher-final-list" id="podium-final-list">
+            <!-- Restliche Platzierungen werden per JS gerendert -->
           </div>
         </div>
 
+      </div>
+
+      <!-- Pass-Überleitung: kurz antippen zum Weitergeben, wie bei der Bombe
+           (siehe .starter-reveal in bombe.css) - ersetzt einen extra
+           "Schätzung starten"-Klick. -->
+      <div class="naeher-pass-overlay" id="naeher-pass-overlay" hidden>
+        <div class="naeher-pass-overlay__wave"></div>
+        <p class="naeher-pass-overlay__hint">Gib das Gerät weiter an</p>
+        <h2 class="naeher-pass-overlay__name" id="pass-overlay-name">...</h2>
+        <div class="naeher-pass-overlay__tap-hint">
+          <svg class="m3-icon"><use href="#icon-touch"></use></svg>
+          <span>Tippen zum Fortfahren</span>
+        </div>
+      </div>
+
+      <div class="game-bottom-bar" id="play-actions" hidden>
+        <div class="quick-rating" id="quick-rating-reveal" hidden></div>
+        <button type="button" class="m3-button m3-button--filled" id="btn-restart-game" hidden>
+          Noch eine Runde
+        </button>
+        <button type="button" class="m3-button m3-button--tonal" id="btn-end-game" hidden>
+          <svg class="m3-icon" style="width: 18px; height: 18px"><use href="#icon-trophy"></use></svg> Spiel beenden
+        </button>
+        <button type="button" class="m3-button m3-button--filled" id="btn-podium-restart" hidden>
+          Neues Spiel
+        </button>
+        <button type="button" class="m3-button m3-button--text" id="btn-exit-to-home" hidden>
+          Zur Startseite
+        </button>
       </div>
     </section>
   </div>

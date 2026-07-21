@@ -102,6 +102,11 @@
       <circle cx="12" cy="12" r="3.5"/>
       <circle cx="12" cy="12" r="9" opacity="0.45"/>
     </symbol>
+    <symbol id="icon-trophy" viewBox="0 0 24 24">
+      <path d="M7 4h10v4a5 5 0 0 1-10 0V4z"/>
+      <path d="M7 5H5a2 2 0 0 0 0 4h2"/><path d="M17 5h2a2 2 0 0 1 0 4h-2"/>
+      <path d="M12 13v4"/><path d="M8 21h8"/>
+    </symbol>
     <symbol id="icon-drink" viewBox="0 0 24 24">
       <path d="M4 4h16l-8 10z"/>
       <line x1="12" y1="14" x2="12" y2="20"/>

@@ -14,6 +14,120 @@
   box-sizing: border-box;
 }
 
+/* ---------- Pass-Überleitung ("Gib weiter an ...", tippen zum Fortfahren) ----------
+   Strukturell identisch zu .starter-reveal in bombe.css (fullscreen, per
+   Klick irgendwo dismissbar, Welle + Text fliegen beim Verlassen weiter in
+   dieselbe Richtung nach oben raus) - eigene Orange-Palette statt Bombe-Rot,
+   damit sich jedes Spiel trotz gleicher Mechanik eigenständig anfühlt. */
+.naeher-pass-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.naeher-pass-overlay[hidden] {
+  display: none;
+}
+
+.naeher-pass-overlay__wave {
+  position: absolute;
+  left: -15%;
+  right: -15%;
+  bottom: 0;
+  height: 160%;
+  background: radial-gradient(circle at 50% 25%, #ffb74d, #e65100 55%, #4e2600 100%);
+  border-radius: 50% 50% 0 0 / 14% 14% 0 0;
+  transform: translateY(100%);
+  animation: naeher-wave-rise 0.5s var(--m3-easing-emphasized) forwards;
+}
+
+.naeher-pass-overlay--out .naeher-pass-overlay__wave {
+  animation: naeher-wave-exit-up 1.8s var(--m3-easing-standard) forwards;
+}
+
+@keyframes naeher-wave-rise {
+  to { transform: translateY(0); }
+}
+
+@keyframes naeher-wave-exit-up {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-100%); }
+}
+
+.naeher-pass-overlay__hint {
+  position: relative;
+  z-index: 1;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0;
+  opacity: 0;
+  animation: naeher-fade-in 0.35s var(--m3-easing-standard) 0.3s forwards;
+}
+
+.naeher-pass-overlay__name {
+  position: relative;
+  z-index: 1;
+  font-family: var(--m3-font-display);
+  font-size: clamp(1.8rem, 9vw, 3rem);
+  font-weight: 800;
+  color: #ffffff;
+  text-align: center;
+  margin: 0;
+  padding: 0 28px;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  transform: translateY(10px) scale(0.92);
+  animation: naeher-pop-in 0.45s var(--m3-easing-emphasized) 0.38s forwards;
+}
+
+.naeher-pass-overlay__tap-hint {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+  opacity: 0;
+  animation: naeher-fade-in 0.35s var(--m3-easing-standard) 0.55s forwards;
+}
+
+.naeher-pass-overlay__tap-hint .m3-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.naeher-pass-overlay--out .naeher-pass-overlay__hint,
+.naeher-pass-overlay--out .naeher-pass-overlay__name,
+.naeher-pass-overlay--out .naeher-pass-overlay__tap-hint {
+  animation: naeher-content-exit-up 1.6s var(--m3-easing-standard) forwards;
+}
+
+@keyframes naeher-fade-in {
+  to { opacity: 1; }
+}
+
+@keyframes naeher-pop-in {
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes naeher-content-exit-up {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-32px); }
+}
+
 .naeher-round-header {
   font-size: 0.85rem;
   font-weight: 700;
@@ -56,6 +170,11 @@
 .naeher-icon-badge .m3-icon {
   width: 32px;
   height: 32px;
+}
+
+.naeher-icon-badge--gold {
+  background: linear-gradient(135deg, #ffd54f, #ff8f00);
+  color: #ffffff;
 }
 
 .naeher-state-title {

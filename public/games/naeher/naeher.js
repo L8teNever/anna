@@ -28,14 +28,14 @@
   const validationWarning = document.getElementById("validation-warning");
   const validationWarningText = document.getElementById("validation-warning-text");
 
+  // Pass-Überleitung (ersetzt den früheren "Schätzung starten"-Klick)
+  const passOverlay = document.getElementById("naeher-pass-overlay");
+  const passOverlayName = document.getElementById("pass-overlay-name");
+
   // State sections inside play-view
-  const playStateReady = document.getElementById("play-state-ready");
   const playStateInput = document.getElementById("play-state-input");
   const playStateReveal = document.getElementById("play-state-reveal");
-
-  // State Ready Elements
-  const nextPlayerName = document.getElementById("next-player-name");
-  const btnStartGuess = document.getElementById("btn-start-guess");
+  const playStatePodium = document.getElementById("play-state-podium");
 
   // State Input Elements
   const inputQuestionText = document.getElementById("input-question-text");
@@ -61,10 +61,17 @@
   const roundResultsList = document.getElementById("round-results-list");
   const btnRevealAnswer = document.getElementById("btn-reveal-answer");
 
-  // End Actions
-  const revealEndActions = document.getElementById("reveal-end-actions");
+  // Podium Elements
+  const podiumRow = document.getElementById("podium-row");
+  const podiumFinalList = document.getElementById("podium-final-list");
+
+  // Bottom-Bar (wie bei allen anderen Spielen: sticky Aktionsleiste statt
+  // Buttons lose in der State-Card verteilt)
+  const playActions = document.getElementById("play-actions");
   const quickRatingReveal = document.getElementById("quick-rating-reveal");
   const btnRestartGame = document.getElementById("btn-restart-game");
+  const btnEndGame = document.getElementById("btn-end-game");
+  const btnPodiumRestart = document.getElementById("btn-podium-restart");
   const btnExitToHome = document.getElementById("btn-exit-to-home");
 
   /* ------------------------------------------------------------------ */
@@ -80,13 +87,29 @@
   let currentPlayerIndex = 0;
   let isGameActive = false;
 
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, (ch) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+    })[ch]);
+  }
+
   /* ------------------------------------------------------------------ */
   /* UI Helper functions                                                */
   /* ------------------------------------------------------------------ */
   function showState(stateName) {
-    playStateReady.hidden = (stateName !== "ready");
     playStateInput.hidden = (stateName !== "input");
     playStateReveal.hidden = (stateName !== "reveal");
+    playStatePodium.hidden = (stateName !== "podium");
+  }
+
+  // mode: "hidden" | "round-end" | "podium"
+  function showBottomBar(mode) {
+    playActions.hidden = (mode === "hidden");
+    quickRatingReveal.hidden = mode !== "round-end";
+    btnRestartGame.hidden = mode !== "round-end";
+    btnEndGame.hidden = mode !== "round-end";
+    btnPodiumRestart.hidden = mode !== "podium";
+    btnExitToHome.hidden = mode === "hidden";
   }
 
   function updatePlayerSummary() {
@@ -152,6 +175,48 @@
   }
 
   /* ------------------------------------------------------------------ */
+  /* Pass-Überleitung: irgendwo antippen zum Weitergeben (wie Bombe)       */
+  /* ------------------------------------------------------------------ */
+  let passOverlayOutTimeoutId = null;
+  let passOverlayDismissHandler = null;
+
+  function showPassOverlay(name, onContinue) {
+    showState(null);
+    showBottomBar("hidden");
+
+    passOverlayName.textContent = name;
+    passOverlay.classList.remove("naeher-pass-overlay--out");
+    passOverlay.hidden = false;
+    void passOverlay.offsetWidth; // Reflow, damit Animationen sicher neu starten
+
+    if (passOverlayDismissHandler) {
+      passOverlay.removeEventListener("click", passOverlayDismissHandler);
+    }
+    passOverlayDismissHandler = () => {
+      passOverlay.removeEventListener("click", passOverlayDismissHandler);
+      passOverlayDismissHandler = null;
+      passOverlay.classList.add("naeher-pass-overlay--out");
+      Sound.beep(720, 0.08);
+      passOverlayOutTimeoutId = setTimeout(() => {
+        passOverlay.hidden = true;
+        passOverlay.classList.remove("naeher-pass-overlay--out");
+        onContinue();
+      }, 320);
+    };
+    passOverlay.addEventListener("click", passOverlayDismissHandler);
+  }
+
+  function teardownPassOverlay() {
+    if (passOverlayDismissHandler) {
+      passOverlay.removeEventListener("click", passOverlayDismissHandler);
+      passOverlayDismissHandler = null;
+    }
+    if (passOverlayOutTimeoutId) { clearTimeout(passOverlayOutTimeoutId); passOverlayOutTimeoutId = null; }
+    passOverlay.hidden = true;
+    passOverlay.classList.remove("naeher-pass-overlay--out");
+  }
+
+  /* ------------------------------------------------------------------ */
   /* Game Loop                                                          */
   /* ------------------------------------------------------------------ */
   function startRound() {
@@ -187,6 +252,7 @@
     isGameActive = true;
 
     Sound.unlock();
+    WakeLock.enable();
     ViewNav.transition(setupView, playView);
     startNextRound();
   }
@@ -211,17 +277,13 @@
   }
 
   function showReadyScreen() {
-    showState("ready");
     const activePlayers = playerPicker.getSelectedNames();
-    nextPlayerName.textContent = activePlayers[currentPlayerIndex];
+    showPassOverlay(activePlayers[currentPlayerIndex], showInputScreen);
   }
-
-  btnStartGuess.addEventListener("click", () => {
-    showInputScreen();
-  });
 
   function showInputScreen() {
     showState("input");
+    showBottomBar("hidden");
     const activePlayers = playerPicker.getSelectedNames();
     const name = activePlayers[currentPlayerIndex];
 
@@ -232,7 +294,7 @@
     // Configure slider
     guessSlider.min = currentQuestion.min;
     guessSlider.max = currentQuestion.max;
-    
+
     // Set initial value to midpoint
     const midpoint = Math.round((currentQuestion.min + currentQuestion.max) / 2);
     guessSlider.value = midpoint;
@@ -282,6 +344,7 @@
   /* ------------------------------------------------------------------ */
   function showRevealScreen() {
     showState("reveal");
+    showBottomBar("hidden");
     revealQuestionText.textContent = currentQuestion.word;
     revealCorrectAnswer.textContent = "?";
     revealCorrectAnswer.classList.remove("revealed");
@@ -290,8 +353,6 @@
     rulerWrapper.hidden = true;
     roundResultsContainer.hidden = true;
     btnRevealAnswer.hidden = false;
-    revealEndActions.hidden = true;
-    quickRatingReveal.hidden = true;
   }
 
   btnRevealAnswer.addEventListener("click", () => {
@@ -303,7 +364,7 @@
     const targetVal = currentQuestion.answer;
     const minVal = currentQuestion.min;
     const maxVal = currentQuestion.max;
-    
+
     // Ticking animation
     const duration = 1500; // ms
     const startTime = performance.now();
@@ -312,11 +373,11 @@
     function tick(now) {
       const elapsed = now - startTime;
       const progress = Math.min(1, elapsed / duration);
-      
+
       // Easing out quadratic
       const easeProgress = progress * (2 - progress);
       const currentVal = Math.round(startVal + (targetVal - startVal) * easeProgress);
-      
+
       revealCorrectAnswer.textContent = currentVal;
       Sound.tick(400 + (currentVal % 300));
 
@@ -342,7 +403,7 @@
     const minVal = currentQuestion.min;
     const maxVal = currentQuestion.max;
     const range = maxVal - minVal || 100;
-    
+
     const activePlayers = playerPicker.getSelectedNames();
     const roundResults = [];
 
@@ -350,7 +411,7 @@
       const guess = roundGuesses[name];
       const deviation = Math.abs(guess - targetVal);
       const percentError = Math.min(1, deviation / range);
-      
+
       // Points allocation: up to 1000 points
       let points = Math.round(1000 * (1 - percentError));
       points = Math.max(0, points);
@@ -381,18 +442,14 @@
 
     rulerWrapper.hidden = false;
     roundResultsContainer.hidden = false;
-    revealEndActions.hidden = false;
 
-    // Quick Feedback
-    if (quickRatingReveal) {
-      quickRatingReveal.hidden = false;
-      GithubFeedback.renderQuickRating(quickRatingReveal, {
-        gameId: "naeher",
-        gameName: "Wer ist näher dran?",
-        categoryLabel: "Gesamtspiel",
-        word: currentQuestion.word
-      });
-    }
+    showBottomBar("round-end");
+    GithubFeedback.renderQuickRating(quickRatingReveal, {
+      gameId: "naeher",
+      gameName: "Wer ist näher dran?",
+      categoryLabel: "Gesamtspiel",
+      word: currentQuestion.word
+    });
   }
 
   function renderRulerPins(results, targetVal, minVal, maxVal) {
@@ -416,7 +473,7 @@
       // Get initials
       const initials = res.name.substring(0, 2).toUpperCase();
       pin.innerHTML = `
-        <span class="naeher-pin-label">${initials}: ${res.guess}</span>
+        <span class="naeher-pin-label">${escapeHtml(initials)}: ${res.guess}</span>
         <div class="naeher-pin-needle"></div>
       `;
       rulerTrack.appendChild(pin);
@@ -449,7 +506,7 @@
             ${index + 1}
           </div>
           <div>
-            <span class="naeher-result-row__name">${res.name}</span>
+            <span class="naeher-result-row__name">${escapeHtml(res.name)}</span>
             <span class="naeher-result-row__guess">(Tipp: ${res.guess})</span>
           </div>
         </div>
@@ -462,8 +519,63 @@
     });
   }
 
+  /* ------------------------------------------------------------------ */
+  /* Spielstand / Podium                                                */
+  /* ------------------------------------------------------------------ */
+  function showPodium() {
+    isGameActive = false;
+
+    const sorted = Object.entries(playerScores)
+      .map(([name, score]) => ({ name, score }))
+      .sort((a, b) => b.score - a.score);
+
+    renderPodium(sorted);
+    showState("podium");
+    showBottomBar("podium");
+  }
+
+  function renderPodium(sorted) {
+    const top3 = sorted.slice(0, 3);
+    const rest = sorted.slice(3);
+    const medals = ["🏆", "🥈", "🥉"];
+
+    // Visuelle Podest-Reihenfolge: 2. – 1. – 3. (Sieger in der Mitte, am
+    // höchsten), fehlende Plätze (z.B. bei nur 2 Mitspielern) überspringen.
+    const order = [1, 0, 2].filter((i) => top3[i]);
+    podiumRow.innerHTML = order.map((i) => {
+      const p = top3[i];
+      const rank = i + 1;
+      return `
+        <div class="naeher-podium-col">
+          <span class="naeher-podium-avatar">${medals[i]}</span>
+          <span class="naeher-podium-name">${escapeHtml(p.name)}</span>
+          <span class="naeher-podium-score">${p.score} P.</span>
+          <div class="naeher-podium-step naeher-podium-step--${rank}">${rank}</div>
+        </div>
+      `;
+    }).join("");
+
+    podiumFinalList.innerHTML = rest
+      .map((p, idx) => `
+        <div class="naeher-final-row">
+          <span class="naeher-final-rank">${idx + 4}.</span>
+          <span class="naeher-final-name">${escapeHtml(p.name)}</span>
+          <span class="naeher-final-score">${p.score} P.</span>
+        </div>
+      `)
+      .join("");
+  }
+
   btnRestartGame.addEventListener("click", () => {
     startNextRound();
+  });
+
+  btnEndGame.addEventListener("click", () => {
+    showPodium();
+  });
+
+  btnPodiumRestart.addEventListener("click", () => {
+    startRound();
   });
 
   btnExitToHome.addEventListener("click", () => {
@@ -478,6 +590,8 @@
 
   function stopGame() {
     isGameActive = false;
+    teardownPassOverlay();
+    WakeLock.disable();
   }
 
   backButton.addEventListener("click", () => {
@@ -494,6 +608,7 @@
         });
         return;
       }
+      stopGame();
       ViewNav.transition(playView, setupView);
       return;
     }
