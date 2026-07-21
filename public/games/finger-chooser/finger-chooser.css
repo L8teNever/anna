@@ -120,6 +120,8 @@
   transform: scale(0.8);
 }
 
+/* Bis zu 6 unterscheidbare Teams (siehe TEAM_CLASSES in
+   finger-chooser.js) - reicht für praktisch jede realistische Fingerzahl. */
 .fc-dot--team-a {
   background: rgba(33, 150, 243, 0.35);
   border-color: #1565c0;
@@ -129,5 +131,29 @@
 .fc-dot--team-b {
   background: rgba(255, 152, 0, 0.35);
   border-color: #ef6c00;
+  transform: scale(1.15);
+}
+
+.fc-dot--team-c {
+  background: rgba(76, 175, 80, 0.35);
+  border-color: #2e7d32;
+  transform: scale(1.15);
+}
+
+.fc-dot--team-d {
+  background: rgba(156, 39, 176, 0.35);
+  border-color: #6a1b9a;
+  transform: scale(1.15);
+}
+
+.fc-dot--team-e {
+  background: rgba(233, 30, 99, 0.35);
+  border-color: #c2185b;
+  transform: scale(1.15);
+}
+
+.fc-dot--team-f {
+  background: rgba(0, 188, 212, 0.35);
+  border-color: #00838f;
   transform: scale(1.15);
 }

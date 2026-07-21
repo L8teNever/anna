@@ -3,11 +3,18 @@
  * Finger bekommt sofort eine eigene Farbe. Nach kurzem gemeinsamem Halten
  * füllt sich ein Ladering um jeden Finger; ist er voll, wird sofort
  * ausgewählt. Über die Einstellungen (oben rechts) lässt sich der Modus
- * wechseln: 1 Gewinner, 2 Gewinner oder Aufteilung in 2 Teams.
+ * wechseln: Gewinner oder Teams, jeweils mit einstellbarer Anzahl.
  */
 (function () {
   const MIN_FINGERS = 2;
   const HOLD_MS = 1400; // MUSS zur animation-duration von .fc-dot__ring-fill in finger-chooser.css passen
+  const COUNT_BOUNDS = {
+    winners: { min: 1, max: 6 },
+    teams: { min: 2, max: 6 },
+  };
+  // Bis zu 6 Teams unterscheidbar (siehe .fc-dot--team-a .. --team-f in
+  // finger-chooser.css) - reicht für praktisch jede realistische Fingerzahl.
+  const TEAM_CLASSES = ["fc-dot--team-a", "fc-dot--team-b", "fc-dot--team-c", "fc-dot--team-d", "fc-dot--team-e", "fc-dot--team-f"];
 
   // Solide Randfarbe + passende halbtransparente Füllung pro Finger, nach
   // Reihenfolge des Auftippens vergeben (siehe nextColorIndex unten).
@@ -32,13 +39,19 @@
   const settingsButton = document.getElementById("fc-settings-button");
   const settingsModal = document.getElementById("fc-settings-modal");
   const modeSegmented = document.getElementById("fc-mode-segmented");
+  const countLabelEl = document.getElementById("fc-count-label");
+  const countValueEl = document.getElementById("fc-count-value");
+  const countMinusBtn = document.getElementById("fc-count-minus");
+  const countPlusBtn = document.getElementById("fc-count-plus");
 
   const activeTouches = new Map(); // identifier -> { el }
   let nextColorIndex = 0;
   let holdTimeoutId = null;
   let selecting = false;
   let selected = false;
-  let currentMode = "single"; // single | double | teams
+  let currentMode = "winners"; // winners | teams
+  let winnerCount = 1;
+  let teamCount = 2;
 
   function createDot(x, y) {
     const color = DOT_COLORS[nextColorIndex % DOT_COLORS.length];
@@ -116,22 +129,22 @@
     const shuffledIdx = dots.map((_, i) => i).sort(() => Math.random() - 0.5);
 
     if (currentMode === "teams") {
-      const half = Math.ceil(dots.length / 2);
-      const teamA = new Set(shuffledIdx.slice(0, half));
-      dots.forEach((el, i) => {
-        el.classList.remove("fc-dot--charging");
-        el.classList.add(teamA.has(i) ? "fc-dot--team-a" : "fc-dot--team-b");
+      // Nie mehr Teams als Finger vorhanden sind - sonst blieben Teams leer.
+      const teams = Math.max(2, Math.min(teamCount, dots.length));
+      dots.forEach((el) => el.classList.remove("fc-dot--charging"));
+      shuffledIdx.forEach((dotIdx, order) => {
+        dots[dotIdx].classList.add(TEAM_CLASSES[order % teams]);
       });
-      statusEl.textContent = "Teams sind aufgeteilt! 🔵🟠";
+      statusEl.textContent = `In ${teams} Teams aufgeteilt! 🎉`;
     } else {
-      const winnerCount = currentMode === "double" ? Math.min(2, dots.length) : 1;
-      const winnerSet = new Set(shuffledIdx.slice(0, winnerCount));
+      const winners = Math.max(1, Math.min(winnerCount, dots.length));
+      const winnerSet = new Set(shuffledIdx.slice(0, winners));
       dots.forEach((el, i) => {
         el.classList.remove("fc-dot--charging");
         el.classList.toggle("fc-dot--winner", winnerSet.has(i));
         el.classList.toggle("fc-dot--loser", !winnerSet.has(i));
       });
-      statusEl.textContent = winnerCount > 1 ? "Diese Personen sind dran! 🎉" : "Diese Person ist dran! 🎉";
+      statusEl.textContent = winners > 1 ? "Diese Personen sind dran! 🎉" : "Diese Person ist dran! 🎉";
     }
 
     Sound.success();
@@ -196,7 +209,7 @@
   resetButton.addEventListener("click", reset);
 
   /* ------------------------------------------------------------------ */
-  /* Einstellungen: Auswahl-Modus                                         */
+  /* Einstellungen: Auswahl-Modus + einstellbare Anzahl                   */
   /* ------------------------------------------------------------------ */
   function syncModeButtons() {
     modeSegmented.querySelectorAll("[data-mode]").forEach((btn) => {
@@ -204,12 +217,37 @@
     });
   }
 
+  function currentCount() {
+    return currentMode === "teams" ? teamCount : winnerCount;
+  }
+
+  function syncCountUI() {
+    const bounds = COUNT_BOUNDS[currentMode];
+    const count = currentCount();
+    countValueEl.textContent = String(count);
+    countLabelEl.textContent = currentMode === "teams" ? "Anzahl Teams" : "Anzahl Gewinner";
+    countMinusBtn.disabled = count <= bounds.min;
+    countPlusBtn.disabled = count >= bounds.max;
+  }
+
+  function setCount(next) {
+    const bounds = COUNT_BOUNDS[currentMode];
+    const clamped = Math.max(bounds.min, Math.min(bounds.max, next));
+    if (currentMode === "teams") teamCount = clamped;
+    else winnerCount = clamped;
+    syncCountUI();
+  }
+
   modeSegmented.addEventListener("click", (event) => {
     const btn = event.target.closest("[data-mode]");
     if (!btn) return;
     currentMode = btn.dataset.mode;
     syncModeButtons();
+    syncCountUI();
   });
+
+  countMinusBtn.addEventListener("click", () => setCount(currentCount() - 1));
+  countPlusBtn.addEventListener("click", () => setCount(currentCount() + 1));
 
   function closeSettingsModal() {
     settingsModal.hidden = true;
@@ -231,6 +269,7 @@
   };
 
   syncModeButtons();
+  syncCountUI();
   updateStatus();
 
   function teardown() {

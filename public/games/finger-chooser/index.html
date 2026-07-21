@@ -58,7 +58,7 @@
     </section>
   </div>
 
-  <!-- Einstellungen: Auswahl-Modus (1 Gewinner / 2 Gewinner / 2 Teams) -->
+  <!-- Einstellungen: Auswahl-Modus (Gewinner/Teams) + einstellbare Anzahl -->
   <div class="m3-modal" id="fc-settings-modal" hidden>
     <div class="m3-modal__backdrop" data-fc-settings-backdrop></div>
     <div class="m3-modal__dialog" style="max-width: 340px">
@@ -66,14 +66,28 @@
         <svg class="m3-icon" style="width: 18px; height: 18px; color: var(--m3-primary)"><use href="#icon-sliders"></use></svg>
         Auswahl-Modus
       </h3>
-      <p class="m3-body" style="margin: 0">
-        Wie soll ausgewählt werden?
-      </p>
-      <div class="m3-segmented" id="fc-mode-segmented" role="group" aria-label="Modus wählen" style="width: 100%">
-        <button type="button" class="m3-segmented__option" data-mode="single">1 Gewinner</button>
-        <button type="button" class="m3-segmented__option" data-mode="double">2 Gewinner</button>
-        <button type="button" class="m3-segmented__option" data-mode="teams">2 Teams</button>
+
+      <div>
+        <label class="m3-field-label">Wie soll ausgewählt werden?</label>
+        <div class="m3-segmented" id="fc-mode-segmented" role="group" aria-label="Modus wählen" style="width: 100%">
+          <button type="button" class="m3-segmented__option" data-mode="winners">Gewinner</button>
+          <button type="button" class="m3-segmented__option" data-mode="teams">Teams</button>
+        </div>
       </div>
+
+      <div class="game-option-row">
+        <span class="game-option-row__label" id="fc-count-label">Anzahl Gewinner</span>
+        <div class="stepper" id="fc-count-stepper">
+          <button type="button" class="m3-icon-button stepper__btn" id="fc-count-minus" aria-label="Weniger">
+            <svg class="m3-icon" style="width: 18px; height: 18px"><use href="#icon-minus"></use></svg>
+          </button>
+          <span class="stepper__value" id="fc-count-value">1</span>
+          <button type="button" class="m3-icon-button stepper__btn" id="fc-count-plus" aria-label="Mehr">
+            <svg class="m3-icon" style="width: 18px; height: 18px"><use href="#icon-add"></use></svg>
+          </button>
+        </div>
+      </div>
+
       <div class="m3-modal__actions">
         <button type="button" class="m3-button m3-button--filled" data-fc-settings-close style="width: 100%">
           Fertig
