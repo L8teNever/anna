@@ -73,6 +73,33 @@
 }
 
 /* ---------- Nachschlagen ---------- */
+/* Direkter Ein-Personen-Nachschlag ("XY ist: ...") statt der vollen
+   Liste aller anderen - man tippt gezielt die eine Person an, die man
+   gerade vergessen hat, statt immer die komplette Liste zu sehen. */
+.lookup-single-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 32px 20px;
+  background: var(--m3-surface-container-high);
+  border-radius: var(--m3-shape-xl);
+  text-align: center;
+}
+
+.lookup-single-result__icon {
+  font-size: 2.4rem;
+  line-height: 1;
+}
+
+.lookup-single-result__text {
+  font-family: var(--m3-font-display);
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--game-teal);
+  line-height: 1.25;
+}
+
 .lookup-stage {
   flex: 1;
   min-height: 0;

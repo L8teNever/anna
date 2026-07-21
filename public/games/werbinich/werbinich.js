@@ -3,8 +3,11 @@
  * Reihum-Halten NICHT die eigene, sondern die aller anderen (wie der
  * klassische Zettel auf der Stirn). Zusätzlich gibt es während der
  * laufenden Runde ein "Nachschlagen": falls jemand vergessen hat, was eine
- * andere Person ist, kann man (nach Auswahl der eigenen Person, damit man
- * nicht versehentlich die eigene Identität sieht) die Liste erneut ansehen.
+ * bestimmte andere Person ist, kann die einfach direkt angetippt werden -
+ * zeigt nur diese eine Identität, nicht die komplette Liste. Kein
+ * eingebauter Schutz vor der eigenen Identität hier (anders als beim
+ * Reihum-Halten) - das Spiel setzt bewusst auf Ehrlichkeit der
+ * Mitspieler, ein Hinweistext warnt zusätzlich davor.
  */
 (function () {
   const MIN_PLAYERS = 3;
@@ -51,7 +54,9 @@
   const lookupSelectStage = document.getElementById("lookup-select-stage");
   const lookupResultStage = document.getElementById("lookup-result-stage");
   const lookupPlayerList = document.getElementById("lookup-player-list");
-  const lookupIdentityList = document.getElementById("lookup-identity-list");
+  const lookupResultTitle = document.getElementById("lookup-result-title");
+  const lookupResultIcon = document.getElementById("lookup-result-icon");
+  const lookupResultText = document.getElementById("lookup-result-text");
   const lookupChangePlayerButton = document.getElementById("lookup-change-player-button");
   const lookupCloseButton = document.getElementById("lookup-close-button");
 
@@ -311,11 +316,25 @@
       .join("");
   }
 
+  // Direkter Ein-Personen-Nachschlag: Person antippen -> zeigt NUR, was
+  // diese eine Person ist (nicht mehr die komplette Liste aller anderen,
+  // die dafür vorher extra die eigene Person zum Ausschließen wählen
+  // musste). Wer beim Reihum-Halten schaut, sieht weiterhin ganz normal
+  // alle anderen außer sich selbst (siehe renderIdentityList/showRevealFor-
+  // CurrentPlayer oben) - das hier ist nur das schnelle Nachschlage-Tool.
+  function showSingleIdentity(idx) {
+    const name = roundPlayers[idx];
+    const identity = roundIdentities[idx];
+    lookupResultTitle.textContent = `${name} ist:`;
+    lookupResultIcon.textContent = identity && identity.icon ? identity.icon : "";
+    lookupResultText.textContent = identity ? identity.text : "…";
+  }
+
   lookupPlayerList.addEventListener("click", (event) => {
     const btn = event.target.closest("[data-lookup-index]");
     if (!btn) return;
     const idx = Number(btn.dataset.lookupIndex);
-    renderIdentityList(lookupIdentityList, idx);
+    showSingleIdentity(idx);
     lookupSelectStage.hidden = true;
     lookupResultStage.hidden = false;
   });

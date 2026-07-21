@@ -203,13 +203,16 @@
     <!-- ---------- Nachschlagen: falls jemand vergessen hat, wer die anderen sind ---------- -->
     <section class="game-view app-view" id="view-lookup" hidden>
       <div class="lookup-stage" id="lookup-select-stage">
-        <p class="m3-title" style="text-align: center">Wer schaut nach?</p>
-        <p class="m3-body" style="text-align: center">Wähle deinen eigenen Namen – du siehst dann alle anderen, aber nicht dich selbst.</p>
+        <p class="m3-title" style="text-align: center">Wen möchtest du nachschlagen?</p>
+        <p class="m3-body" style="text-align: center">Person antippen, um zu sehen, wer oder was sie ist – nicht deine eigene wählen!</p>
         <div class="lookup-player-list" id="lookup-player-list"></div>
       </div>
       <div class="lookup-stage" id="lookup-result-stage" hidden>
-        <p class="m3-title" style="text-align: center">Die anderen sind:</p>
-        <div class="identity-list" id="lookup-identity-list"></div>
+        <p class="m3-title" style="text-align: center" id="lookup-result-title">XY ist:</p>
+        <div class="lookup-single-result">
+          <span class="lookup-single-result__icon" id="lookup-result-icon"></span>
+          <span class="lookup-single-result__text" id="lookup-result-text"></span>
+        </div>
         <button type="button" class="m3-button m3-button--tonal" id="lookup-change-player-button">Andere Person wählen</button>
       </div>
       <div class="game-bottom-bar">
