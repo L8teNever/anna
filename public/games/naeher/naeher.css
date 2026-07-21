@@ -132,6 +132,43 @@
   100% { opacity: 0; transform: translateY(-32px); }
 }
 
+/* ---------- Wellen-Übergang zwischen den 3 Reveal-Schritten ----------
+   Gleicher visueller Effekt wie .naeher-pass-overlay oben (gleiche
+   Keyframes), aber ohne Text/Tap - läuft automatisch beim Klick auf
+   "Weiter" (siehe playStepWaveTransition() in naeher.js): Welle deckt kurz
+   den ganzen Bildschirm ab, Inhalt wird darunter ausgetauscht, Welle zieht
+   sich wieder zurück. */
+.naeher-step-wave {
+  position: fixed;
+  inset: 0;
+  z-index: 28;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.naeher-step-wave[hidden] {
+  display: none;
+}
+
+.naeher-step-wave__fill {
+  position: absolute;
+  left: -15%;
+  right: -15%;
+  bottom: 0;
+  height: 160%;
+  background: radial-gradient(circle at 50% 25%, #ffb74d, #e65100 55%, #4e2600 100%);
+  border-radius: 50% / 14%;
+  transform: translateY(100%);
+}
+
+.naeher-step-wave--rising .naeher-step-wave__fill {
+  animation: naeher-wave-rise 0.4s var(--m3-easing-emphasized) forwards;
+}
+
+.naeher-step-wave--falling .naeher-step-wave__fill {
+  animation: naeher-wave-exit-up 0.5s var(--m3-easing-standard) forwards;
+}
+
 .naeher-round-header {
   font-size: 0.85rem;
   font-weight: 700;
@@ -152,6 +189,16 @@
   flex-direction: column;
   align-items: center;
   animation: naeher-fade-in 0.4s var(--m3-easing-emphasized) forwards;
+}
+
+/* Unterschritt innerhalb der Reveal-Karte (Antwort / Übersicht / Tipps) -
+   per "Weiter" manuell durchgeklickt, siehe #naeher-step-wave für den
+   Übergangseffekt dazwischen. */
+.naeher-reveal-step {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 @keyframes naeher-fade-in {
@@ -486,11 +533,6 @@
 }
 
 /* Round results list */
-.naeher-results-container {
-  width: 100%;
-  box-sizing: border-box;
-}
-
 .naeher-results-title {
   font-size: 0.9rem;
   font-weight: 700;
@@ -561,24 +603,7 @@
 }
 
 .naeher-result-row__deviation {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--m3-error);
-}
-
-.naeher-result-row__points {
   font-size: 0.9rem;
   font-weight: 700;
-  color: #2e7d32;
-}
-
-.naeher-result-row__points.bonus {
-  color: #ff8f00;
-  font-size: 0.95rem;
-  animation: pulse-bonus 1s infinite alternate;
-}
-
-@keyframes pulse-bonus {
-  from { transform: scale(1); }
-  to { transform: scale(1.05); }
+  color: var(--m3-error);
 }

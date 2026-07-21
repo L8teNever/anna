@@ -190,44 +190,60 @@
           </button>
         </div>
 
-        <!-- STATE: AUFLÖSUNG / REVEAL SCREEN -->
+        <!-- STATE: AUFLÖSUNG / REVEAL SCREEN - 3 Unterschritte, per "Weiter"
+             manuell durchgeklickt, jeweils mit Wellen-Übergang dazwischen
+             (siehe #naeher-step-wave unten). -->
         <div class="naeher-state-card" id="play-state-reveal" hidden>
-          <div class="naeher-question-card">
-            <h3 class="naeher-question-text" id="reveal-question-text">Wie hoch ist der Eiffelturm?</h3>
+
+          <!-- Unterschritt 1: Antwort -->
+          <div class="naeher-reveal-step" id="reveal-step-answer">
+            <div class="naeher-question-card">
+              <h3 class="naeher-question-text" id="reveal-question-text">Wie hoch ist der Eiffelturm?</h3>
+            </div>
+
+            <!-- Die digitale Schätzanzeige (mit Ticker-Effekt) -->
+            <div class="naeher-reveal-answer-box">
+              <span class="naeher-reveal-label">Echte Antwort:</span>
+              <div class="naeher-reveal-value-container">
+                <span id="reveal-correct-answer" class="naeher-reveal-value">?</span>
+                <span id="reveal-unit-display" class="naeher-reveal-unit"></span>
+              </div>
+            </div>
+
+            <button type="button" class="m3-button m3-button--filled" id="btn-reveal-answer" style="width: 100%; margin-top: 16px">
+              Antwort enthüllen!
+            </button>
+            <button type="button" class="m3-button m3-button--filled" id="btn-reveal-step1-continue" style="width: 100%; margin-top: 16px" hidden>
+              Weiter <svg class="m3-icon" style="width: 18px; height: 18px"><use href="#icon-chevron-right"></use></svg>
+            </button>
           </div>
 
-          <!-- Die digitale Schätzanzeige (mit Ticker-Effekt) -->
-          <div class="naeher-reveal-answer-box">
-            <span class="naeher-reveal-label">Echte Antwort:</span>
-            <div class="naeher-reveal-value-container">
-              <span id="reveal-correct-answer" class="naeher-reveal-value">?</span>
-              <span id="reveal-unit-display" class="naeher-reveal-unit"></span>
+          <!-- Unterschritt 2: Übersicht / Skala -->
+          <div class="naeher-reveal-step" id="reveal-step-overview" hidden>
+            <h4 class="naeher-results-title">Übersicht</h4>
+            <div class="naeher-ruler-wrapper" id="ruler-wrapper">
+              <div class="naeher-ruler-track" id="ruler-track">
+                <!-- Korrekter Pin & Spielerpins werden per JS gerendert -->
+              </div>
+              <div class="naeher-ruler-labels">
+                <span id="ruler-label-min">0</span>
+                <span class="naeher-label-correct">Antwort</span>
+                <span id="ruler-label-max">1000</span>
+              </div>
             </div>
+            <button type="button" class="m3-button m3-button--filled" id="btn-reveal-step2-continue" style="width: 100%; margin-top: 16px">
+              Weiter <svg class="m3-icon" style="width: 18px; height: 18px"><use href="#icon-chevron-right"></use></svg>
+            </button>
           </div>
 
-          <!-- Virtuelle Messskala / Ruler -->
-          <div class="naeher-ruler-wrapper" id="ruler-wrapper" hidden>
-            <div class="naeher-ruler-track" id="ruler-track">
-              <!-- Korrekter Pin & Spielerpins werden per JS gerendert -->
-            </div>
-            <div class="naeher-ruler-labels">
-              <span id="ruler-label-min">0</span>
-              <span id="ruler-label-correct" class="naeher-label-correct">Antwort</span>
-              <span id="ruler-label-max">1000</span>
-            </div>
-          </div>
-
-          <!-- Rundenergebnisse -->
-          <div class="naeher-results-container" id="round-results-container" hidden>
-            <h4 class="naeher-results-title">Ergebnisse dieser Runde:</h4>
+          <!-- Unterschritt 3: Wer hat welchen Tipp abgegeben -->
+          <div class="naeher-reveal-step" id="reveal-step-guesses" hidden>
+            <h4 class="naeher-results-title">Wer hat welchen Tipp abgegeben?</h4>
             <div class="naeher-results-list" id="round-results-list">
               <!-- Listeneinträge werden per JS gerendert -->
             </div>
           </div>
 
-          <button type="button" class="m3-button m3-button--filled" id="btn-reveal-answer" style="width: 100%; margin-top: 16px">
-            Antwort enthüllen!
-          </button>
         </div>
 
       </div>
@@ -243,6 +259,13 @@
           <svg class="m3-icon"><use href="#icon-touch"></use></svg>
           <span>Tippen zum Fortfahren</span>
         </div>
+      </div>
+
+      <!-- Wellen-Übergang zwischen den 3 Reveal-Schritten (gleicher Effekt
+           wie die Pass-Überleitung, nur ohne Text/Tap - läuft automatisch
+           beim Klick auf "Weiter"). -->
+      <div class="naeher-step-wave" id="naeher-step-wave" hidden>
+        <div class="naeher-step-wave__fill"></div>
       </div>
 
       <div class="game-bottom-bar" id="play-actions" hidden>

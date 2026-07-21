@@ -32,6 +32,9 @@
   const passOverlay = document.getElementById("naeher-pass-overlay");
   const passOverlayName = document.getElementById("pass-overlay-name");
 
+  // Wellen-Übergang zwischen den 3 Reveal-Unterschritten
+  const stepWave = document.getElementById("naeher-step-wave");
+
   // State sections inside play-view
   const playStateInput = document.getElementById("play-state-input");
   const playStateReveal = document.getElementById("play-state-reveal");
@@ -48,17 +51,24 @@
   const limitMaxDisplay = document.getElementById("limit-max");
   const btnLockGuess = document.getElementById("btn-lock-guess");
 
-  // State Reveal Elements
+  // Reveal-Unterschritt 1: Antwort
+  const revealStepAnswer = document.getElementById("reveal-step-answer");
   const revealQuestionText = document.getElementById("reveal-question-text");
   const revealCorrectAnswer = document.getElementById("reveal-correct-answer");
   const revealUnitDisplay = document.getElementById("reveal-unit-display");
-  const rulerWrapper = document.getElementById("ruler-wrapper");
+  const btnRevealAnswer = document.getElementById("btn-reveal-answer");
+  const btnRevealStep1Continue = document.getElementById("btn-reveal-step1-continue");
+
+  // Reveal-Unterschritt 2: Übersicht / Skala
+  const revealStepOverview = document.getElementById("reveal-step-overview");
   const rulerTrack = document.getElementById("ruler-track");
   const rulerLabelMin = document.getElementById("ruler-label-min");
   const rulerLabelMax = document.getElementById("ruler-label-max");
-  const roundResultsContainer = document.getElementById("round-results-container");
+  const btnRevealStep2Continue = document.getElementById("btn-reveal-step2-continue");
+
+  // Reveal-Unterschritt 3: Wer hat welchen Tipp
+  const revealStepGuesses = document.getElementById("reveal-step-guesses");
   const roundResultsList = document.getElementById("round-results-list");
-  const btnRevealAnswer = document.getElementById("btn-reveal-answer");
 
   // Bottom-Bar (wie bei allen anderen Spielen: sticky Aktionsleiste statt
   // Buttons lose in der State-Card verteilt)
@@ -75,10 +85,14 @@
 
   let questionPool = [];
   let currentQuestion = null;
-  let playerScores = {}; // name -> number
   let roundGuesses = {}; // name -> number
   let currentPlayerIndex = 0;
   let isGameActive = false;
+
+  // Aktuelle Runden-Ergebnisse, zwischen den Reveal-Unterschritten geteilt
+  // (Schritt 1 berechnet sie, Schritt 2+3 rendern daraus).
+  let currentRoundResults = [];
+  let currentRoundBounds = null;
 
   function escapeHtml(value) {
     return String(value).replace(/[&<>"']/g, (ch) => ({
@@ -92,6 +106,12 @@
   function showState(stateName) {
     playStateInput.hidden = (stateName !== "input");
     playStateReveal.hidden = (stateName !== "reveal");
+  }
+
+  function showRevealSubStep(step) {
+    revealStepAnswer.hidden = step !== "answer";
+    revealStepOverview.hidden = step !== "overview";
+    revealStepGuesses.hidden = step !== "guesses";
   }
 
   // mode: "hidden" | "round-end"
@@ -207,6 +227,37 @@
   }
 
   /* ------------------------------------------------------------------ */
+  /* Wellen-Übergang zwischen den 3 Reveal-Unterschritten                 */
+  /* ------------------------------------------------------------------ */
+  let pendingStepTimeouts = [];
+
+  function clearPendingStepTimeouts() {
+    pendingStepTimeouts.forEach((id) => clearTimeout(id));
+    pendingStepTimeouts = [];
+  }
+
+  function playStepWaveTransition(swapContentFn) {
+    stepWave.classList.remove("naeher-step-wave--falling");
+    stepWave.classList.add("naeher-step-wave--rising");
+    stepWave.hidden = false;
+    void stepWave.offsetWidth; // Reflow, damit die Animation sicher neu startet
+    Sound.beep(700, 0.06);
+
+    const riseTimeoutId = setTimeout(() => {
+      swapContentFn();
+      stepWave.classList.remove("naeher-step-wave--rising");
+      stepWave.classList.add("naeher-step-wave--falling");
+
+      const fallTimeoutId = setTimeout(() => {
+        stepWave.hidden = true;
+        stepWave.classList.remove("naeher-step-wave--falling");
+      }, 500);
+      pendingStepTimeouts.push(fallTimeoutId);
+    }, 400);
+    pendingStepTimeouts.push(riseTimeoutId);
+  }
+
+  /* ------------------------------------------------------------------ */
   /* Game Loop                                                          */
   /* ------------------------------------------------------------------ */
   function startRound() {
@@ -236,9 +287,6 @@
     questionPool = rawPool.map(parseQuestion);
     questionPool.sort(() => Math.random() - 0.5);
 
-    // Initialize state
-    playerScores = {};
-    activePlayers.forEach(name => { playerScores[name] = 0; });
     isGameActive = true;
 
     Sound.unlock();
@@ -330,20 +378,21 @@
   });
 
   /* ------------------------------------------------------------------ */
-  /* Suspense Reveal                                                    */
+  /* Reveal: 1) Antwort  2) Übersicht/Skala  3) wer welchen Tipp hat       */
+  /* Jeder Wechsel läuft manuell per "Weiter" und mit Wellen-Übergang.     */
   /* ------------------------------------------------------------------ */
   function showRevealScreen() {
-    clearRevealSequence();
+    clearPendingStepTimeouts();
     showState("reveal");
     showBottomBar("hidden");
+    showRevealSubStep("answer");
+
     revealQuestionText.textContent = currentQuestion.word;
     revealCorrectAnswer.textContent = "?";
     revealCorrectAnswer.classList.remove("revealed");
     revealUnitDisplay.textContent = "";
-
-    rulerWrapper.hidden = true;
-    roundResultsContainer.hidden = true;
     btnRevealAnswer.hidden = false;
+    btnRevealStep1Continue.hidden = true;
   }
 
   btnRevealAnswer.addEventListener("click", () => {
@@ -381,101 +430,51 @@
         revealUnitDisplay.textContent = currentQuestion.unit;
         Sound.success();
 
-        // Calculate scores and render ruler/results
-        evaluateRound();
+        computeRoundResults();
+        btnRevealStep1Continue.hidden = false;
       }
     }
 
     requestAnimationFrame(tick);
   }
 
-  function evaluateRound() {
+  function computeRoundResults() {
     const targetVal = currentQuestion.answer;
     const minVal = currentQuestion.min;
     const maxVal = currentQuestion.max;
-    const range = maxVal - minVal || 100;
 
     const activePlayers = playerPicker.getSelectedNames();
-    const roundResults = [];
+    currentRoundResults = activePlayers
+      .map((name) => {
+        const guess = roundGuesses[name];
+        const deviation = Math.abs(guess - targetVal);
+        return { name, guess, deviation, exactMatch: deviation === 0 };
+      })
+      .sort((a, b) => a.deviation - b.deviation);
 
-    activePlayers.forEach(name => {
-      const guess = roundGuesses[name];
-      const deviation = Math.abs(guess - targetVal);
-      const percentError = Math.min(1, deviation / range);
+    currentRoundBounds = { targetVal, minVal, maxVal };
+  }
 
-      // Points allocation: up to 1000 points
-      let points = Math.round(1000 * (1 - percentError));
-      points = Math.max(0, points);
+  btnRevealStep1Continue.addEventListener("click", () => {
+    playStepWaveTransition(() => {
+      renderOverviewStep();
+      showRevealSubStep("overview");
+    });
+  });
 
-      // Exact match bonus (+500 points)
-      const exactMatch = (deviation === 0);
-      if (exactMatch) points += 500;
-
-      playerScores[name] = (playerScores[name] || 0) + points;
-
-      roundResults.push({
-        name,
-        guess,
-        deviation,
-        points,
-        exactMatch
+  btnRevealStep2Continue.addEventListener("click", () => {
+    playStepWaveTransition(() => {
+      renderGuessesStep();
+      showRevealSubStep("guesses");
+      showBottomBar("round-end");
+      GithubFeedback.renderQuickRating(quickRatingReveal, {
+        gameId: "naeher",
+        gameName: "Wer ist näher dran?",
+        categoryLabel: "Gesamtspiel",
+        word: currentQuestion.word
       });
     });
-
-    // Sort round results by closeness (ascending deviation) - bestimmt auch
-    // die Reihenfolge der nacheinander folgenden Enthüllung unten.
-    roundResults.sort((a, b) => a.deviation - b.deviation);
-
-    rulerTrack.innerHTML = "";
-    roundResultsList.innerHTML = "";
-    rulerLabelMin.textContent = minVal;
-    rulerLabelMax.textContent = maxVal;
-    rulerWrapper.hidden = false;
-    roundResultsContainer.hidden = false;
-
-    // Referenzpunkt (die richtige Antwort) steht sofort auf der Skala,
-    // danach werden die Spieler-Tipps einzeln nacheinander enthüllt.
-    appendCorrectPin(targetVal, minVal, maxVal);
-    animateResultsSequence(roundResults, minVal, maxVal);
-  }
-
-  /* ------------------------------------------------------------------ */
-  /* Tipps nacheinander enthüllen (Pin + Ergebniszeile im Gleichschritt,   */
-  /* wie eine Welle) - erst danach erscheint die Aktionsleiste unten.      */
-  /* ------------------------------------------------------------------ */
-  let revealSequenceTimeouts = [];
-
-  function clearRevealSequence() {
-    revealSequenceTimeouts.forEach((id) => clearTimeout(id));
-    revealSequenceTimeouts = [];
-  }
-
-  function animateResultsSequence(results, minVal, maxVal) {
-    clearRevealSequence();
-    const STEP_DELAY = 650;
-
-    results.forEach((res, index) => {
-      const timeoutId = setTimeout(() => {
-        appendPlayerPin(res, minVal, maxVal);
-        appendResultRow(res, index);
-        Sound.tick(res.exactMatch ? 900 : 550);
-
-        if (index === results.length - 1) {
-          const finalTimeoutId = setTimeout(() => {
-            showBottomBar("round-end");
-            GithubFeedback.renderQuickRating(quickRatingReveal, {
-              gameId: "naeher",
-              gameName: "Wer ist näher dran?",
-              categoryLabel: "Gesamtspiel",
-              word: currentQuestion.word
-            });
-          }, 500);
-          revealSequenceTimeouts.push(finalTimeoutId);
-        }
-      }, index * STEP_DELAY);
-      revealSequenceTimeouts.push(timeoutId);
-    });
-  }
+  });
 
   function rulerLeftPercent(val, minVal, maxVal) {
     const range = maxVal - minVal || 100;
@@ -483,7 +482,24 @@
     return Math.max(2, Math.min(98, p)); // clamp to avoid pins falling off track
   }
 
-  function appendCorrectPin(targetVal, minVal, maxVal) {
+  function renderOverviewStep() {
+    const { targetVal, minVal, maxVal } = currentRoundBounds;
+    rulerTrack.innerHTML = "";
+    rulerLabelMin.textContent = minVal;
+    rulerLabelMax.textContent = maxVal;
+
+    currentRoundResults.forEach((res) => {
+      const pin = document.createElement("div");
+      pin.className = "naeher-pin";
+      pin.style.left = `${rulerLeftPercent(res.guess, minVal, maxVal)}%`;
+      const initials = res.name.substring(0, 2).toUpperCase();
+      pin.innerHTML = `
+        <span class="naeher-pin-label">${escapeHtml(initials)}: ${res.guess}</span>
+        <div class="naeher-pin-needle"></div>
+      `;
+      rulerTrack.appendChild(pin);
+    });
+
     const correctPin = document.createElement("div");
     correctPin.className = "naeher-pin naeher-pin--correct";
     correctPin.style.left = `${rulerLeftPercent(targetVal, minVal, maxVal)}%`;
@@ -494,41 +510,31 @@
     rulerTrack.appendChild(correctPin);
   }
 
-  function appendPlayerPin(res, minVal, maxVal) {
-    const pin = document.createElement("div");
-    pin.className = "naeher-pin";
-    pin.style.left = `${rulerLeftPercent(res.guess, minVal, maxVal)}%`;
-    const initials = res.name.substring(0, 2).toUpperCase();
-    pin.innerHTML = `
-      <span class="naeher-pin-label">${escapeHtml(initials)}: ${res.guess}</span>
-      <div class="naeher-pin-needle"></div>
-    `;
-    rulerTrack.appendChild(pin);
-  }
+  function renderGuessesStep() {
+    roundResultsList.innerHTML = "";
+    currentRoundResults.forEach((res, index) => {
+      const row = document.createElement("div");
+      row.className = "naeher-result-row";
+      row.style.animationDelay = `${index * 100}ms`;
 
-  function appendResultRow(res, index) {
-    const row = document.createElement("div");
-    row.className = "naeher-result-row";
+      const devText = res.deviation === 0 ? "Exakt!" : `±${res.deviation}`;
 
-    const devText = res.deviation === 0 ? "Exakt!" : `±${res.deviation}`;
-    const bonusTag = res.exactMatch ? ' <span class="naeher-result-row__points bonus">🏆 Exakt-Bonus +500</span>' : "";
-
-    row.innerHTML = `
-      <div class="naeher-result-row__left">
-        <div class="naeher-result-row__badge" style="background: var(--m3-primary-container); color: var(--m3-on-primary-container)">
-          ${index + 1}
+      row.innerHTML = `
+        <div class="naeher-result-row__left">
+          <div class="naeher-result-row__badge" style="background: var(--m3-primary-container); color: var(--m3-on-primary-container)">
+            ${index + 1}
+          </div>
+          <div>
+            <span class="naeher-result-row__name">${escapeHtml(res.name)}</span>
+            <span class="naeher-result-row__guess">(Tipp: ${res.guess})</span>
+          </div>
         </div>
-        <div>
-          <span class="naeher-result-row__name">${escapeHtml(res.name)}</span>
-          <span class="naeher-result-row__guess">(Tipp: ${res.guess})</span>
+        <div class="naeher-result-row__right">
+          <span class="naeher-result-row__deviation" style="color: ${res.deviation === 0 ? '#2e7d32' : 'var(--m3-error)'}">${devText}</span>
         </div>
-      </div>
-      <div class="naeher-result-row__right">
-        <span class="naeher-result-row__deviation" style="color: ${res.deviation === 0 ? '#2e7d32' : 'var(--m3-error)'}">${devText}</span>
-        <span class="naeher-result-row__points">+${res.points} P.${bonusTag}</span>
-      </div>
-    `;
-    roundResultsList.appendChild(row);
+      `;
+      roundResultsList.appendChild(row);
+    });
   }
 
   btnRestartGame.addEventListener("click", () => {
@@ -548,7 +554,9 @@
   function stopGame() {
     isGameActive = false;
     teardownPassOverlay();
-    clearRevealSequence();
+    clearPendingStepTimeouts();
+    stepWave.hidden = true;
+    stepWave.classList.remove("naeher-step-wave--rising", "naeher-step-wave--falling");
     WakeLock.disable();
   }
 
