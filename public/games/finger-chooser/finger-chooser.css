@@ -39,15 +39,6 @@
   margin: 0;
 }
 
-.fc-actions {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 2;
-  padding: 16px 20px calc(16px + env(safe-area-inset-bottom, 0px));
-}
-
 /* Einstellungen-Auslöser oben rechts in der Kopfzeile - .game-topbar hat
    selbst kein justify-content:space-between, margin-left:auto schiebt
    dieses eine Element (und nur dieses) an den rechten Rand. */

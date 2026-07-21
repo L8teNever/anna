@@ -4,6 +4,10 @@
  * füllt sich ein Ladering um jeden Finger; ist er voll, wird sofort
  * ausgewählt. Über die Einstellungen (oben rechts) lässt sich der Modus
  * wechseln: Gewinner oder Teams, jeweils mit einstellbarer Anzahl.
+ *
+ * Sobald nach der Auswahl alle Finger vom Bildschirm genommen wurden,
+ * setzt sich der Chooser nach AUTO_RESET_DELAY_MS von selbst zurück - kein
+ * manueller "Nochmal"-Button nötig.
  */
 (function () {
   const MIN_FINGERS = 2;
@@ -31,11 +35,14 @@
     { solid: "#78909c", fill: "rgba(120, 144, 156, 0.28)" },
   ];
 
+  // Nach der Auswahl wartet der Chooser, bis WIRKLICH alle Finger vom
+  // Bildschirm genommen wurden, und setzt dann von selbst zurück - kein
+  // manueller "Nochmal"-Button mehr nötig.
+  const AUTO_RESET_DELAY_MS = 3000;
+
   const backButton = document.getElementById("back-button");
   const statusEl = document.getElementById("fc-status");
   const surface = document.getElementById("fc-surface");
-  const actions = document.getElementById("fc-actions");
-  const resetButton = document.getElementById("fc-reset-button");
   const settingsButton = document.getElementById("fc-settings-button");
   const settingsModal = document.getElementById("fc-settings-modal");
   const modeSegmented = document.getElementById("fc-mode-segmented");
@@ -47,6 +54,7 @@
   const activeTouches = new Map(); // identifier -> { el }
   let nextColorIndex = 0;
   let holdTimeoutId = null;
+  let autoResetTimeoutId = null;
   let selecting = false;
   let selected = false;
   let currentMode = "winners"; // winners | teams
@@ -90,6 +98,18 @@
       clearTimeout(holdTimeoutId);
       holdTimeoutId = null;
     }
+  }
+
+  function clearAutoResetTimer() {
+    if (autoResetTimeoutId) {
+      clearTimeout(autoResetTimeoutId);
+      autoResetTimeoutId = null;
+    }
+  }
+
+  function scheduleAutoReset() {
+    clearAutoResetTimer();
+    autoResetTimeoutId = setTimeout(reset, AUTO_RESET_DELAY_MS);
   }
 
   // Startet/stoppt den Lade-Ring auf ALLEN aktuell liegenden Fingern
@@ -149,17 +169,21 @@
 
     Sound.success();
     if (Storage.getSettings().vibrationEnabled && navigator.vibrate) navigator.vibrate([40, 40, 120]);
-    actions.hidden = false;
+
+    // Fingerabdrücke bleiben sichtbar, bis die zugehörigen Finger
+    // tatsächlich abgehoben werden (siehe onTouchEnd) - erst wenn ALLE weg
+    // sind, startet der Auto-Reset-Countdown.
+    if (activeTouches.size === 0) scheduleAutoReset();
   }
 
   function reset() {
     clearHoldTimer();
-    activeTouches.forEach((entry) => entry.el.remove());
+    clearAutoResetTimer();
+    surface.innerHTML = "";
     activeTouches.clear();
     nextColorIndex = 0;
     selecting = false;
     selected = false;
-    actions.hidden = true;
     updateStatus();
   }
 
@@ -190,7 +214,19 @@
 
   function onTouchEnd(event) {
     event.preventDefault();
-    if (selected || selecting) return;
+    if (selecting) return; // mitten im (kurzen) Auswahl-Moment nichts anfassen
+
+    if (selected) {
+      // Ergebnis bleibt sichtbar (Sieger/Team-Farbe), auch wenn der Finger
+      // schon abgehoben wurde - nur aus der Tracking-Map nehmen, damit wir
+      // wissen, wann WIRKLICH alle weg sind.
+      Array.from(event.changedTouches).forEach((touch) => {
+        activeTouches.delete(touch.identifier);
+      });
+      if (activeTouches.size === 0) scheduleAutoReset();
+      return;
+    }
+
     Array.from(event.changedTouches).forEach((touch) => {
       const entry = activeTouches.get(touch.identifier);
       if (!entry) return;
@@ -205,8 +241,6 @@
   surface.addEventListener("touchmove", onTouchMove, { passive: false });
   surface.addEventListener("touchend", onTouchEnd, { passive: false });
   surface.addEventListener("touchcancel", onTouchEnd, { passive: false });
-
-  resetButton.addEventListener("click", reset);
 
   /* ------------------------------------------------------------------ */
   /* Einstellungen: Auswahl-Modus + einstellbare Anzahl                   */
@@ -274,6 +308,7 @@
 
   function teardown() {
     clearHoldTimer();
+    clearAutoResetTimer();
   }
   window.addEventListener("beforeunload", teardown, { signal: Router.signal });
   Router.onTeardown(teardown);
