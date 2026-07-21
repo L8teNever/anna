@@ -59,6 +59,29 @@
       ],
     },
     {
+      // Klassiker und Reaktionsspiele sind bewusst als Block direkt hinter
+      // dem Finger-Chooser gruppiert (beides "Sammel-Hubs" mit mehreren
+      // Untergames) - danach folgen erst die normalen Party-Spiele wie
+      // Impostor oder Bombe in ihrer gewohnten Reihenfolge.
+      id: "klassiker",
+      name: "Klassiker",
+      tag: "Brettspiele",
+      description: "Tic Tac Toe, 4 Gewinnt und mehr – alle Klassiker an einem Ort.",
+      detail: "Eine wachsende Sammlung bekannter Brettspiel-Klassiker zum abwechselnden Spielen auf einem Gerät. Untergame aus der Übersicht wählen und direkt loslegen.",
+      icon: "dice",
+      color: "amber",
+      minPlayers: 2,
+      maxPlayers: 2,
+      assets: [
+        "/games/klassiker/klassiker.js",
+        "/games/klassiker/klassiker.css",
+        "/games/klassiker/tictactoe.js",
+        "/games/klassiker/tictactoe.css",
+        "/games/klassiker/connect4.js",
+        "/games/klassiker/connect4.css",
+      ],
+    },
+    {
       id: "naeher",
       name: "Wer ist näher dran?",
       tag: "Schätzen",
@@ -141,25 +164,6 @@
       minPlayers: 3,
       maxPlayers: 20,
       assets: ["/games/eher/eher.js", "/games/eher/eher.css", "/games/eher/categories.json"],
-    },
-    {
-      id: "klassiker",
-      name: "Klassiker",
-      tag: "Brettspiele",
-      description: "Tic Tac Toe, 4 Gewinnt und mehr – alle Klassiker an einem Ort.",
-      detail: "Eine wachsende Sammlung bekannter Brettspiel-Klassiker zum abwechselnden Spielen auf einem Gerät. Untergame aus der Übersicht wählen und direkt loslegen.",
-      icon: "dice",
-      color: "amber",
-      minPlayers: 2,
-      maxPlayers: 2,
-      assets: [
-        "/games/klassiker/klassiker.js",
-        "/games/klassiker/klassiker.css",
-        "/games/klassiker/tictactoe.js",
-        "/games/klassiker/tictactoe.css",
-        "/games/klassiker/connect4.js",
-        "/games/klassiker/connect4.css",
-      ],
     },
     {
       id: "werwolf-lokal",
