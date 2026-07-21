@@ -12,10 +12,43 @@
   gap: 10px;
 }
 
+/* Bühne für das aktive Untergame - selbst eine Material-Tonal-Karte, deren
+   Hintergrund per data-tint (vom jeweiligen Untergame gesetzt, siehe z.B.
+   tictactoe.js/connect4.js) weich in die Farbe des Spielers wechselt, der
+   gerade dran ist. Die konkreten [data-tint="..."]-Werte/Farben gehören
+   bewusst in die jeweilige Untergame-CSS-Datei, nicht hier rein - siehe
+   Konventions-Hinweis oben. */
 .klassiker-subgame-stage {
   width: 100%;
   max-width: 480px;
   margin: 0 auto;
-  padding: 8px 0 24px;
+  padding: 24px 20px;
   box-sizing: border-box;
+  background: var(--m3-surface-container);
+  border: 1px solid var(--m3-outline-variant);
+  border-radius: var(--m3-shape-xl);
+  transition: background-color 0.35s var(--m3-easing-standard), border-color 0.35s var(--m3-easing-standard);
+}
+
+/* Generische Textbausteine, die jedes Untergame verwenden kann (Score-
+   Zeile + große "wer ist dran"-Statuszeile) - bleiben hier statt in einer
+   einzelnen Untergame-CSS-Datei, damit kein Untergame heimlich von einem
+   anderen mitgeladen werden muss, nur um diese Klassen zu bekommen. */
+.klassiker-scoreline {
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--m3-on-surface-variant);
+  margin: 0 0 4px 0;
+}
+
+.klassiker-status {
+  text-align: center;
+  font-family: var(--m3-font-display);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--m3-on-surface);
+  margin: 0 0 20px 0;
 }

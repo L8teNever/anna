@@ -31,6 +31,21 @@
     const boardEl = container.querySelector("#ttt-board");
     const restartBtn = container.querySelector("#ttt-restart");
 
+    // Zellen werden NUR einmal gebaut - jeder Zug aktualisiert danach
+    // gezielt nur die betroffene Zelle, statt das ganze Brett neu zu
+    // rendern (das sorgte vorher für einen kurzen Layout-Sprung bei jedem
+    // Zug, weil alle 9 Buttons jedes Mal komplett neu erzeugt wurden).
+    function buildBoard() {
+      boardEl.innerHTML = "";
+      for (let i = 0; i < 9; i++) {
+        const cell = document.createElement("button");
+        cell.type = "button";
+        cell.className = "ttt-cell";
+        cell.dataset.idx = String(i);
+        boardEl.appendChild(cell);
+      }
+    }
+
     function checkWinner() {
       for (const line of WIN_LINES) {
         const [a, b, c] = line;
@@ -41,24 +56,16 @@
       return null;
     }
 
-    function render() {
-      boardEl.innerHTML = board
-        .map((val, idx) => {
-          const isWin = winLine && winLine.includes(idx);
-          return `
-            <button type="button" class="ttt-cell${isWin ? " ttt-cell--win" : ""}" data-idx="${idx}" ${val ? "disabled" : ""}>
-              ${val || ""}
-            </button>
-          `;
-        })
-        .join("");
-
+    function updateStatus() {
       if (winner) {
         statusEl.textContent = `${winner} hat gewonnen! 🎉`;
+        container.dataset.tint = winner === "X" ? "ttt-x" : "ttt-o";
       } else if (board.every(Boolean)) {
         statusEl.textContent = "Unentschieden!";
+        delete container.dataset.tint;
       } else {
         statusEl.textContent = `${current} ist dran`;
+        container.dataset.tint = current === "X" ? "ttt-x" : "ttt-o";
       }
       scoreEl.textContent = `X: ${wins.X} · O: ${wins.O}`;
     }
@@ -70,11 +77,22 @@
       if (board[idx]) return;
 
       board[idx] = current;
+      btn.textContent = current;
+      btn.dataset.mark = current;
+      btn.disabled = true;
+      // Reflow erzwingen, damit die Pop-Animation bei jeder neuen Zelle
+      // zuverlässig von vorne startet (Klasse einfach neu setzen reicht
+      // sonst nicht, falls sie zufällig schon dranhängt).
+      btn.classList.remove("ttt-cell--pop");
+      void btn.offsetWidth;
+      btn.classList.add("ttt-cell--pop");
+
       const result = checkWinner();
       if (result) {
         winner = result.player;
         winLine = result.line;
         wins[winner] += 1;
+        winLine.forEach((i) => boardEl.children[i].classList.add("ttt-cell--win"));
         Sound.success();
         if (Storage.getSettings().vibrationEnabled && navigator.vibrate) navigator.vibrate(30);
       } else if (board.every(Boolean)) {
@@ -83,7 +101,7 @@
         current = current === "X" ? "O" : "X";
         Sound.tick(current === "X" ? 620 : 500);
       }
-      render();
+      updateStatus();
     }
 
     function restart() {
@@ -91,18 +109,21 @@
       current = "X";
       winner = null;
       winLine = null;
-      render();
+      buildBoard();
+      updateStatus();
     }
 
     boardEl.addEventListener("click", handleCellClick);
     restartBtn.addEventListener("click", restart);
 
-    render();
+    buildBoard();
+    updateStatus();
 
     return {
       teardown() {
         boardEl.removeEventListener("click", handleCellClick);
         restartBtn.removeEventListener("click", restart);
+        delete container.dataset.tint;
       },
     };
   }

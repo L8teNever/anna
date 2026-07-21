@@ -1,25 +1,8 @@
 /**
- * Styles für das Tic-Tac-Toe-Untergame (siehe tictactoe.js).
+ * Styles für das Tic-Tac-Toe-Untergame (siehe tictactoe.js). Generische
+ * Bausteine wie .klassiker-scoreline/.klassiker-status liegen in
+ * klassiker.css (werden auch von connect4.js genutzt).
  */
-
-.klassiker-scoreline {
-  text-align: center;
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--m3-on-surface-variant);
-  margin: 0 0 4px 0;
-}
-
-.klassiker-status {
-  text-align: center;
-  font-family: var(--m3-font-display);
-  font-size: 1.15rem;
-  font-weight: 800;
-  color: var(--m3-on-surface);
-  margin: 0 0 20px 0;
-}
 
 .ttt-board {
   display: grid;
@@ -55,8 +38,42 @@
   background: var(--m3-surface-container-highest);
 }
 
+.ttt-cell[data-mark="O"] {
+  color: var(--m3-tertiary);
+}
+
 .ttt-cell--win {
   background: var(--m3-primary-container);
   color: var(--m3-on-primary-container);
   border-color: var(--m3-primary);
+}
+
+.ttt-cell--win[data-mark="O"] {
+  background: var(--m3-tertiary-container);
+  color: var(--m3-on-tertiary-container);
+  border-color: var(--m3-tertiary);
+}
+
+/* Neu gesetzte Marke poppt kurz rein, statt abrupt zu erscheinen. */
+@keyframes ttt-pop-in {
+  0% { transform: scale(0.4); opacity: 0; }
+  60% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.ttt-cell--pop {
+  animation: ttt-pop-in 0.3s var(--m3-easing-emphasized);
+}
+
+/* Bühnen-Hintergrund passt sich an, wer gerade dran ist (siehe
+   updateStatus() in tictactoe.js) - Übergang übernimmt die Transition auf
+   .klassiker-subgame-stage in klassiker.css. */
+.klassiker-subgame-stage[data-tint="ttt-x"] {
+  background: var(--m3-primary-container);
+  border-color: var(--m3-primary);
+}
+
+.klassiker-subgame-stage[data-tint="ttt-o"] {
+  background: var(--m3-tertiary-container);
+  border-color: var(--m3-tertiary);
 }

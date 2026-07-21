@@ -40,3 +40,30 @@
 .c4-cell--win {
   box-shadow: 0 0 0 3px #ffffff inset;
 }
+
+/* Scheibe fällt sichtbar von oberhalb des Bretts auf ihre Landeposition -
+   --drop-rows kommt pro Zelle von placeDisc() in connect4.js. Die Distanz
+   kombiniert Prozent (eigene Zellhöhe) mit dem festen 6px-Grid-Gap, damit
+   der Sprung exakt über die richtige Anzahl Reihen geht, egal wie groß
+   das Brett gerade gerendert wird. */
+@keyframes c4-drop {
+  from { transform: translateY(calc(var(--drop-rows, 0) * (-100% - 6px))); }
+  to { transform: translateY(0); }
+}
+
+.c4-cell--dropping {
+  animation: c4-drop 0.4s cubic-bezier(0.55, 0, 1, 0.45);
+}
+
+/* Bühnen-Hintergrund passt sich an, wer gerade dran ist (siehe
+   updateStatus() in connect4.js) - Übergang übernimmt die Transition auf
+   .klassiker-subgame-stage in klassiker.css. */
+.klassiker-subgame-stage[data-tint="c4-r"] {
+  background: var(--m3-error-container);
+  border-color: var(--m3-error);
+}
+
+.klassiker-subgame-stage[data-tint="c4-g"] {
+  background: var(--game-amber-container);
+  border-color: var(--game-amber);
+}

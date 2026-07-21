@@ -13,7 +13,6 @@
     let board = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
     let current = "R";
     let winner = null;
-    let winCells = [];
     const wins = { R: 0, G: 0 };
 
     container.innerHTML = `
@@ -29,6 +28,28 @@
     const statusEl = container.querySelector("#c4-status");
     const boardEl = container.querySelector("#c4-board");
     const restartBtn = container.querySelector("#c4-restart");
+
+    // Zellen werden NUR einmal gebaut - jeder Zug aktualisiert danach
+    // gezielt nur die eine neue Scheibe (statt das ganze Brett neu zu
+    // rendern), sonst würde die Fall-Animation unten bei jedem Zug auf
+    // ALLEN bereits liegenden Scheiben erneut abspielen.
+    function buildBoard() {
+      boardEl.innerHTML = "";
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const cell = document.createElement("button");
+          cell.type = "button";
+          cell.className = "c4-cell";
+          cell.dataset.row = String(r);
+          cell.dataset.col = String(c);
+          boardEl.appendChild(cell);
+        }
+      }
+    }
+
+    function cellAt(row, col) {
+      return boardEl.children[row * COLS + col];
+    }
 
     function lowestEmptyRow(col) {
       for (let r = ROWS - 1; r >= 0; r--) {
@@ -60,29 +81,30 @@
       return null;
     }
 
-    function isWinCell(row, col) {
-      return winCells.some(([wr, wc]) => wr === row && wc === col);
+    // Scheibe fällt sichtbar von oberhalb des Bretts (eine Reihe über der
+    // ersten Zeile) bis zur Landeposition - Anzahl Reihen wird als CSS-
+    // Variable an die c4-drop-Keyframe-Animation übergeben (siehe
+    // connect4.css).
+    function placeDisc(row, col, player) {
+      const cell = cellAt(row, col);
+      cell.classList.add(`c4-cell--${player}`);
+      cell.style.setProperty("--drop-rows", String(row + 1));
+      cell.classList.remove("c4-cell--dropping");
+      void cell.offsetWidth;
+      cell.classList.add("c4-cell--dropping");
     }
 
-    function render() {
-      boardEl.innerHTML = "";
-      for (let r = 0; r < ROWS; r++) {
-        for (let c = 0; c < COLS; c++) {
-          const val = board[r][c];
-          const cell = document.createElement("button");
-          cell.type = "button";
-          cell.className = "c4-cell" + (val ? ` c4-cell--${val}` : "") + (isWinCell(r, c) ? " c4-cell--win" : "");
-          cell.dataset.col = String(c);
-          boardEl.appendChild(cell);
-        }
-      }
-
+    function updateStatus() {
+      const isDraw = !winner && board.every((row) => row.every(Boolean));
       if (winner) {
         statusEl.textContent = `${PLAYER_NAMES[winner]} hat gewonnen! 🎉`;
-      } else if (board.every((row) => row.every(Boolean))) {
+        container.dataset.tint = winner === "R" ? "c4-r" : "c4-g";
+      } else if (isDraw) {
         statusEl.textContent = "Unentschieden!";
+        delete container.dataset.tint;
       } else {
         statusEl.textContent = `${PLAYER_NAMES[current]} ist dran`;
+        container.dataset.tint = current === "R" ? "c4-r" : "c4-g";
       }
       scoreEl.textContent = `Rot: ${wins.R} · Gelb: ${wins.G}`;
     }
@@ -98,11 +120,13 @@
       }
 
       board[row][col] = current;
+      placeDisc(row, col, current);
+
       const win = findWin(row, col);
       if (win) {
         winner = current;
-        winCells = win;
         wins[winner] += 1;
+        win.forEach(([wr, wc]) => cellAt(wr, wc).classList.add("c4-cell--win"));
         Sound.success();
         if (Storage.getSettings().vibrationEnabled && navigator.vibrate) navigator.vibrate(30);
       } else if (board.every((r) => r.every(Boolean))) {
@@ -111,26 +135,28 @@
         current = current === "R" ? "G" : "R";
         Sound.tick(current === "R" ? 620 : 500);
       }
-      render();
+      updateStatus();
     }
 
     function restart() {
       board = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
       current = "R";
       winner = null;
-      winCells = [];
-      render();
+      buildBoard();
+      updateStatus();
     }
 
     boardEl.addEventListener("click", handleBoardClick);
     restartBtn.addEventListener("click", restart);
 
-    render();
+    buildBoard();
+    updateStatus();
 
     return {
       teardown() {
         boardEl.removeEventListener("click", handleBoardClick);
         restartBtn.removeEventListener("click", restart);
+        delete container.dataset.tint;
       },
     };
   }
