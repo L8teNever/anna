@@ -35,7 +35,6 @@
   // State sections inside play-view
   const playStateInput = document.getElementById("play-state-input");
   const playStateReveal = document.getElementById("play-state-reveal");
-  const playStatePodium = document.getElementById("play-state-podium");
 
   // State Input Elements
   const inputQuestionText = document.getElementById("input-question-text");
@@ -61,17 +60,11 @@
   const roundResultsList = document.getElementById("round-results-list");
   const btnRevealAnswer = document.getElementById("btn-reveal-answer");
 
-  // Podium Elements
-  const podiumRow = document.getElementById("podium-row");
-  const podiumFinalList = document.getElementById("podium-final-list");
-
   // Bottom-Bar (wie bei allen anderen Spielen: sticky Aktionsleiste statt
   // Buttons lose in der State-Card verteilt)
   const playActions = document.getElementById("play-actions");
   const quickRatingReveal = document.getElementById("quick-rating-reveal");
   const btnRestartGame = document.getElementById("btn-restart-game");
-  const btnEndGame = document.getElementById("btn-end-game");
-  const btnPodiumRestart = document.getElementById("btn-podium-restart");
   const btnExitToHome = document.getElementById("btn-exit-to-home");
 
   /* ------------------------------------------------------------------ */
@@ -99,16 +92,13 @@
   function showState(stateName) {
     playStateInput.hidden = (stateName !== "input");
     playStateReveal.hidden = (stateName !== "reveal");
-    playStatePodium.hidden = (stateName !== "podium");
   }
 
-  // mode: "hidden" | "round-end" | "podium"
+  // mode: "hidden" | "round-end"
   function showBottomBar(mode) {
     playActions.hidden = (mode === "hidden");
     quickRatingReveal.hidden = mode !== "round-end";
     btnRestartGame.hidden = mode !== "round-end";
-    btnEndGame.hidden = mode !== "round-end";
-    btnPodiumRestart.hidden = mode !== "podium";
     btnExitToHome.hidden = mode === "hidden";
   }
 
@@ -343,6 +333,7 @@
   /* Suspense Reveal                                                    */
   /* ------------------------------------------------------------------ */
   function showRevealScreen() {
+    clearRevealSequence();
     showState("reveal");
     showBottomBar("hidden");
     revealQuestionText.textContent = currentQuestion.word;
@@ -431,58 +422,71 @@
       });
     });
 
-    // Sort round results by closeness (ascending deviation)
+    // Sort round results by closeness (ascending deviation) - bestimmt auch
+    // die Reihenfolge der nacheinander folgenden Enthüllung unten.
     roundResults.sort((a, b) => a.deviation - b.deviation);
 
-    // Plot pins on virtual ruler
-    renderRulerPins(roundResults, targetVal, minVal, maxVal);
-
-    // Render results list
-    renderRoundResultsList(roundResults);
-
+    rulerTrack.innerHTML = "";
+    roundResultsList.innerHTML = "";
+    rulerLabelMin.textContent = minVal;
+    rulerLabelMax.textContent = maxVal;
     rulerWrapper.hidden = false;
     roundResultsContainer.hidden = false;
 
-    showBottomBar("round-end");
-    GithubFeedback.renderQuickRating(quickRatingReveal, {
-      gameId: "naeher",
-      gameName: "Wer ist näher dran?",
-      categoryLabel: "Gesamtspiel",
-      word: currentQuestion.word
+    // Referenzpunkt (die richtige Antwort) steht sofort auf der Skala,
+    // danach werden die Spieler-Tipps einzeln nacheinander enthüllt.
+    appendCorrectPin(targetVal, minVal, maxVal);
+    animateResultsSequence(roundResults, minVal, maxVal);
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Tipps nacheinander enthüllen (Pin + Ergebniszeile im Gleichschritt,   */
+  /* wie eine Welle) - erst danach erscheint die Aktionsleiste unten.      */
+  /* ------------------------------------------------------------------ */
+  let revealSequenceTimeouts = [];
+
+  function clearRevealSequence() {
+    revealSequenceTimeouts.forEach((id) => clearTimeout(id));
+    revealSequenceTimeouts = [];
+  }
+
+  function animateResultsSequence(results, minVal, maxVal) {
+    clearRevealSequence();
+    const STEP_DELAY = 650;
+
+    results.forEach((res, index) => {
+      const timeoutId = setTimeout(() => {
+        appendPlayerPin(res, minVal, maxVal);
+        appendResultRow(res, index);
+        Sound.tick(res.exactMatch ? 900 : 550);
+
+        if (index === results.length - 1) {
+          const finalTimeoutId = setTimeout(() => {
+            showBottomBar("round-end");
+            GithubFeedback.renderQuickRating(quickRatingReveal, {
+              gameId: "naeher",
+              gameName: "Wer ist näher dran?",
+              categoryLabel: "Gesamtspiel",
+              word: currentQuestion.word
+            });
+          }, 500);
+          revealSequenceTimeouts.push(finalTimeoutId);
+        }
+      }, index * STEP_DELAY);
+      revealSequenceTimeouts.push(timeoutId);
     });
   }
 
-  function renderRulerPins(results, targetVal, minVal, maxVal) {
-    rulerTrack.innerHTML = "";
-    rulerLabelMin.textContent = minVal;
-    rulerLabelMax.textContent = maxVal;
-
+  function rulerLeftPercent(val, minVal, maxVal) {
     const range = maxVal - minVal || 100;
+    const p = ((val - minVal) / range) * 100;
+    return Math.max(2, Math.min(98, p)); // clamp to avoid pins falling off track
+  }
 
-    // Helper to get percent left
-    const getLeftPercent = (val) => {
-      const p = ((val - minVal) / range) * 100;
-      return Math.max(2, Math.min(98, p)); // clamp to avoid pins falling off track
-    };
-
-    // Render players pins
-    results.forEach(res => {
-      const pin = document.createElement("div");
-      pin.className = "naeher-pin";
-      pin.style.left = `${getLeftPercent(res.guess)}%`;
-      // Get initials
-      const initials = res.name.substring(0, 2).toUpperCase();
-      pin.innerHTML = `
-        <span class="naeher-pin-label">${escapeHtml(initials)}: ${res.guess}</span>
-        <div class="naeher-pin-needle"></div>
-      `;
-      rulerTrack.appendChild(pin);
-    });
-
-    // Render correct answer pin
+  function appendCorrectPin(targetVal, minVal, maxVal) {
     const correctPin = document.createElement("div");
     correctPin.className = "naeher-pin naeher-pin--correct";
-    correctPin.style.left = `${getLeftPercent(targetVal)}%`;
+    correctPin.style.left = `${rulerLeftPercent(targetVal, minVal, maxVal)}%`;
     correctPin.innerHTML = `
       <span class="naeher-pin-label">✓ ${targetVal}</span>
       <div class="naeher-pin-needle"></div>
@@ -490,92 +494,45 @@
     rulerTrack.appendChild(correctPin);
   }
 
-  function renderRoundResultsList(results) {
-    roundResultsList.innerHTML = "";
-    results.forEach((res, index) => {
-      const row = document.createElement("div");
-      row.className = "naeher-result-row";
-      row.style.animationDelay = `${index * 150}ms`;
-
-      const devText = res.deviation === 0 ? "Exakt!" : `±${res.deviation}`;
-      const bonusTag = res.exactMatch ? ' <span class="naeher-result-row__points bonus">🏆 Exakt-Bonus +500</span>' : "";
-
-      row.innerHTML = `
-        <div class="naeher-result-row__left">
-          <div class="naeher-result-row__badge" style="background: var(--m3-primary-container); color: var(--m3-on-primary-container)">
-            ${index + 1}
-          </div>
-          <div>
-            <span class="naeher-result-row__name">${escapeHtml(res.name)}</span>
-            <span class="naeher-result-row__guess">(Tipp: ${res.guess})</span>
-          </div>
-        </div>
-        <div class="naeher-result-row__right">
-          <span class="naeher-result-row__deviation" style="color: ${res.deviation === 0 ? '#2e7d32' : 'var(--m3-error)'}">${devText}</span>
-          <span class="naeher-result-row__points">+${res.points} P.${bonusTag}</span>
-        </div>
-      `;
-      roundResultsList.appendChild(row);
-    });
+  function appendPlayerPin(res, minVal, maxVal) {
+    const pin = document.createElement("div");
+    pin.className = "naeher-pin";
+    pin.style.left = `${rulerLeftPercent(res.guess, minVal, maxVal)}%`;
+    const initials = res.name.substring(0, 2).toUpperCase();
+    pin.innerHTML = `
+      <span class="naeher-pin-label">${escapeHtml(initials)}: ${res.guess}</span>
+      <div class="naeher-pin-needle"></div>
+    `;
+    rulerTrack.appendChild(pin);
   }
 
-  /* ------------------------------------------------------------------ */
-  /* Spielstand / Podium                                                */
-  /* ------------------------------------------------------------------ */
-  function showPodium() {
-    isGameActive = false;
+  function appendResultRow(res, index) {
+    const row = document.createElement("div");
+    row.className = "naeher-result-row";
 
-    const sorted = Object.entries(playerScores)
-      .map(([name, score]) => ({ name, score }))
-      .sort((a, b) => b.score - a.score);
+    const devText = res.deviation === 0 ? "Exakt!" : `±${res.deviation}`;
+    const bonusTag = res.exactMatch ? ' <span class="naeher-result-row__points bonus">🏆 Exakt-Bonus +500</span>' : "";
 
-    renderPodium(sorted);
-    showState("podium");
-    showBottomBar("podium");
-  }
-
-  function renderPodium(sorted) {
-    const top3 = sorted.slice(0, 3);
-    const rest = sorted.slice(3);
-    const medals = ["🏆", "🥈", "🥉"];
-
-    // Visuelle Podest-Reihenfolge: 2. – 1. – 3. (Sieger in der Mitte, am
-    // höchsten), fehlende Plätze (z.B. bei nur 2 Mitspielern) überspringen.
-    const order = [1, 0, 2].filter((i) => top3[i]);
-    podiumRow.innerHTML = order.map((i) => {
-      const p = top3[i];
-      const rank = i + 1;
-      return `
-        <div class="naeher-podium-col">
-          <span class="naeher-podium-avatar">${medals[i]}</span>
-          <span class="naeher-podium-name">${escapeHtml(p.name)}</span>
-          <span class="naeher-podium-score">${p.score} P.</span>
-          <div class="naeher-podium-step naeher-podium-step--${rank}">${rank}</div>
+    row.innerHTML = `
+      <div class="naeher-result-row__left">
+        <div class="naeher-result-row__badge" style="background: var(--m3-primary-container); color: var(--m3-on-primary-container)">
+          ${index + 1}
         </div>
-      `;
-    }).join("");
-
-    podiumFinalList.innerHTML = rest
-      .map((p, idx) => `
-        <div class="naeher-final-row">
-          <span class="naeher-final-rank">${idx + 4}.</span>
-          <span class="naeher-final-name">${escapeHtml(p.name)}</span>
-          <span class="naeher-final-score">${p.score} P.</span>
+        <div>
+          <span class="naeher-result-row__name">${escapeHtml(res.name)}</span>
+          <span class="naeher-result-row__guess">(Tipp: ${res.guess})</span>
         </div>
-      `)
-      .join("");
+      </div>
+      <div class="naeher-result-row__right">
+        <span class="naeher-result-row__deviation" style="color: ${res.deviation === 0 ? '#2e7d32' : 'var(--m3-error)'}">${devText}</span>
+        <span class="naeher-result-row__points">+${res.points} P.${bonusTag}</span>
+      </div>
+    `;
+    roundResultsList.appendChild(row);
   }
 
   btnRestartGame.addEventListener("click", () => {
     startNextRound();
-  });
-
-  btnEndGame.addEventListener("click", () => {
-    showPodium();
-  });
-
-  btnPodiumRestart.addEventListener("click", () => {
-    startRound();
   });
 
   btnExitToHome.addEventListener("click", () => {
@@ -591,6 +548,7 @@
   function stopGame() {
     isGameActive = false;
     teardownPassOverlay();
+    clearRevealSequence();
     WakeLock.disable();
   }
 
