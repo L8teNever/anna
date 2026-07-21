@@ -109,6 +109,14 @@
 
   function scheduleAutoReset() {
     clearAutoResetTimer();
+    // Punkte schrumpfen sichtbar über genau AUTO_RESET_DELAY_MS auf
+    // Größe 0 - die Übergangsdauer kommt hier direkt aus derselben
+    // Konstante wie der Reset-Timer selbst, damit beides exakt zusammen
+    // fertig wird (kein zweiter, separat gepflegter Zeitwert im CSS).
+    surface.querySelectorAll(".fc-dot").forEach((dot) => {
+      dot.style.transition = `transform ${AUTO_RESET_DELAY_MS}ms linear, opacity ${AUTO_RESET_DELAY_MS}ms linear`;
+      dot.classList.add("fc-dot--vanishing");
+    });
     autoResetTimeoutId = setTimeout(reset, AUTO_RESET_DELAY_MS);
   }
 

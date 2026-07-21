@@ -148,3 +148,14 @@
   border-color: #00838f;
   transform: scale(1.15);
 }
+
+/* Countdown zum Auto-Reset (siehe scheduleAutoReset() in
+   finger-chooser.js): Punkte schrumpfen sichtbar auf Größe 0, sobald alle
+   Finger abgehoben wurden - die Übergangsdauer wird dafür per Inline-Style
+   direkt aus AUTO_RESET_DELAY_MS gesetzt, deshalb hier keine feste
+   transition-duration. Steht bewusst NACH den Sieger-/Team-Regeln oben,
+   damit scale(0) deren eigenes transform zuverlässig überschreibt. */
+.fc-dot--vanishing {
+  transform: scale(0);
+  opacity: 0;
+}
