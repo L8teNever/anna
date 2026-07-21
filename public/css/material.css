@@ -249,6 +249,14 @@ body {
   user-select: none;
   /* Kein Callout-Menü bei langem Drücken auf iOS */
   -webkit-touch-callout: none;
+  /* Kein Pinch-/Doppeltipp-Zoom (App-Feeling, wie eine native App) -
+     ergänzt maximum-scale=1/user-scalable=no im viewport-Meta-Tag jeder
+     Seite; manche mobilen Browser ignorieren Letzteres inzwischen aus
+     Barrierefreiheits-Gründen teilweise, touch-action greift zusätzlich
+     auf CSS-Ebene. Browser-Zoom am PC (Strg+Mausrad, Strg+Plus/Minus)
+     lässt sich von einer Webseite technisch NICHT unterbinden - das ist
+     eine bewusste Browser-/OS-Grenze, keine Lücke hier.  */
+  touch-action: pan-x pan-y;
 }
 
 body {

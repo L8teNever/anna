@@ -10,6 +10,11 @@
     [0, 4, 8], [2, 4, 6],
   ];
 
+  const WIN_WAVE_COLORS = {
+    X: { light: "#64b5f6", mid: "#0b57cf", dark: "#062d68" },
+    O: { light: "#ce93d8", mid: "#6a1b9a", dark: "#2e0a44" },
+  };
+
   function mount(container) {
     let board = Array(9).fill(null);
     let current = "X";
@@ -95,6 +100,12 @@
         winLine.forEach((i) => boardEl.children[i].classList.add("ttt-cell--win"));
         Sound.success();
         if (Storage.getSettings().vibrationEnabled && navigator.vibrate) navigator.vibrate(30);
+        if (window.KlassikerHub) {
+          window.KlassikerHub.playWinWave({
+            ...WIN_WAVE_COLORS[winner],
+            label: `${winner} hat gewonnen! 🎉`,
+          });
+        }
       } else if (board.every(Boolean)) {
         Sound.beep(420, 0.15);
       } else {

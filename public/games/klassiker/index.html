@@ -12,7 +12,7 @@
       } catch (e) {}
     })();
   </script>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#0f1014" />
   <title>Klassiker – Anna</title>
   <link rel="manifest" href="/manifest.json" />
@@ -64,6 +64,15 @@
     <section class="game-view app-view" id="subgame-view" hidden>
       <div class="klassiker-subgame-stage" id="klassiker-subgame-stage"></div>
     </section>
+  </div>
+
+  <!-- Sieg-Welle: kurze volle Bildschirm-Welle beim Gewinnen, Farbe/Text
+       kommen vom jeweiligen Untergame (siehe window.KlassikerHub.playWinWave
+       in klassiker.js) - so bleibt dieser Effekt für künftige Untergames
+       einfach mitnutzbar, ohne dass sie ihn selbst bauen müssen. -->
+  <div class="klassiker-win-wave" id="klassiker-win-wave" hidden>
+    <div class="klassiker-win-wave__fill"></div>
+    <p class="klassiker-win-wave__label" id="klassiker-win-wave-label"></p>
   </div>
 
   <script src="/js/version.js"></script>

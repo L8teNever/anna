@@ -52,3 +52,86 @@
   color: var(--m3-on-surface);
   margin: 0 0 20px 0;
 }
+
+/* ---------- Sieg-Welle ----------
+   Strukturell dieselbe Technik wie die Pass-Überleitung bei Bombe/Wer ist
+   näher dran (volle Bildschirm-Welle, oben UND unten gerundet, damit sie
+   beim Rein-/Rauslaufen an beiden Kanten wellenförmig aussieht statt
+   gerade abgeschnitten). Farbe kommt live vom aufrufenden Untergame über
+   --win-wave-light/-mid/-dark (siehe playWinWave() in klassiker.js), damit
+   dieser Effekt für jedes künftige Untergame ohne eigene Kopie nutzbar ist. */
+.klassiker-win-wave {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.klassiker-win-wave[hidden] {
+  display: none;
+}
+
+.klassiker-win-wave__fill {
+  position: absolute;
+  left: -15%;
+  right: -15%;
+  bottom: 0;
+  height: 160%;
+  background: radial-gradient(
+    circle at 50% 25%,
+    var(--win-wave-light, #ffd54f),
+    var(--win-wave-mid, #ff8f00) 55%,
+    var(--win-wave-dark, #7a4600) 100%
+  );
+  border-radius: 50% / 14%;
+  transform: translateY(100%);
+}
+
+.klassiker-win-wave--rising .klassiker-win-wave__fill {
+  animation: klassiker-wave-rise 0.4s var(--m3-easing-emphasized) forwards;
+}
+
+.klassiker-win-wave--falling .klassiker-win-wave__fill {
+  animation: klassiker-wave-exit-up 0.5s var(--m3-easing-standard) forwards;
+}
+
+@keyframes klassiker-wave-rise {
+  to { transform: translateY(0); }
+}
+
+@keyframes klassiker-wave-exit-up {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-100%); }
+}
+
+.klassiker-win-wave__label {
+  position: relative;
+  z-index: 1;
+  font-family: var(--m3-font-display);
+  font-size: clamp(1.6rem, 8vw, 2.6rem);
+  font-weight: 800;
+  color: #ffffff;
+  text-align: center;
+  margin: 0;
+  padding: 0 28px;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  transform: translateY(10px) scale(0.92);
+  animation: klassiker-wave-label-in 0.4s var(--m3-easing-emphasized) 0.25s forwards;
+}
+
+.klassiker-win-wave--falling .klassiker-win-wave__label {
+  animation: klassiker-wave-label-out 0.4s var(--m3-easing-standard) forwards;
+}
+
+@keyframes klassiker-wave-label-in {
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes klassiker-wave-label-out {
+  to { opacity: 0; }
+}

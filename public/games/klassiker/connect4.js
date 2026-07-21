@@ -8,6 +8,10 @@
   const COLS = 7;
   const DIRECTIONS = [[0, 1], [1, 0], [1, 1], [1, -1]];
   const PLAYER_NAMES = { R: "Rot", G: "Gelb" };
+  const WIN_WAVE_COLORS = {
+    R: { light: "#ff8a80", mid: "#e53935", dark: "#5c0f0f" },
+    G: { light: "#fff59d", mid: "#fdd835", dark: "#6b5900" },
+  };
 
   function mount(container) {
     let board = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
@@ -129,6 +133,12 @@
         win.forEach(([wr, wc]) => cellAt(wr, wc).classList.add("c4-cell--win"));
         Sound.success();
         if (Storage.getSettings().vibrationEnabled && navigator.vibrate) navigator.vibrate(30);
+        if (window.KlassikerHub) {
+          window.KlassikerHub.playWinWave({
+            ...WIN_WAVE_COLORS[winner],
+            label: `${PLAYER_NAMES[winner]} hat gewonnen! 🎉`,
+          });
+        }
       } else if (board.every((r) => r.every(Boolean))) {
         Sound.beep(420, 0.15);
       } else {

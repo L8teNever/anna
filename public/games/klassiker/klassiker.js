@@ -81,6 +81,51 @@
     activeController = null;
     stage.innerHTML = "";
     titleEl.textContent = "Klassiker";
+    clearWinWaveTimeouts();
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Sieg-Welle (siehe Kommentar in klassiker.css) - für jedes Untergame  */
+  /* nutzbar über window.KlassikerHub.playWinWave({...}), damit dieser    */
+  /* Effekt nicht in jedem Untergame einzeln nachgebaut werden muss.      */
+  /* ------------------------------------------------------------------ */
+  const winWave = document.getElementById("klassiker-win-wave");
+  const winWaveFill = winWave ? winWave.querySelector(".klassiker-win-wave__fill") : null;
+  const winWaveLabel = document.getElementById("klassiker-win-wave-label");
+  let winWaveTimeouts = [];
+
+  function clearWinWaveTimeouts() {
+    winWaveTimeouts.forEach((id) => clearTimeout(id));
+    winWaveTimeouts = [];
+  }
+
+  // options: { light, mid, dark (CSS-Farbwerte für den Wellenverlauf), label (Text) }
+  function playWinWave(options) {
+    if (!winWave || !winWaveFill) return;
+    const opts = options || {};
+    clearWinWaveTimeouts();
+
+    winWaveFill.style.setProperty("--win-wave-light", opts.light || "#ffd54f");
+    winWaveFill.style.setProperty("--win-wave-mid", opts.mid || "#ff8f00");
+    winWaveFill.style.setProperty("--win-wave-dark", opts.dark || "#7a4600");
+    winWaveLabel.textContent = opts.label || "";
+
+    winWave.classList.remove("klassiker-win-wave--falling");
+    winWave.classList.add("klassiker-win-wave--rising");
+    winWave.hidden = false;
+    void winWave.offsetWidth; // Reflow, damit die Animation sicher neu startet
+
+    const fallStartId = setTimeout(() => {
+      winWave.classList.remove("klassiker-win-wave--rising");
+      winWave.classList.add("klassiker-win-wave--falling");
+
+      const hideId = setTimeout(() => {
+        winWave.hidden = true;
+        winWave.classList.remove("klassiker-win-wave--falling");
+      }, 500);
+      winWaveTimeouts.push(hideId);
+    }, 1300);
+    winWaveTimeouts.push(fallStartId);
   }
 
   hubGrid.addEventListener("click", (event) => {
@@ -104,6 +149,8 @@
   window.confirmGameExit = function () {
     return true;
   };
+
+  window.KlassikerHub = { playWinWave };
 
   renderHub();
   Router.onTeardown(closeSubgame);
