@@ -218,9 +218,12 @@
   bottom: 0;
   height: 160%;
   background: radial-gradient(circle at 50% 25%, #ff5252, #b3261e 55%, #500e0b 100%);
-  /* Elliptischer oberer Rand statt gerader Kante -> wirkt wie eine
-     Welle/ein Schwall, der von unten hochsteigt, statt wie ein Vorhang. */
-  border-radius: 50% 50% 0 0 / 14% 14% 0 0;
+  /* Elliptischer Rand oben UND unten (nicht nur oben) -> beim Reinkommen
+     sieht man die Welle an der Oberkante, beim Rausgehen (siehe
+     starter-wave-exit-up) verlässt genau dieselbe gerundete Kante unten
+     das Bild statt eines geraden Schnitts - beide Übergänge sehen dadurch
+     gleich "wellenförmig" aus statt nur einer Seite. */
+  border-radius: 50% / 14%;
   transform: translateY(100%);
   animation: starter-wave-rise 0.5s var(--m3-easing-emphasized) forwards;
 }

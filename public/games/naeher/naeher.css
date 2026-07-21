@@ -43,7 +43,11 @@
   bottom: 0;
   height: 160%;
   background: radial-gradient(circle at 50% 25%, #ffb74d, #e65100 55%, #4e2600 100%);
-  border-radius: 50% 50% 0 0 / 14% 14% 0 0;
+  /* Elliptischer Rand oben UND unten (nicht nur oben) -> beim Reinkommen
+     sieht man die Welle an der Oberkante, beim Rausgehen (siehe
+     naeher-wave-exit-up) verlässt genau dieselbe gerundete Kante unten das
+     Bild statt eines geraden Schnitts. */
+  border-radius: 50% / 14%;
   transform: translateY(100%);
   animation: naeher-wave-rise 0.5s var(--m3-easing-emphasized) forwards;
 }
