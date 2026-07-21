@@ -1,9 +1,9 @@
 /**
- * Reflextest – Feld ist rot, nach einer zufälligen Wartezeit wird es grün.
- * Wer zu früh tippt, hat verloren und muss neu starten; wer nach Grün
- * antippt, sieht seine Reaktionszeit in Millisekunden. Registriert sich
- * als Untergame im Reaktionsspiele-Hub (siehe reaktion.js für die Plugin-
- * Schnittstelle).
+ * Reflextest – der GANZE Bildschirm (nicht nur eine Karte) ist rot, nach
+ * einer zufälligen Wartezeit wird alles grün. Wer zu früh tippt, hat
+ * verloren und muss neu starten; wer nach Grün antippt, sieht seine
+ * Reaktionszeit in Millisekunden. Registriert sich als Untergame im
+ * Reaktionsspiele-Hub (siehe reaktion.js für die Plugin-Schnittstelle).
  */
 (function () {
   const MIN_DELAY_MS = 1200;
@@ -15,24 +15,27 @@
     let goAt = 0;
     let bestMs = null;
 
+    // Bricht bewusst aus der normalen, eingerahmten Untergame-Karte aus
+    // (siehe .reaktion-subgame-stage--full in reaktion.css) - der ganze
+    // Bildschirm unterhalb der Kopfzeile soll die Farbe wechseln, nicht
+    // nur eine Karte darin.
+    container.classList.add("reaktion-subgame-stage--full");
     container.innerHTML = `
-      <p class="reaktion-scoreline" id="rx-best">Bestzeit: –</p>
-      <div class="rx-stage" id="rx-stage" data-state="idle">
-        <p class="rx-stage__text" id="rx-text">Auf "Start" tippen, dann warten, bis das Feld grün wird.</p>
+      <div class="rx-fullstage" id="rx-fullstage" data-state="idle">
+        <p class="rx-fullstage__best" id="rx-best">Bestzeit: –</p>
+        <p class="rx-fullstage__text" id="rx-text">Auf "Start" tippen, dann warten, bis der ganze Bildschirm grün wird.</p>
+        <button type="button" class="m3-button m3-button--filled" id="rx-action">Start</button>
       </div>
-      <button type="button" class="m3-button m3-button--filled" id="rx-action" style="width: 100%; margin-top: 20px">
-        Start
-      </button>
     `;
 
-    const stage = container.querySelector("#rx-stage");
+    const fullstage = container.querySelector("#rx-fullstage");
     const textEl = container.querySelector("#rx-text");
     const bestEl = container.querySelector("#rx-best");
     const actionBtn = container.querySelector("#rx-action");
 
     function setState(next) {
       state = next;
-      stage.dataset.state = next;
+      fullstage.dataset.state = next;
     }
 
     function startRound() {
@@ -77,14 +80,23 @@
       if (Storage.getSettings().vibrationEnabled && navigator.vibrate) navigator.vibrate(20);
     }
 
-    stage.addEventListener("click", handleStageClick);
-    actionBtn.addEventListener("click", startRound);
+    function handleActionClick(event) {
+      // Der Start/Nochmal-Button liegt INNERHALB der klickbaren Vollbild-
+      // Fläche - ohne stopPropagation würde derselbe Klick zusätzlich
+      // handleStageClick auslösen (Event-Bubbling).
+      event.stopPropagation();
+      startRound();
+    }
+
+    fullstage.addEventListener("click", handleStageClick);
+    actionBtn.addEventListener("click", handleActionClick);
 
     return {
       teardown() {
         clearTimeout(waitTimeoutId);
-        stage.removeEventListener("click", handleStageClick);
-        actionBtn.removeEventListener("click", startRound);
+        fullstage.removeEventListener("click", handleStageClick);
+        actionBtn.removeEventListener("click", handleActionClick);
+        container.classList.remove("reaktion-subgame-stage--full");
       },
     };
   }
@@ -95,7 +107,7 @@
     name: "Reflextest",
     icon: "flash",
     color: "red",
-    description: "Tippe, sobald das Feld grün wird – so schnell wie möglich.",
+    description: "Tippe, sobald der Bildschirm grün wird – so schnell wie möglich.",
     players: "1+ Spieler",
     mount,
   });

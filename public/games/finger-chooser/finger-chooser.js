@@ -1,32 +1,61 @@
 /**
- * Finger-Chooser – jede Person legt einen Finger auf den Bildschirm, nach
- * kurzem gemeinsamen Halten wählt die App per kleiner "Roulette"-Animation
- * zufällig eine Person aus. Kein Rollen-/Rundensystem wie die anderen
- * Spiele, bewusst ein einfaches Werkzeug für "wer ist dran".
+ * Finger-Chooser – jede Person legt einen Finger auf den Bildschirm, jeder
+ * Finger bekommt sofort eine eigene Farbe. Nach kurzem gemeinsamem Halten
+ * füllt sich ein Ladering um jeden Finger; ist er voll, wird sofort
+ * ausgewählt. Über die Einstellungen (oben rechts) lässt sich der Modus
+ * wechseln: 1 Gewinner, 2 Gewinner oder Aufteilung in 2 Teams.
  */
 (function () {
   const MIN_FINGERS = 2;
-  const HOLD_MS = 1200; // so lange müssen mindestens MIN_FINGERS ruhig liegen
-  const STEP_BASE_MS = 55; // Tempo der Roulette-Animation zu Beginn
-  const STEP_MAX_EXTRA_MS = 240; // zusätzliche Verzögerung zum Ende hin (wird langsamer)
+  const HOLD_MS = 1400; // MUSS zur animation-duration von .fc-dot__ring-fill in finger-chooser.css passen
+
+  // Solide Randfarbe + passende halbtransparente Füllung pro Finger, nach
+  // Reihenfolge des Auftippens vergeben (siehe nextColorIndex unten).
+  const DOT_COLORS = [
+    { solid: "#42a5f5", fill: "rgba(66, 165, 245, 0.28)" },
+    { solid: "#ef5350", fill: "rgba(239, 83, 80, 0.28)" },
+    { solid: "#66bb6a", fill: "rgba(102, 187, 106, 0.28)" },
+    { solid: "#ffca28", fill: "rgba(255, 202, 40, 0.28)" },
+    { solid: "#ab47bc", fill: "rgba(171, 71, 188, 0.28)" },
+    { solid: "#26c6da", fill: "rgba(38, 198, 218, 0.28)" },
+    { solid: "#ff7043", fill: "rgba(255, 112, 67, 0.28)" },
+    { solid: "#8d6e63", fill: "rgba(141, 110, 99, 0.28)" },
+    { solid: "#ec407a", fill: "rgba(236, 64, 122, 0.28)" },
+    { solid: "#78909c", fill: "rgba(120, 144, 156, 0.28)" },
+  ];
 
   const backButton = document.getElementById("back-button");
   const statusEl = document.getElementById("fc-status");
   const surface = document.getElementById("fc-surface");
   const actions = document.getElementById("fc-actions");
   const resetButton = document.getElementById("fc-reset-button");
+  const settingsButton = document.getElementById("fc-settings-button");
+  const settingsModal = document.getElementById("fc-settings-modal");
+  const modeSegmented = document.getElementById("fc-mode-segmented");
 
   const activeTouches = new Map(); // identifier -> { el }
+  let nextColorIndex = 0;
   let holdTimeoutId = null;
-  let spinTimeoutId = null;
   let selecting = false;
   let selected = false;
+  let currentMode = "single"; // single | double | teams
 
   function createDot(x, y) {
+    const color = DOT_COLORS[nextColorIndex % DOT_COLORS.length];
+    nextColorIndex += 1;
+
     const dot = document.createElement("div");
     dot.className = "fc-dot";
     dot.style.left = `${x}px`;
     dot.style.top = `${y}px`;
+    dot.style.setProperty("--dot-color", color.solid);
+    dot.style.setProperty("--dot-fill", color.fill);
+    dot.innerHTML = `
+      <svg class="fc-dot__ring" viewBox="0 0 100 100">
+        <circle class="fc-dot__ring-bg" cx="50" cy="50" r="42"></circle>
+        <circle class="fc-dot__ring-fill" cx="50" cy="50" r="42"></circle>
+      </svg>
+    `;
     surface.appendChild(dot);
     return dot;
   }
@@ -50,66 +79,61 @@
     }
   }
 
-  function clearSpinTimer() {
-    if (spinTimeoutId) {
-      clearTimeout(spinTimeoutId);
-      spinTimeoutId = null;
-    }
+  // Startet/stoppt den Lade-Ring auf ALLEN aktuell liegenden Fingern
+  // gleichzeitig - läuft exakt HOLD_MS lang (siehe CSS), damit alle Ringe
+  // im selben Moment fertig sind, in dem finishSelection() feuert.
+  function setCharging(isCharging) {
+    activeTouches.forEach((entry) => {
+      if (isCharging) {
+        // Reflow erzwingen, damit die CSS-Animation bei jedem (Neu-)Start
+        // zuverlässig von vorne beginnt.
+        entry.el.classList.remove("fc-dot--charging");
+        void entry.el.offsetWidth;
+        entry.el.classList.add("fc-dot--charging");
+      } else {
+        entry.el.classList.remove("fc-dot--charging");
+      }
+    });
   }
 
   function scheduleSelection() {
     clearHoldTimer();
     if (activeTouches.size >= MIN_FINGERS && !selecting && !selected) {
-      holdTimeoutId = setTimeout(startSelection, HOLD_MS);
+      setCharging(true);
+      holdTimeoutId = setTimeout(finishSelection, HOLD_MS);
+    } else {
+      setCharging(false);
     }
   }
 
-  // Der Gewinner wird VORHER zufällig bestimmt, die Roulette-Animation
-  // läuft dann eine feste Anzahl voller Runden über alle Finger und landet
-  // exakt auf diesem Index - fühlt sich dadurch wie ein "sich entscheidendes"
-  // Rattern an, statt am Ende einen zweiten, unabhängigen Zufallswert zu
-  // zeigen, der nicht zur Animation passt.
-  function startSelection() {
-    clearHoldTimer();
+  function finishSelection() {
     if (activeTouches.size < MIN_FINGERS) return;
-
-    selecting = true;
-    const dots = Array.from(activeTouches.values()).map((entry) => entry.el);
-    statusEl.textContent = "Wer wird's? …";
-
-    const winnerIdx = Math.floor(Math.random() * dots.length);
-    const fullRounds = 3 + Math.floor(Math.random() * 2); // 3-4 volle Runden
-    const totalSteps = fullRounds * dots.length + winnerIdx + 1;
-
-    let step = 0;
-    function tick() {
-      dots.forEach((el) => el.classList.remove("fc-dot--active"));
-      const idx = step % dots.length;
-      dots[idx].classList.add("fc-dot--active");
-      Sound.tick(420 + idx * 30);
-      step += 1;
-
-      if (step < totalSteps) {
-        const progress = step / totalSteps;
-        const delay = STEP_BASE_MS + progress * progress * STEP_MAX_EXTRA_MS;
-        spinTimeoutId = setTimeout(tick, delay);
-      } else {
-        finishSelection(dots, winnerIdx);
-      }
-    }
-    tick();
-  }
-
-  function finishSelection(dots, winnerIdx) {
-    dots.forEach((el, i) => {
-      el.classList.remove("fc-dot--active");
-      el.classList.toggle("fc-dot--winner", i === winnerIdx);
-      el.classList.toggle("fc-dot--loser", i !== winnerIdx);
-    });
     selecting = false;
     selected = true;
-    spinTimeoutId = null;
-    statusEl.textContent = "Diese Person ist dran! 🎉";
+    clearHoldTimer();
+
+    const dots = Array.from(activeTouches.values()).map((entry) => entry.el);
+    const shuffledIdx = dots.map((_, i) => i).sort(() => Math.random() - 0.5);
+
+    if (currentMode === "teams") {
+      const half = Math.ceil(dots.length / 2);
+      const teamA = new Set(shuffledIdx.slice(0, half));
+      dots.forEach((el, i) => {
+        el.classList.remove("fc-dot--charging");
+        el.classList.add(teamA.has(i) ? "fc-dot--team-a" : "fc-dot--team-b");
+      });
+      statusEl.textContent = "Teams sind aufgeteilt! 🔵🟠";
+    } else {
+      const winnerCount = currentMode === "double" ? Math.min(2, dots.length) : 1;
+      const winnerSet = new Set(shuffledIdx.slice(0, winnerCount));
+      dots.forEach((el, i) => {
+        el.classList.remove("fc-dot--charging");
+        el.classList.toggle("fc-dot--winner", winnerSet.has(i));
+        el.classList.toggle("fc-dot--loser", !winnerSet.has(i));
+      });
+      statusEl.textContent = winnerCount > 1 ? "Diese Personen sind dran! 🎉" : "Diese Person ist dran! 🎉";
+    }
+
     Sound.success();
     if (Storage.getSettings().vibrationEnabled && navigator.vibrate) navigator.vibrate([40, 40, 120]);
     actions.hidden = false;
@@ -117,9 +141,9 @@
 
   function reset() {
     clearHoldTimer();
-    clearSpinTimer();
     activeTouches.forEach((entry) => entry.el.remove());
     activeTouches.clear();
+    nextColorIndex = 0;
     selecting = false;
     selected = false;
     actions.hidden = true;
@@ -171,20 +195,46 @@
 
   resetButton.addEventListener("click", reset);
 
+  /* ------------------------------------------------------------------ */
+  /* Einstellungen: Auswahl-Modus                                         */
+  /* ------------------------------------------------------------------ */
+  function syncModeButtons() {
+    modeSegmented.querySelectorAll("[data-mode]").forEach((btn) => {
+      btn.setAttribute("aria-pressed", String(btn.dataset.mode === currentMode));
+    });
+  }
+
+  modeSegmented.addEventListener("click", (event) => {
+    const btn = event.target.closest("[data-mode]");
+    if (!btn) return;
+    currentMode = btn.dataset.mode;
+    syncModeButtons();
+  });
+
+  function closeSettingsModal() {
+    settingsModal.hidden = true;
+  }
+
+  settingsButton.addEventListener("click", () => {
+    settingsModal.hidden = false;
+  });
+  settingsModal.querySelector("[data-fc-settings-close]").addEventListener("click", closeSettingsModal);
+  settingsModal.querySelector("[data-fc-settings-backdrop]").addEventListener("click", closeSettingsModal);
+
   backButton.addEventListener("click", () => {
     PageTransition.navigate("/");
   });
 
-  // Kein Zwischenstand, der beim Verlassen verloren gehen könnte.
+  // Kein Zwischenstand, der beim Verlassen "verloren" gehen könnte.
   window.confirmGameExit = function () {
     return true;
   };
 
+  syncModeButtons();
   updateStatus();
 
   function teardown() {
     clearHoldTimer();
-    clearSpinTimer();
   }
   window.addEventListener("beforeunload", teardown, { signal: Router.signal });
   Router.onTeardown(teardown);

@@ -12,6 +12,13 @@
   gap: 10px;
 }
 
+/* Positionierungs-Anker für .reaktion-subgame-stage--full unten - die
+   Kopfzeile (.game-topbar) liegt außerhalb dieses Abschnitts, ein darin
+   absolut positioniertes Element deckt also nie den Zurück-Button ab. */
+#subgame-view {
+  position: relative;
+}
+
 .reaktion-subgame-stage {
   width: 100%;
   max-width: 480px;
@@ -21,6 +28,21 @@
   background: var(--m3-surface-container);
   border: 1px solid var(--m3-outline-variant);
   border-radius: var(--m3-shape-xl);
+}
+
+/* Modifikator für Untergames, die den kompletten Bildschirm unterhalb der
+   Kopfzeile brauchen statt nur einer eingerahmten Karte (siehe reflex.js).
+   Wird vom jeweiligen Untergame selbst per classList.add()/remove() auf
+   dem Container gesetzt (mount()/teardown()). */
+.reaktion-subgame-stage--full {
+  position: absolute;
+  inset: 0;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
 }
 
 /* Generischer Textbaustein, den jedes Untergame verwenden kann (Bestzeit-
