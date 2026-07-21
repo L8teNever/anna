@@ -1,0 +1,62 @@
+/**
+ * Styles für das Tic-Tac-Toe-Untergame (siehe tictactoe.js).
+ */
+
+.klassiker-scoreline {
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--m3-on-surface-variant);
+  margin: 0 0 4px 0;
+}
+
+.klassiker-status {
+  text-align: center;
+  font-family: var(--m3-font-display);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--m3-on-surface);
+  margin: 0 0 20px 0;
+}
+
+.ttt-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+  aspect-ratio: 1;
+}
+
+.ttt-cell {
+  background: var(--m3-surface-container-high);
+  border: 1px solid var(--m3-outline-variant);
+  border-radius: var(--m3-shape-md);
+  font-family: var(--m3-font-display);
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: var(--m3-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  transition: background-color 0.15s var(--m3-easing-standard);
+}
+
+.ttt-cell:disabled {
+  cursor: default;
+}
+
+.ttt-cell:not(:disabled):hover {
+  background: var(--m3-surface-container-highest);
+}
+
+.ttt-cell--win {
+  background: var(--m3-primary-container);
+  color: var(--m3-on-primary-container);
+  border-color: var(--m3-primary);
+}

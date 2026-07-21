@@ -119,6 +119,8 @@
   --game-indigo-container: rgba(184, 194, 255, 0.16);
   --game-pink: #ffb2c8;
   --game-pink-container: rgba(255, 178, 200, 0.16);
+  --game-amber: #ffd54f;
+  --game-amber-container: rgba(255, 213, 79, 0.16);
 }
 
 :root[data-theme="light"] {
@@ -174,6 +176,8 @@
   --game-indigo-container: #dee0ff;
   --game-pink: #9c3061;
   --game-pink-container: #ffd8e4;
+  --game-amber: #8a5d00;
+  --game-amber-container: #ffdea3;
 }
 
 @media (prefers-color-scheme: light) {

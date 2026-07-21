@@ -1,0 +1,42 @@
+/**
+ * Styles für das 4-Gewinnt-Untergame (siehe connect4.js).
+ */
+
+.c4-board {
+  display: grid;
+  grid-template-columns: repeat(var(--c4-cols, 7), 1fr);
+  gap: 6px;
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  background: var(--m3-primary);
+  padding: 8px;
+  border-radius: var(--m3-shape-lg);
+  box-sizing: border-box;
+}
+
+.c4-cell {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--m3-surface);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: background-color 0.15s var(--m3-easing-standard), transform 0.15s var(--m3-easing-emphasized);
+}
+
+.c4-cell:hover {
+  transform: scale(1.05);
+}
+
+.c4-cell--R {
+  background: #e53935;
+}
+
+.c4-cell--G {
+  background: #fdd835;
+}
+
+.c4-cell--win {
+  box-shadow: 0 0 0 3px #ffffff inset;
+}

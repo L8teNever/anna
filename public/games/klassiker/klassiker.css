@@ -1,0 +1,21 @@
+/**
+ * Styles für den Klassiker-Hub selbst (Kachel-Liste + Bühne für das
+ * jeweils aktive Untergame). Styles der einzelnen Untergames (Tic Tac Toe,
+ * 4 Gewinnt, ...) liegen bewusst in eigenen CSS-Dateien (tictactoe.css,
+ * connect4.css), damit ein neues Untergame diese Datei hier nie anfassen
+ * muss.
+ */
+
+.klassiker-hub-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.klassiker-subgame-stage {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 8px 0 24px;
+  box-sizing: border-box;
+}

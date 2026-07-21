@@ -110,6 +110,29 @@
       <circle cx="15" cy="12" r="1.5" fill="currentColor" stroke="none"/>
       <circle cx="15" cy="18" r="1.5" fill="currentColor" stroke="none"/>
     </symbol>
+    <symbol id="icon-dice" viewBox="0 0 24 24">
+      <rect x="3" y="3" width="18" height="18" rx="3"/>
+      <circle cx="8" cy="8" r="1.3" fill="currentColor" stroke="none"/>
+      <circle cx="16" cy="8" r="1.3" fill="currentColor" stroke="none"/>
+      <circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/>
+      <circle cx="8" cy="16" r="1.3" fill="currentColor" stroke="none"/>
+      <circle cx="16" cy="16" r="1.3" fill="currentColor" stroke="none"/>
+    </symbol>
+    <symbol id="icon-tictactoe" viewBox="0 0 24 24">
+      <line x1="9" y1="3" x2="9" y2="21"/>
+      <line x1="15" y1="3" x2="15" y2="21"/>
+      <line x1="3" y1="9" x2="21" y2="9"/>
+      <line x1="3" y1="15" x2="21" y2="15"/>
+    </symbol>
+    <symbol id="icon-connect4" viewBox="0 0 24 24">
+      <rect x="2" y="4" width="20" height="16" rx="2"/>
+      <circle cx="7" cy="9" r="1.6" fill="currentColor" stroke="none"/>
+      <circle cx="12" cy="9" r="1.6" fill="currentColor" stroke="none"/>
+      <circle cx="17" cy="9" r="1.6" fill="currentColor" stroke="none"/>
+      <circle cx="7" cy="15" r="1.6" fill="currentColor" stroke="none"/>
+      <circle cx="12" cy="15" r="1.6" fill="currentColor" stroke="none"/>
+      <circle cx="17" cy="15" r="1.6" fill="currentColor" stroke="none"/>
+    </symbol>
     <symbol id="icon-drink" viewBox="0 0 24 24">
       <path d="M4 4h16l-8 10z"/>
       <line x1="12" y1="14" x2="12" y2="20"/>
