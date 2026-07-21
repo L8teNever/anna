@@ -20,6 +20,22 @@
 (function (root) {
   const GAMES = [
     {
+      // Bewusst als allererstes Element im Array: Startseite rendert GAMES
+      // 1:1 in Array-Reihenfolge (siehe app.js renderGames(), kein sort())
+      // - so bleibt der Finger-Chooser immer ganz oben, egal was sonst noch
+      // hinzukommt.
+      id: "finger-chooser",
+      name: "Finger-Chooser",
+      tag: "Werkzeug",
+      description: "Alle Finger auf den Bildschirm – die App wählt zufällig eine Person.",
+      detail: "Jede Person legt einen Finger auf den Bildschirm und hält kurz still. Nach ein paar Sekunden wählt die App zufällig eine Person aus – praktisch, um schnell zu entscheiden, wer anfängt oder dran ist.",
+      icon: "touch",
+      color: "cyan",
+      minPlayers: 2,
+      maxPlayers: 10,
+      assets: ["/games/finger-chooser/finger-chooser.js", "/games/finger-chooser/finger-chooser.css"],
+    },
+    {
       id: "naeher",
       name: "Wer ist näher dran?",
       tag: "Schätzen",

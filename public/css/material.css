@@ -121,6 +121,8 @@
   --game-pink-container: rgba(255, 178, 200, 0.16);
   --game-amber: #ffd54f;
   --game-amber-container: rgba(255, 213, 79, 0.16);
+  --game-cyan: #81d4fa;
+  --game-cyan-container: rgba(129, 212, 250, 0.16);
 }
 
 :root[data-theme="light"] {
@@ -178,6 +180,8 @@
   --game-pink-container: #ffd8e4;
   --game-amber: #8a5d00;
   --game-amber-container: #ffdea3;
+  --game-cyan: #01579b;
+  --game-cyan-container: #b3e5fc;
 }
 
 @media (prefers-color-scheme: light) {

@@ -1,0 +1,83 @@
+/**
+ * Styles für den Finger-Chooser. Die Touch-Bühne braucht den kompletten
+ * restlichen Bildschirm (kein Innenabstand, kein Scrollen, keine
+ * Breitenbegrenzung wie sonst bei .game-view) - Finger müssen überall
+ * erkannt werden können, auch ganz am Rand.
+ */
+
+.fc-view {
+  position: relative;
+  padding: 0;
+  margin: 0;
+  max-width: none;
+  overflow: hidden;
+  gap: 0;
+}
+
+.fc-surface {
+  position: absolute;
+  inset: 0;
+  touch-action: none;
+}
+
+.fc-instructions {
+  position: absolute;
+  top: 28px;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  padding: 0 24px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.fc-status {
+  font-family: var(--m3-font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--m3-on-surface);
+  margin: 0;
+}
+
+.fc-actions {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  padding: 16px 20px calc(16px + env(safe-area-inset-bottom, 0px));
+}
+
+.fc-dot {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  margin-left: -32px;
+  margin-top: -32px;
+  border-radius: 50%;
+  background: var(--game-cyan-container);
+  border: 3px solid var(--game-cyan);
+  box-sizing: border-box;
+  transition: background-color 0.2s var(--m3-easing-standard),
+    border-color 0.2s var(--m3-easing-standard),
+    transform 0.2s var(--m3-easing-emphasized),
+    box-shadow 0.2s var(--m3-easing-standard);
+}
+
+.fc-dot--active {
+  background: var(--game-cyan);
+  border-color: var(--game-cyan);
+  transform: scale(1.2);
+}
+
+.fc-dot--winner {
+  background: #2e7d32;
+  border-color: #1b5e20;
+  transform: scale(1.4);
+  box-shadow: 0 0 28px rgba(46, 125, 50, 0.55);
+}
+
+.fc-dot--loser {
+  opacity: 0.25;
+  transform: scale(0.8);
+}

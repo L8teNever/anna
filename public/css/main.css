@@ -621,6 +621,12 @@ body.page-transition-out {
   color: var(--game-amber);
 }
 
+.game-card[data-color="cyan"] .game-card__icon,
+.game-card[data-color="cyan"] .game-card__badge {
+  background: var(--game-cyan-container);
+  color: var(--game-cyan);
+}
+
 .game-card[data-color="red"] .game-card__label { color: var(--game-red); }
 .game-card[data-color="purple"] .game-card__label { color: var(--game-purple); }
 .game-card[data-color="green"] .game-card__label { color: var(--game-green); }
@@ -629,6 +635,7 @@ body.page-transition-out {
 .game-card[data-color="indigo"] .game-card__label { color: var(--game-indigo); }
 .game-card[data-color="pink"] .game-card__label { color: var(--game-pink); }
 .game-card[data-color="amber"] .game-card__label { color: var(--game-amber); }
+.game-card[data-color="cyan"] .game-card__label { color: var(--game-cyan); }
 
 /* ---------- Rechtliches (Impressum & Datenschutz) ---------- */
 .legal-nav {
