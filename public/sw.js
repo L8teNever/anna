@@ -79,7 +79,7 @@
 // String mit hochgezählt werden (parallel zu version.js, das weiterhin die
 // in den Einstellungen angezeigte Versionsnummer liefert), sonst bleibt
 // sw.js byte-identisch und das gesamte Update-System bleibt wirkungslos.
-const APP_VERSION = "3.70.0";
+const APP_VERSION = "3.71.0";
 const CACHE_NAME = `anna-cache-${APP_VERSION}`;
 
 // Versionsunabhängige Marker: NICHT umbenennen und NICHT in CACHE_NAME
@@ -144,6 +144,25 @@ const GAME_ASSETS = (self.GAMES || []).flatMap((game) => [game.href || `/${game.
 
 const PRECACHE_URLS = [...CORE_ASSETS, ...GAME_ASSETS];
 
+// Die Avatar-Bilder (Wer bin ich?/Impostor/Werwolf-Aufdeckkarte) haben
+// KEINE festen Dateinamen - sie werden von image_processor.py aus
+// /assets/reveal_images/ hash-basiert erzeugt und können sich jederzeit
+// ändern (neue Bilder importiert, alte gelöscht). Eine feste Liste hier
+// wäre sofort veraltet. Stattdessen holt precacheAll() sich die aktuelle
+// Liste bei JEDEM Precache-Lauf frisch vom selben Endpoint, den auch die
+// Spiele selbst zur Laufzeit nutzen - so landen die Bilder proaktiv im
+// Cache, statt erst nach dem ersten zufälligen Online-Aufruf eines Spiels.
+async function fetchRevealAvatarUrls() {
+  try {
+    const response = await fetch("/api/reveal-avatars", { cache: "no-store" });
+    if (!response.ok) return [];
+    const list = await response.json();
+    return Array.isArray(list) ? list : [];
+  } catch (err) {
+    return [];
+  }
+}
+
 async function isOfflineEnabled() {
   const cache = await caches.open(FLAG_CACHE);
   const match = await cache.match(FLAG_KEY);
@@ -193,7 +212,8 @@ async function enableOfflineMode() {
   await flagCache.put(FLAG_KEY, new Response("1"));
 
   const cache = await caches.open(CACHE_NAME);
-  await precacheAll(cache, PRECACHE_URLS);
+  const avatarUrls = await fetchRevealAvatarUrls();
+  await precacheAll(cache, [...PRECACHE_URLS, ...avatarUrls]);
 }
 
 self.addEventListener("install", (event) => {
@@ -214,7 +234,8 @@ self.addEventListener("install", (event) => {
       // Reine Browser-Tab-Nutzer bekommen hier NICHTS gecacht.
       if (await isOfflineEnabled()) {
         const cache = await caches.open(CACHE_NAME);
-        await precacheAll(cache, PRECACHE_URLS);
+        const avatarUrls = await fetchRevealAvatarUrls();
+        await precacheAll(cache, [...PRECACHE_URLS, ...avatarUrls]);
       }
 
       if (isFirstAnnaInstall) {
