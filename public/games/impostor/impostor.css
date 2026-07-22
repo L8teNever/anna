@@ -1,33 +1,21 @@
 /**
  * Visuals, die ausschließlich zum Impostor-Spiel gehören. Layout/Grundgerüst
  * (.game-shell, .game-view, .picker-*, .reveal-stage, .reveal-card ...) kommt
- * aus main.css, hier nur der Stepper für die Impostor-Anzahl und die
- * Impostor-spezifische Rot-Einfärbung der (gemeinsamen) Wisch-Karte.
+ * aus main.css, .stepper aus components.css (siehe dort - wird auch vom
+ * Finger-Chooser genutzt), hier nur die Impostor-spezifische
+ * Rot-Einfärbung der (gemeinsamen) Wisch-Karte und die Startspieler-Anzeige.
  */
 
-/* ---------- Stepper (Impostor-Anzahl) ---------- */
-.stepper {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: var(--m3-surface-container-high);
-  border-radius: var(--m3-shape-full);
-  padding: 2px;
-}
-
-.stepper__btn {
-  /* 40px statt 36px: näher an der Mindest-Tippfläche (Apple 44pt/Google
-     48dp), damit der Button auf dem Handy leicht zu treffen ist. */
-  width: 40px;
-  height: 40px;
-}
-
-.stepper__value {
-  min-width: 28px;
+/* Zeigt, wer die Diskussionsrunde eröffnet (siehe beginRound()/
+   revealNextButton in impostor.js - rein zufällig unter allen Mitspielern
+   gewählt, ohne jede Bevorzugung des Impostors). */
+.impostor-starter {
+  font-family: var(--m3-font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--m3-primary);
   text-align: center;
-  font-weight: 700;
-  font-size: 1rem;
-  color: var(--m3-on-surface);
+  margin: 0;
 }
 
 /* ---------- Impostor-Einfärbung der Wisch-Karte ---------- */

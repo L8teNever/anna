@@ -556,6 +556,32 @@
   margin-bottom: 6px;
 }
 
+/* ---------- Stepper (Anzahl-Regler, z.B. Impostor-Anzahl, Finger-Chooser
+   Gewinner/Team-Anzahl) ---------- */
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--m3-surface-container-high);
+  border-radius: var(--m3-shape-full);
+  padding: 2px;
+}
+
+.stepper__btn {
+  /* 40px statt 36px: näher an der Mindest-Tippfläche (Apple 44pt/Google
+     48dp), damit der Button auf dem Handy leicht zu treffen ist. */
+  width: 40px;
+  height: 40px;
+}
+
+.stepper__value {
+  min-width: 28px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--m3-on-surface);
+}
+
 /* ---------- Switch (Einstellungen) ---------- */
 .m3-switch {
   position: relative;

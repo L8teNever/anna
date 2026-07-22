@@ -53,6 +53,7 @@
   const restartButton = document.getElementById("restart-button");
   const exitButton = document.getElementById("exit-button");
   const quickRatingEl = document.getElementById("quick-rating");
+  const starterTextEl = document.getElementById("impostor-starter-text");
 
   const playerPicker = PlayerPicker.create();
   const categoryPicker = CategoryPicker.create("impostor", "/games/impostor/categories.json");
@@ -334,6 +335,13 @@
       showRevealForCurrentPlayer();
     } else {
       ViewNav.transition(revealView, playView);
+      // Rein zufällig unter ALLEN Mitspielern (Impostor eingeschlossen,
+      // keine Bevorzugung in irgendeine Richtung) - so ist weder immer
+      // dieselbe Person noch nach einem erkennbaren Muster dran.
+      if (starterTextEl) {
+        const starter = roundPlayers[Math.floor(Math.random() * roundPlayers.length)];
+        starterTextEl.textContent = `${starter} fängt an! 🎲`;
+      }
       if (quickRatingEl) {
         quickRatingEl.hidden = true;
         GithubFeedback.renderQuickRating(quickRatingEl, {
