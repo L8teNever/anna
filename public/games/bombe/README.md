@@ -38,6 +38,16 @@ Antworten ein Prompt zulässt, desto besser – ein Prompt mit nur 3-4
 möglichen Antworten führt schnell zu Wiederholungen/Stillstand und ist
 langweilig zu spielen.
 
+## Skippen & keine Wiederholungen
+
+- Auf dem „X fängt an!“-Bildschirm steht der Begriff schon, **bevor** die
+  Bombe tickt. Gefällt er nicht, tauscht „Anderer Begriff“ ihn aus.
+- Jeder gezeigte Begriff (auch geskippte) wird im localStorage des Geräts
+  gemerkt (`anna:bombe:history`, nie auf dem Server). Gezogen wird zuerst
+  aus Begriffen der gewählten Kategorien, die noch nicht dran waren – auch
+  nach Verlassen/Neustart des Spiels oder mit neuen Mitspielern. Sind alle
+  durch, kommen die am längsten nicht gespielten zuerst wieder.
+
 ## Aufbau der Datei
 
 `categories.json` ist eine Liste (Array) von Kategorie-Objekten:

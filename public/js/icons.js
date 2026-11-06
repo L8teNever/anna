@@ -112,6 +112,10 @@
       <circle cx="12" cy="12" r="3.5"/>
       <circle cx="12" cy="12" r="9" opacity="0.45"/>
     </symbol>
+    <symbol id="icon-skip" viewBox="0 0 24 24">
+      <path d="M5 5.5v13l9-6.5-9-6.5Z"/>
+      <line x1="18" y1="5" x2="18" y2="19"/>
+    </symbol>
     <symbol id="icon-drag-handle" viewBox="0 0 24 24">
       <circle cx="9" cy="6" r="1.5" fill="currentColor" stroke="none"/>
       <circle cx="9" cy="12" r="1.5" fill="currentColor" stroke="none"/>

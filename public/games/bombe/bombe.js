@@ -59,6 +59,10 @@
   // Start-Reveal ("X fängt an"), liegt kurz über dem restlichen Spielfeld
   const starterReveal     = document.getElementById("starter-reveal");
   const starterRevealName = document.getElementById("starter-reveal-name");
+  const starterRevealPrompt     = document.getElementById("starter-reveal-prompt");
+  const starterRevealPromptText = document.getElementById("starter-reveal-prompt-text");
+  const starterRevealPromptCat  = document.getElementById("starter-reveal-prompt-cat");
+  const starterRevealSkip       = document.getElementById("starter-reveal-skip");
   // Muss >= der längsten CSS-Exit-Animation sein (starter-wave-exit-up läuft
   // 1.8s, siehe bombe.css) - sonst wird das Element per hidden=true schon
   // mitten in der Bewegung abgeschnitten statt sauber auszulaufen.
@@ -121,16 +125,110 @@
   playerConfirmButton.addEventListener("click", () => ViewNav.transition(playerSelectView, setupView));
 
   /* ------------------------------------------------------------------ */
-  /* Zufällige Kategorie für diese Runde ziehen                          */
+  /* Begriff-Verlauf (gegen Wiederholungen)                               */
   /* ------------------------------------------------------------------ */
+  // Jeder gezeigte Begriff (auch geskippte) landet hinten in diesem
+  // Verlauf. Liegt NUR im localStorage dieses Geräts (nie auf dem Server)
+  // und überlebt damit auch Verlassen/Neustarten des Spiels oder neue
+  // Mitspieler - die Begriffe der letzten Runden kommen so erst wieder,
+  // wenn alle anderen aus den gewählten Kategorien schon dran waren.
+  const HISTORY_KEY = "anna:bombe:history";
+  const HISTORY_MAX = 1000;
+
+  function promptKey(catId, word) {
+    return `${catId}::${word || ""}`;
+  }
+
+  function readHistory() {
+    try {
+      const list = JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+      return Array.isArray(list) ? list : [];
+    } catch (err) {
+      return [];
+    }
+  }
+
+  function rememberPrompt(key) {
+    const list = readHistory().filter((k) => k !== key);
+    list.push(key);
+    try {
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(list.slice(-HISTORY_MAX)));
+    } catch (err) {
+      /* Speicher voll oder deaktiviert – Spiel läuft trotzdem weiter. */
+    }
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Begriff für diese Runde ziehen                                       */
+  /* ------------------------------------------------------------------ */
+  // Zuerst zufällig aus den Begriffen der gewählten Kategorien, die noch
+  // nie (bzw. seit dem Verlauf-Limit nicht) dran waren. Sind alle schon
+  // gelaufen, zufällig aus dem ältesten Viertel - so kommt nie direkt
+  // wieder, was gerade erst gespielt wurde.
   function pickCategory() {
     const active = categoryPicker.getSelectedCategories();
     if (!active.length) return null;
-    const cat = active[Math.floor(Math.random() * active.length)];
-    const words = Array.isArray(cat.words) ? cat.words : [];
-    const word = words.length ? words[Math.floor(Math.random() * words.length)] : null;
-    return { ...cat, word };
+
+    const candidates = [];
+    active.forEach((cat) => {
+      const words = Array.isArray(cat.words) && cat.words.length ? cat.words : [null];
+      words.forEach((word) => candidates.push({ cat, word, key: promptKey(cat.id, word) }));
+    });
+
+    const history = readHistory();
+    const lastUsed = new Map(history.map((key, index) => [key, index]));
+    const fresh = candidates.filter((c) => !lastUsed.has(c.key));
+
+    let pool = fresh;
+    if (!pool.length) {
+      const byAge = candidates.slice().sort((a, b) => lastUsed.get(a.key) - lastUsed.get(b.key));
+      pool = byAge.slice(0, Math.max(1, Math.ceil(byAge.length / 4)));
+    }
+
+    const choice = pool[Math.floor(Math.random() * pool.length)];
+    rememberPrompt(choice.key);
+    return { ...choice.cat, word: choice.word };
   }
+
+  function showCategory(cat) {
+    currentRoundCategory = cat;
+    if (!activeCatBadge) return;
+    if (!cat) { activeCatBadge.hidden = true; return; }
+    const promptText = cat.word || cat.label;
+    activeCatText.textContent = `${cat.icon}  ${promptText}`;
+    if (activeCatExample) {
+      activeCatExample.hidden = !cat.word;
+      if (cat.word) activeCatExample.textContent = `Kategorie: ${cat.label}`;
+    }
+    activeCatBadge.hidden = false;
+    // Slide-in Animation neu starten
+    activeCatBadge.classList.remove("active-cat--in");
+    void activeCatBadge.offsetWidth;
+    activeCatBadge.classList.add("active-cat--in");
+  }
+
+  function showRevealPrompt(cat, animate) {
+    if (!cat) { starterRevealPrompt.hidden = true; return; }
+    starterRevealPromptText.textContent = `${cat.icon}  ${cat.word || cat.label}`;
+    starterRevealPromptCat.textContent = cat.word ? `Kategorie: ${cat.label}` : "";
+    starterRevealPromptCat.hidden = !cat.word;
+    starterRevealPrompt.hidden = false;
+    if (animate) {
+      starterRevealPromptText.classList.remove("starter-reveal__prompt-text--swap");
+      void starterRevealPromptText.offsetWidth;
+      starterRevealPromptText.classList.add("starter-reveal__prompt-text--swap");
+    }
+  }
+
+  // Skip vor dem eigentlichen Start: neuen Begriff ziehen, ohne dass der
+  // Tipp aufs Reveal (= Timer-Start) mit ausgelöst wird.
+  starterRevealSkip.addEventListener("click", (event) => {
+    event.stopPropagation();
+    if (!starterRevealDismissHandler) return; // Reveal läuft schon raus
+    const cat = pickCategory();
+    showCategory(cat);
+    showRevealPrompt(cat, true);
+  });
 
   /* ------------------------------------------------------------------ */
   /* Tick-Logik                                                           */
@@ -196,24 +294,11 @@
     bombIconUse.setAttribute("href", "#icon-bomb");
     playStatus.dataset.exploded = "false";
 
-    // Kategorie ziehen und anzeigen
+    // Begriff ziehen und anzeigen (auch schon auf dem Start-Reveal, damit
+    // man ihn dort vor dem Timer-Start noch skippen kann)
     const cat = pickCategory();
-    currentRoundCategory = cat;
-    if (cat && activeCatBadge) {
-      const promptText = cat.word || cat.label;
-      activeCatText.textContent = `${cat.icon}  ${promptText}`;
-      if (activeCatExample) {
-        activeCatExample.hidden = !cat.word;
-        if (cat.word) activeCatExample.textContent = `Kategorie: ${cat.label}`;
-      }
-      activeCatBadge.hidden = false;
-      // Slide-in Animation neu starten
-      activeCatBadge.classList.remove("active-cat--in");
-      void activeCatBadge.offsetWidth;
-      activeCatBadge.classList.add("active-cat--in");
-    } else if (activeCatBadge) {
-      activeCatBadge.hidden = true;
-    }
+    showCategory(cat);
+    showRevealPrompt(cat, false);
 
     Sound.unlock();
     WakeLock.enable();

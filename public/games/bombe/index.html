@@ -20,7 +20,7 @@
   <link rel="stylesheet" href="/css/material.css" />
   <link rel="stylesheet" href="/css/components.css" />
   <link rel="stylesheet" href="/css/main.css" />
-  <link rel="stylesheet" href="/games/bombe/bombe.css?v=3.56.10" />
+  <link rel="stylesheet" href="/games/bombe/bombe.css?v=3.72.0" />
   <!-- Session-globale Scripts, siehe router.js -->
   <script src="/js/icons.js"></script>
   <script src="/js/router.js"></script>
@@ -171,6 +171,16 @@
           <div class="starter-reveal__wave"></div>
           <p class="starter-reveal__hint">Los geht's</p>
           <h2 class="starter-reveal__name" id="starter-reveal-name"></h2>
+          <!-- Begriff schon VOR dem Timer-Start zeigen, damit man ihn per
+               Skip-Button tauschen kann, falls er keinem gefällt. -->
+          <div class="starter-reveal__prompt" id="starter-reveal-prompt" hidden>
+            <p class="starter-reveal__prompt-text" id="starter-reveal-prompt-text"></p>
+            <p class="starter-reveal__prompt-cat" id="starter-reveal-prompt-cat"></p>
+            <button type="button" class="starter-reveal__skip" id="starter-reveal-skip">
+              <svg class="m3-icon"><use href="#icon-skip"></use></svg>
+              <span>Anderer Begriff</span>
+            </button>
+          </div>
           <div class="starter-reveal__tap-hint">
             <svg class="m3-icon"><use href="#icon-touch"></use></svg>
             <span>Tippen zum Start</span>

@@ -291,6 +291,83 @@
   height: 16px;
 }
 
+/* Begriff + Skip-Button auf dem Start-Reveal */
+.starter-reveal__prompt {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin: 14px 24px 6px;
+  padding: 16px 22px 14px;
+  max-width: 440px;
+  border-radius: var(--m3-shape-xl);
+  background: rgba(0, 0, 0, 0.22);
+  text-align: center;
+  opacity: 0;
+  animation: starter-fade-in 0.35s var(--m3-easing-standard) 0.48s forwards;
+}
+
+.starter-reveal__prompt[hidden] {
+  display: none;
+}
+
+.starter-reveal__prompt-text {
+  margin: 0;
+  font-family: var(--m3-font-display);
+  font-size: clamp(1.2rem, 5.5vw, 1.7rem);
+  font-weight: 800;
+  line-height: 1.2;
+  color: #ffffff;
+  word-wrap: break-word;
+}
+
+.starter-reveal__prompt-text.starter-reveal__prompt-text--swap {
+  animation: starter-prompt-swap 0.3s var(--m3-easing-emphasized);
+}
+
+@keyframes starter-prompt-swap {
+  0%   { opacity: 0; transform: translateY(6px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.starter-reveal__prompt-cat {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.starter-reveal__skip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 8px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.starter-reveal__skip:active {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.starter-reveal__skip .m3-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.starter-reveal--out .starter-reveal__prompt {
+  animation: starter-content-exit-up 1.6s var(--m3-easing-standard) forwards;
+}
+
 /* Text wandert beim Weggehen mit der Welle mit (statt nur an Ort und
    Stelle auszublenden) - wirkt wie EIN zusammenhängendes Element, das nach
    oben aus dem Bild rausfliegt und darunter das Spielfeld freigibt. */
